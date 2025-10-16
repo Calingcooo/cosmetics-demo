@@ -129,7 +129,7 @@ export default function Home() {
               ].map((review, index) => (
                 <div key={index} className="bg-card p-6 rounded-lg shadow-sm">
                   <div className="text-primary mb-3">★★★★★</div>
-                  <p className="text-sm mb-4 italic">&quot;{review.text}"</p>
+                  <p className="text-sm mb-4 italic">&quot;{review.text}&quot;</p>
                   <p className="font-semibold text-sm">&ndash; {review.name}</p>
                 </div>
               ))}
