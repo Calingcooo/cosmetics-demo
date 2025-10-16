@@ -18,6 +18,8 @@ const ProductCard = ({
 }: ProductCardProps) => {
   //   const { addToCart } = useCart();
 
+  console.log(id)
+
   return (
     <div className="group rounded-lg border bg-[theme(--card)] text-[theme(--card-foreground)] shadow-sm overflow-hidden border-[theme(--border)]/40 hover:border-[theme(--primary)]/40 transition-all duration-300 hover:shadow-[theme(--card)]">
       <div className="p-0">
