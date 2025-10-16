@@ -1,103 +1,208 @@
-import Image from "next/image";
+import HeroCarousel from "./components/pages/home/HeroCarousel";
+import ProductCard from "./components/ProductCard";
+import Header from "./components/header/Header";
+import Footer from "./components/footer/Footer";
+
+import productLipstick from "../../public/assets/products/product-lipstick.jpg";
+import productSerum from "../../public/assets/products/product-serum.jpg";
+import productPalette from "../../public/assets/products/product-palette.jpg";
+import productCream from "../../public/assets/products/product-cream.jpg";
+
+const featuredProducts = [
+  {
+    id: 1,
+    name: "Velvet Rose Lipstick",
+    price: 28.99,
+    image: productLipstick,
+    category: "Makeup",
+  },
+  {
+    id: 2,
+    name: "Radiance Face Serum",
+    price: 45.99,
+    image: productSerum,
+    category: "Skincare",
+  },
+  {
+    id: 3,
+    name: "Nude Dreams Palette",
+    price: 52.99,
+    image: productPalette,
+    category: "Makeup",
+  },
+  {
+    id: 4,
+    name: "Luxury Moisturizer",
+    price: 38.99,
+    image: productCream,
+    category: "Skincare",
+  },
+];
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen flex flex-col">
+      <Header />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="container mx-auto px-4 py-8">
+          <HeroCarousel />
+        </section>
+
+        {/* Featured Products */}
+        <section className="container mx-auto px-4 py-16">
+          <div className="text-center mb-12 space-y-2">
+            <h2 className="text-3xl md:text-4xl font-bold">
+              Featured Products
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Discover our handpicked selection of luxury cosmetics and skincare
+              essentials
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} {...product} />
+            ))}
+          </div>
+        </section>
+
+        {/* Category Highlights */}
+        <section className="container mx-auto px-4 py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-2">
+              Shop by Category
+            </h2>
+            <p className="text-muted-foreground">Find exactly what you need</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { name: "Skincare", icon: "✨", filter: "Skincare" },
+              { name: "Makeup", icon: "💄", filter: "Makeup" },
+              { name: "Fragrance", icon: "🌸", filter: "Fragrance" },
+              { name: "Tools", icon: "🖌️", filter: "Tools" },
+            ].map((category) => (
+              <a
+                key={category.name}
+                href={`/products?category=${category.filter}`}
+                className="group p-6 rounded-lg hover:shadow-[theme(--card)] transition-all duration-300 text-center"
+                style={{ backgroundImage: "var(--gradient-subtle)" }}
+              >
+                <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">
+                  {category.icon}
+                </div>
+                <h3 className="font-semibold">{category.name}</h3>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        {/* Customer Testimonials */}
+        <section className="bg-[theme(--muted)]/30 py-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-2">
+                What Our Customers Say
+              </h2>
+              <p className="text-[theme(--muted-foreground)]">
+                Real reviews from real people
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {[
+                {
+                  text: "Best lipstick I've ever used! The color stays all day and feels amazing.",
+                  name: "Jane D.",
+                },
+                {
+                  text: "This serum transformed my skin in just 2 weeks. Absolutely love it!",
+                  name: "Sarah M.",
+                },
+                {
+                  text: "Premium quality products at great prices. Will definitely order again!",
+                  name: "Emily R.",
+                },
+              ].map((review, index) => (
+                <div key={index} className="bg-card p-6 rounded-lg shadow-sm">
+                  <div className="text-primary mb-3">★★★★★</div>
+                  <p className="text-sm mb-4 italic">"{review.text}"</p>
+                  <p className="font-semibold text-sm">&ndash; {review.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Newsletter Signup */}
+        <section className="container mx-auto px-4 py-16">
+          <div
+            className="max-w-2xl mx-auto text-center bg-[theme(--gradient-hero)] p-8 rounded-lg"
+            style={{ backgroundImage: "var(--gradient-hero)" }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">
+              Stay in the Glow
+            </h2>
+            <p className="text-[theme(--muted-foreground)] mb-6">
+              Subscribe to get exclusive offers and beauty tips delivered to
+              your inbox
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className=" bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border border-input px-3 py-2 text-base ring-offset-[theme(--background)] file:border-0 file:bg-transparent placeholder:text-[theme(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[theme(--ring)] focus-visible:ring-offset-2 md:text-sm"
+              />
+              <button className="px-6 py-2 bg-[theme(--primary)] text-[theme(--primary-foreground)] rounded-md hover:bg-[theme(--primary)]/90 transition-colors font-medium">
+                Subscribe
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Benefits Section */}
+        <section
+          className="py-16"
+          style={{ backgroundImage: "var(--gradient-hero)" }}
+        >
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+              <div className="space-y-2">
+                <div className="mx-auto w-12 h-12 rounded-full bg-[theme(--primary)]/20 flex items-center justify-center mb-4">
+                  <span className="text-2xl">🌸</span>
+                </div>
+                <h3 className="font-semibold">Natural Ingredients</h3>
+                <p className="text-sm text-[theme(--muted-foreground)]">
+                  Pure, cruelty-free formulations
+                </p>
+              </div>
+              <div className="space-y-2">
+                <div className="mx-auto w-12 h-12 rounded-full bg-[theme(--primary)]/20 flex items-center justify-center mb-4">
+                  <span className="text-2xl">✨</span>
+                </div>
+                <h3 className="font-semibold">Premium Quality</h3>
+                <p className="text-sm text-[theme(--muted-foreground)]">
+                  Luxury products that deliver results
+                </p>
+              </div>
+              <div className="space-y-2">
+                <div className="mx-auto w-12 h-12 rounded-full bg-[theme(--primary)]/20 flex items-center justify-center mb-4">
+                  <span className="text-2xl">💝</span>
+                </div>
+                <h3 className="font-semibold">Free Shipping</h3>
+                <p className="text-sm text-[theme(--muted-foreground)]">
+                  On orders over $50
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+      <Footer />
     </div>
   );
 }
