@@ -17,7 +17,6 @@ const ProductCard = ({
   category,
 }: ProductCardProps) => {
   //   const { addToCart } = useCart();
-
   console.log(id)
 
   return (
