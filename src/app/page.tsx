@@ -1,45 +1,14 @@
+// import { featuredProducts } from "./data/featuredProducts";
+import { allProducts, type Product } from "@/app/data/products";
 import HeroCarousel from "./components/pages/home/HeroCarousel";
 import ProductCard from "./components/ProductCard";
-import Header from "./components/header/Header";
-import Footer from "./components/footer/Footer";
-
-import productLipstick from "../../public/assets/products/product-lipstick.jpg";
-import productSerum from "../../public/assets/products/product-serum.jpg";
-import productPalette from "../../public/assets/products/product-palette.jpg";
-import productCream from "../../public/assets/products/product-cream.jpg";
-
-const featuredProducts = [
-  {
-    id: 1,
-    name: "Velvet Rose Lipstick",
-    price: 28.99,
-    image: productLipstick,
-    category: "Makeup",
-  },
-  {
-    id: 2,
-    name: "Radiance Face Serum",
-    price: 45.99,
-    image: productSerum,
-    category: "Skincare",
-  },
-  {
-    id: 3,
-    name: "Nude Dreams Palette",
-    price: 52.99,
-    image: productPalette,
-    category: "Makeup",
-  },
-  {
-    id: 4,
-    name: "Luxury Moisturizer",
-    price: 38.99,
-    image: productCream,
-    category: "Skincare",
-  },
-];
 
 export default function Home() {
+  function getFeaturedProducts(limit: number = 4): Product[] {
+    // Shuffle the array randomly and slice the first 'limit' products
+    const shuffled = [...allProducts].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, limit);
+  }
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
@@ -61,7 +30,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
-            {featuredProducts.map((product) => (
+            {getFeaturedProducts().map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>

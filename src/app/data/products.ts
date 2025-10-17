@@ -9,7 +9,7 @@ import productBrushes from "../../../public/assets/products/product-brushes.jpg"
 
 export interface ProductVariationOption {
   name: string;
-  color?: string; // optional hex or CSS color value
+  color?: string;
 }
 
 export interface ProductVariation {
@@ -44,17 +44,13 @@ export const allProducts: Product[] = [
           { name: "Deep Rose", color: "#B04E6F" },
           { name: "Coral Rose", color: "#F88379" },
           { name: "Burgundy", color: "#800020" },
-        ]
+        ],
       },
       {
         name: "Finish",
-        options: [
-          { name: "Matte" },
-          { name: "Satin" },
-          { name: "Velvet" }
-        ]
-      }
-    ]
+        options: [{ name: "Matte" }, { name: "Satin" }, { name: "Velvet" }],
+      },
+    ],
   },
   {
     id: 2,
@@ -63,7 +59,7 @@ export const allProducts: Product[] = [
     image: productSerum,
     category: "Skincare",
     description:
-      "Transform your skin with our powerful radiance serum. Packed with vitamin C and hyaluronic acid for a glowing complexion."
+      "Transform your skin with our powerful radiance serum. Packed with vitamin C and hyaluronic acid for a glowing complexion.",
   },
   {
     id: 3,
@@ -79,10 +75,10 @@ export const allProducts: Product[] = [
         options: [
           { name: "Warm Nudes", color: "#C49E85" },
           { name: "Cool Nudes", color: "#B0A8B9" },
-          { name: "Rose Nudes", color: "#D8A7A7" }
-        ]
-      }
-    ]
+          { name: "Rose Nudes", color: "#D8A7A7" },
+        ],
+      },
+    ],
   },
   {
     id: 4,
@@ -91,7 +87,7 @@ export const allProducts: Product[] = [
     image: productCream,
     category: "Skincare",
     description:
-      "Indulge your skin with our rich, luxurious moisturizer. Deeply hydrating formula that leaves skin soft, supple, and radiant."
+      "Indulge your skin with our rich, luxurious moisturizer. Deeply hydrating formula that leaves skin soft, supple, and radiant.",
   },
   {
     id: 5,
@@ -104,13 +100,9 @@ export const allProducts: Product[] = [
     variations: [
       {
         name: "Size",
-        options: [
-          { name: "30ml" },
-          { name: "50ml" },
-          { name: "100ml" }
-        ]
-      }
-    ]
+        options: [{ name: "30ml" }, { name: "50ml" }, { name: "100ml" }],
+      },
+    ],
   },
   {
     id: 6,
@@ -119,7 +111,7 @@ export const allProducts: Product[] = [
     image: productBrushes,
     category: "Tools",
     description:
-      "Complete your makeup collection with this professional 10-piece brush set. Soft synthetic bristles for flawless application every time."
+      "Complete your makeup collection with this professional 10-piece brush set. Soft synthetic bristles for flawless application every time.",
   },
   {
     id: 7,
@@ -128,7 +120,7 @@ export const allProducts: Product[] = [
     image: productLipstick,
     category: "Makeup",
     description:
-      "A beautiful coral shade that complements all skin tones. Creamy formula with a satin finish for natural-looking lips."
+      "A beautiful coral shade that complements all skin tones. Creamy formula with a satin finish for natural-looking lips.",
   },
   {
     id: 8,
@@ -137,6 +129,161 @@ export const allProducts: Product[] = [
     image: productSerum,
     category: "Skincare",
     description:
-      "Overnight renewal serum that works while you sleep. Wake up to refreshed, plump, and hydrated skin every morning."
+      "Overnight renewal serum that works while you sleep. Wake up to refreshed, plump, and hydrated skin every morning.",
+  },
+  {
+    id: 9,
+    name: "Glow Perfecting Primer",
+    price: 34.99,
+    image: productCream,
+    category: "Makeup",
+    description:
+      "Lightweight primer that blurs imperfections and enhances your natural glow. Perfect base for a flawless makeup finish.",
+    variations: [
+      {
+        name: "Finish",
+        options: [{ name: "Dewy" }, { name: "Matte" }, { name: "Luminous" }],
+      },
+    ],
+  },
+  {
+    id: 10,
+    name: "Blossom Essence Perfume",
+    price: 72.99,
+    image: productPerfume,
+    category: "Fragrance",
+    description:
+      "A delicate blend of cherry blossom and vanilla musk. A timeless scent that captures the essence of elegance and freshness.",
+    variations: [
+      {
+        name: "Bottle Color",
+        options: [
+          { name: "Pink Blossom", color: "#FFC0CB" },
+          { name: "Soft Gold", color: "#EAD7A1" },
+          { name: "Crystal Clear", color: "#F8F8F8" },
+        ],
+      },
+    ],
+  },
+  {
+    id: 11,
+    name: "Luxe Foundation",
+    price: 44.99,
+    image: productCream,
+    category: "Makeup",
+    description:
+      "Full coverage foundation that feels weightless on the skin. Long-wearing and buildable for a flawless complexion.",
+    variations: [
+      {
+        name: "Shade",
+        options: [
+          { name: "Ivory", color: "#F8E2C8" },
+          { name: "Beige", color: "#E3B778" },
+          { name: "Honey", color: "#D6A85D" },
+          { name: "Caramel", color: "#B77B48" },
+        ],
+      },
+    ],
+  },
+  {
+    id: 12,
+    name: "Gentle Foaming Cleanser",
+    price: 27.99,
+    image: productSerum,
+    category: "Skincare",
+    description:
+      "A gentle yet effective foaming cleanser that removes dirt, oil, and makeup without stripping skin of its natural moisture.",
+  },
+  {
+    id: 13,
+    name: "Soft Glow Highlighter",
+    price: 33.49,
+    image: productPalette,
+    category: "Makeup",
+    description:
+      "A silky powder highlighter that gives your skin a soft, radiant glow. Blendable formula perfect for any skin tone.",
+    variations: [
+      {
+        name: "Shade",
+        options: [
+          { name: "Champagne", color: "#F7E7CE" },
+          { name: "Rose Gold", color: "#B76E79" },
+          { name: "Pearl", color: "#F8F8FF" },
+        ],
+      },
+    ],
+  },
+  {
+    id: 14,
+    name: "Rejuvenating Eye Cream",
+    price: 39.99,
+    image: productCream,
+    category: "Skincare",
+    description:
+      "Nourishing eye cream that reduces puffiness and fine lines. Brightens the under-eye area for a youthful appearance.",
+  },
+  {
+    id: 15,
+    name: "Matte Finish Setting Spray",
+    price: 29.99,
+    image: productSerum,
+    category: "Makeup",
+    description:
+      "Lock in your makeup with a lightweight, oil-control setting spray. Keeps your look fresh and shine-free all day.",
+  },
+  {
+    id: 16,
+    name: "Ocean Breeze Perfume",
+    price: 69.99,
+    image: productPerfume,
+    category: "Fragrance",
+    description:
+      "Refreshing aquatic fragrance with notes of sea salt, citrus, and driftwood. Perfect for daytime wear.",
+  },
+  {
+    id: 17,
+    name: "Silky Hair Serum",
+    price: 32.99,
+    image: productSerum,
+    category: "Haircare",
+    description:
+      "Lightweight serum that tames frizz and adds shine. Infused with argan oil for smooth, manageable hair.",
+  },
+  {
+    id: 18,
+    name: "Revive Clay Mask",
+    price: 36.49,
+    image: productCream,
+    category: "Skincare",
+    description:
+      "Detoxifying clay mask that draws out impurities and tightens pores. Leaves your skin refreshed and rejuvenated.",
+  },
+  {
+    id: 19,
+    name: "Essential Eye Brush Set",
+    price: 31.99,
+    image: productBrushes,
+    category: "Tools",
+    description:
+      "A 6-piece eye brush set for perfect blending, shading, and lining. Designed for both beginners and professionals.",
+  },
+  {
+    id: 20,
+    name: "Berry Bliss Lipstick",
+    price: 27.99,
+    image: productLipstick,
+    category: "Makeup",
+    description:
+      "Rich berry-toned lipstick that provides intense color in one swipe. Creamy texture that nourishes and hydrates your lips.",
+    variations: [
+      {
+        name: "Shade",
+        options: [
+          { name: "Berry Crush", color: "#8B004B" },
+          { name: "Mauve Plum", color: "#B76BA3" },
+          { name: "Dark Cherry", color: "#660033" },
+        ],
+      },
+    ],
   },
 ];

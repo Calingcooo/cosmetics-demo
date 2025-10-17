@@ -32,7 +32,6 @@ const Products = () => {
           {categories.map((category) => (
             <button
               key={category}
-              //   variant={selectedCategory === category ? "default" : "outline"}
               onClick={() => setSelectedCategory(category)}
               className={clsx(
                 "rounded-full h-10 px-4 py-2 inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-[theme(--background)] transition-colors cursor-pointer",

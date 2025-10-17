@@ -5,6 +5,7 @@ import "./app.css";
 
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
+import CookieConsent from "./components/CookieConsent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
+        <CookieConsent />
       </body>
     </html>
   );

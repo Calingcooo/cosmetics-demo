@@ -18,15 +18,6 @@ const ProductDetail = () => {
 
   const product = allProducts.find((p) => p.id === Number(id));
 
-  const getContrastColor = (hex: string) => {
-    if (!hex.startsWith("#")) return "#fff";
-    const r = parseInt(hex.substring(1, 3), 16);
-    const g = parseInt(hex.substring(3, 5), 16);
-    const b = parseInt(hex.substring(5, 7), 16);
-    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 128 ? "#000" : "#fff";
-  };
-
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-center p-8">
