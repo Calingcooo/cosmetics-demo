@@ -1,5 +1,8 @@
+"use client";
+
 import { LuShoppingCart, LuEye } from "react-icons/lu";
 import Image, { StaticImageData } from "next/image";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
   id: number;
@@ -17,7 +20,7 @@ const ProductCard = ({
   category,
 }: ProductCardProps) => {
   //   const { addToCart } = useCart();
-  console.log(id)
+  const router = useRouter()
 
   return (
     <div className="group rounded-lg border bg-[theme(--card)] text-[theme(--card-foreground)] shadow-sm overflow-hidden border-[theme(--border)]/40 hover:border-[theme(--primary)]/40 transition-all duration-300 hover:shadow-[theme(--card)]">
@@ -40,10 +43,10 @@ const ProductCard = ({
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
             <button
               className="opacity-0 h-9 rounded-md px-3 group-hover:opacity-100 transition-opacity duration-300 bg-[theme(--secondary)] text-[theme(--secondary-foreground)] hover:bg-[theme(--secondary)]/80 inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium cursor-pointer"
-              //   onClick={(e) => {
-              //     e.stopPropagation();
-              //     navigate(`/product/${id}`);
-              //   }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/product/${id}`);
+                }}
             >
               <LuEye className="mr-2 h-4 w-4" />
               View Details

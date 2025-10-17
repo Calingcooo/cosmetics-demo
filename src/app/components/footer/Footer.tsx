@@ -132,7 +132,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-8 pt-8 border-t text-center text-sm text-[theme(--muted-foreground)]">
-          <p>© 2025 Demo Cosmetics. All rights reserved.</p>
+          <p>© 2025 E-commerce demo. All rights reserved.</p>
           <p>
             Developed by{" "}
             <a
