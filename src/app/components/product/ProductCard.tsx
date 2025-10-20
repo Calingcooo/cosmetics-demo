@@ -8,7 +8,7 @@ interface ProductCardProps {
   id: number;
   name: string;
   price: number;
-  image: string | StaticImageData;
+  images: (string | StaticImageData)[];
   category?: string;
 }
 
@@ -16,7 +16,7 @@ const ProductCard = ({
   id,
   name,
   price,
-  image,
+  images,
   category,
 }: ProductCardProps) => {
   //   const { addToCart } = useCart();
@@ -31,7 +31,7 @@ const ProductCard = ({
           //   onClick={() => navigate(`/product/${id}`)}
         >
           <Image
-            src={image}
+            src={images[0]}
             alt={name}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />

@@ -4,7 +4,7 @@ import { useState } from "react";
 import clsx from "clsx";
 import { allProducts } from "../data/products";
 
-import ProductCard from "../components/ProductCard";
+import ProductCard from "../components/product/ProductCard";
 
 const categories = ["All", "Makeup", "Skincare", "Fragrance", "Tools"];
 

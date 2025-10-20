@@ -1,11 +1,13 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import clsx from "clsx";
-import { LuCheck, LuShoppingCart, LuArrowLeft } from "react-icons/lu";
-import Image from "next/image";
 import { useState } from "react";
+import Image from "next/image";
+import clsx from "clsx";
+import { usePathname, useRouter } from "next/navigation";
+import { LuCheck, LuShoppingCart, LuArrowLeft } from "react-icons/lu";
+
 import { allProducts } from "@/app/data/products";
+import ProductPreview from "@/app/components/product/ProductPreview";
 
 const ProductDetail = () => {
   const pathname = usePathname();
@@ -60,12 +62,8 @@ const ProductDetail = () => {
         {/* Product Detail Layout */}
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12 animate-fade-in">
           {/* Product Image */}
-          <div className="relative aspect-square overflow-hidden rounded-lg bg-[theme(--muted)]/30">
-            <Image
-              src={product.image}
-              alt={product.name}
-              className="h-full w-full object-cover"
-            />
+          <div className="">
+            <ProductPreview images={product.images} threshold={4} />
           </div>
 
           {/* Product Info */}
