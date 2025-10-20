@@ -15,7 +15,7 @@ type User = {
 } | null;
 
 type AuthContextType = {
-  authenticated: boolean,
+  authenticated: boolean;
   user: User;
   authError: string | null;
   login: (formData: User) => Promise<LoginResponse>;
@@ -63,10 +63,16 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         variant: "default",
       });
       return { success: true, message: "Login success!" };
-    } catch (error: any) {
-      console.error(error);
-      setAuthError(error?.message);
-      return { success: false, message: error?.message };
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error);
+        setAuthError(error.message);
+        return { success: false, message: error.message };
+      } else {
+        console.error(error);
+        setAuthError("An unknown error occurred");
+        return { success: false, message: "An unknown error occurred" };
+      }
     } finally {
       setAuthError(null);
     }
@@ -78,7 +84,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ authenticated, user, authError, login, logout }}>
+    <AuthContext.Provider
+      value={{ authenticated, user, authError, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

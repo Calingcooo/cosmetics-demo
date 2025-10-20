@@ -13,7 +13,7 @@ export const useCart = () => {
     throw new Error("useCart must be used within a CartProvider");
   }
 
-  const { items, setItems } = context;
+  const { setItems } = context;
 
   // Fetch authenticated user's cart from backend
   useEffect(() => {
