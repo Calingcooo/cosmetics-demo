@@ -37,29 +37,15 @@ const allImages: StaticImageData[] = [
   productBrushes,
 ];
 
-// Shuffle utility
-const shuffleArray = <T,>(array: T[]): T[] => {
-  const newArray = [...array];
-  for (let i = newArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-  }
-  return newArray;
-};
-
-// Get randomized images for each product (like Shopee's gallery)
-const getRandomImages = (): StaticImageData[] => {
-  const shuffled = shuffleArray(allImages);
-  const randomLength = Math.floor(Math.random() * 4) + 3; // 3–6 images per product
-  return shuffled.slice(0, randomLength);
-};
+const getImages = (start: number, count: number): StaticImageData[] =>
+  allImages.slice(start, start + count);
 
 export const allProducts: Product[] = [
   {
     id: 1,
     name: "Velvet Rose Lipstick",
     price: 28.99,
-    images: getRandomImages(),
+    images: getImages(0, 3),
     category: "Makeup",
     description:
       "A luxurious velvet-finish lipstick with rich color payoff that lasts all day. Infused with moisturizing ingredients for comfortable wear.",
@@ -83,7 +69,7 @@ export const allProducts: Product[] = [
     id: 2,
     name: "Radiance Face Serum",
     price: 45.99,
-    images: getRandomImages(),
+    images: getImages(0, 5),
     category: "Skincare",
     description:
       "Transform your skin with our powerful radiance serum. Packed with vitamin C and hyaluronic acid for a glowing complexion.",
@@ -92,7 +78,7 @@ export const allProducts: Product[] = [
     id: 3,
     name: "Nude Dreams Palette",
     price: 52.99,
-    images: getRandomImages(),
+    images: getImages(0, 2),
     category: "Makeup",
     description:
       "The ultimate eyeshadow palette featuring 12 stunning nude shades. From matte to shimmer, create endless looks with this versatile collection.",
@@ -111,7 +97,7 @@ export const allProducts: Product[] = [
     id: 4,
     name: "Luxury Moisturizer",
     price: 38.99,
-    images: getRandomImages(),
+    images: getImages(0, 1),
     category: "Skincare",
     description:
       "Indulge your skin with our rich, luxurious moisturizer. Deeply hydrating formula that leaves skin soft, supple, and radiant.",
@@ -120,7 +106,7 @@ export const allProducts: Product[] = [
     id: 5,
     name: "Rose Gold Perfume",
     price: 65.99,
-    images: getRandomImages(),
+    images: getImages(0, 5),
     category: "Fragrance",
     description:
       "An enchanting floral fragrance with notes of rose, jasmine, and sandalwood. Elegant and long-lasting, perfect for any occasion.",
@@ -135,7 +121,7 @@ export const allProducts: Product[] = [
     id: 6,
     name: "Professional Brush Set",
     price: 42.99,
-    images: getRandomImages(),
+    images: getImages(0, 6),
     category: "Tools",
     description:
       "Complete your makeup collection with this professional 10-piece brush set. Soft synthetic bristles for flawless application every time.",
@@ -144,7 +130,7 @@ export const allProducts: Product[] = [
     id: 7,
     name: "Coral Blush Lipstick",
     price: 26.99,
-    images: getRandomImages(),
+    images: getImages(0, 3),
     category: "Makeup",
     description:
       "A beautiful coral shade that complements all skin tones. Creamy formula with a satin finish for natural-looking lips.",
@@ -153,7 +139,7 @@ export const allProducts: Product[] = [
     id: 8,
     name: "Hydrating Night Serum",
     price: 48.99,
-    images: getRandomImages(),
+    images: getImages(0, 3),
     category: "Skincare",
     description:
       "Overnight renewal serum that works while you sleep. Wake up to refreshed, plump, and hydrated skin every morning.",
@@ -162,7 +148,7 @@ export const allProducts: Product[] = [
     id: 9,
     name: "Glow Perfecting Primer",
     price: 34.99,
-    images: getRandomImages(),
+    images: getImages(0, 3),
     category: "Makeup",
     description:
       "Lightweight primer that blurs imperfections and enhances your natural glow. Perfect base for a flawless makeup finish.",
@@ -177,7 +163,7 @@ export const allProducts: Product[] = [
     id: 10,
     name: "Blossom Essence Perfume",
     price: 72.99,
-    images: getRandomImages(),
+    images: getImages(0, 3),
     category: "Fragrance",
     description:
       "A delicate blend of cherry blossom and vanilla musk. A timeless scent that captures the essence of elegance and freshness.",
@@ -196,7 +182,7 @@ export const allProducts: Product[] = [
     id: 11,
     name: "Luxe Foundation",
     price: 44.99,
-    images: getRandomImages(),
+    images: getImages(0, 3),
     category: "Makeup",
     description:
       "Full coverage foundation that feels weightless on the skin. Long-wearing and buildable for a flawless complexion.",
@@ -216,7 +202,7 @@ export const allProducts: Product[] = [
     id: 12,
     name: "Gentle Foaming Cleanser",
     price: 27.99,
-    images: getRandomImages(),
+    images: getImages(0, 3),
     category: "Skincare",
     description:
       "A gentle yet effective foaming cleanser that removes dirt, oil, and makeup without stripping skin of its natural moisture.",
@@ -225,7 +211,7 @@ export const allProducts: Product[] = [
     id: 13,
     name: "Soft Glow Highlighter",
     price: 33.49,
-    images: getRandomImages(),
+    images: getImages(0, 3),
     category: "Makeup",
     description:
       "A silky powder highlighter that gives your skin a soft, radiant glow. Blendable formula perfect for any skin tone.",
@@ -234,7 +220,7 @@ export const allProducts: Product[] = [
     id: 14,
     name: "Rejuvenating Eye Cream",
     price: 39.99,
-    images: getRandomImages(),
+    images: getImages(0, 3),
     category: "Skincare",
     description:
       "Nourishing eye cream that reduces puffiness and fine lines. Brightens the under-eye area for a youthful appearance.",
@@ -243,7 +229,7 @@ export const allProducts: Product[] = [
     id: 15,
     name: "Matte Finish Setting Spray",
     price: 29.99,
-    images: getRandomImages(),
+    images: getImages(0, 3),
     category: "Makeup",
     description:
       "Lock in your makeup with a lightweight, oil-control setting spray. Keeps your look fresh and shine-free all day.",
@@ -252,7 +238,7 @@ export const allProducts: Product[] = [
     id: 16,
     name: "Ocean Breeze Perfume",
     price: 69.99,
-    images: getRandomImages(),
+    images: getImages(0, 3),
     category: "Fragrance",
     description:
       "Refreshing aquatic fragrance with notes of sea salt, citrus, and driftwood. Perfect for daytime wear.",
@@ -261,7 +247,7 @@ export const allProducts: Product[] = [
     id: 17,
     name: "Silky Hair Serum",
     price: 32.99,
-    images: getRandomImages(),
+    images: getImages(0, 4),
     category: "Haircare",
     description:
       "Lightweight serum that tames frizz and adds shine. Infused with argan oil for smooth, manageable hair.",
@@ -270,7 +256,7 @@ export const allProducts: Product[] = [
     id: 18,
     name: "Revive Clay Mask",
     price: 36.49,
-    images: getRandomImages(),
+    images: getImages(0, 5),
     category: "Skincare",
     description:
       "Detoxifying clay mask that draws out impurities and tightens pores. Leaves your skin refreshed and rejuvenated.",
@@ -279,7 +265,7 @@ export const allProducts: Product[] = [
     id: 19,
     name: "Essential Eye Brush Set",
     price: 31.99,
-    images: getRandomImages(),
+    images: getImages(0, 1),
     category: "Tools",
     description:
       "A 6-piece eye brush set for perfect blending, shading, and lining. Designed for both beginners and professionals.",
@@ -288,7 +274,7 @@ export const allProducts: Product[] = [
     id: 20,
     name: "Berry Bliss Lipstick",
     price: 27.99,
-    images: getRandomImages(),
+    images: getImages(0, 4),
     category: "Makeup",
     description:
       "Rich berry-toned lipstick that provides intense color in one swipe. Creamy texture that nourishes and hydrates your lips.",

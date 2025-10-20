@@ -1,24 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import clsx from "clsx";
 import { usePathname, useRouter } from "next/navigation";
 import { LuCheck, LuShoppingCart, LuArrowLeft } from "react-icons/lu";
 
-import { allProducts } from "@/app/data/products";
+import { allProducts, Product } from "@/app/data/products";
+import { useCart } from "@/app/hooks/useCart";
 import ProductPreview from "@/app/components/product/ProductPreview";
 
 const ProductDetail = () => {
   const pathname = usePathname();
   const router = useRouter();
   const id = pathname.split("/").pop();
+  const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [selectedVariations, setSelectedVariations] = useState<
     Record<string, string>
   >({});
 
   const product = allProducts.find((p) => p.id === Number(id));
+
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.images[0],
+      selectedVariations,
+    });
+  };
 
   if (!product) {
     return (
@@ -34,20 +45,6 @@ const ProductDetail = () => {
     );
   }
 
-  const handleAddToCart = () => {
-    console.log("add to cart...");
-    // for (let i = 0; i < quantity; i++) {
-    //   addToCart({
-    //     ...product,
-    //     selectedVariations: Object.keys(selectedVariations).length > 0 ? selectedVariations : undefined
-    //   });
-    // }
-    // toast({
-    //   title: "Added to cart",
-    //   description: `${quantity} × ${product.name} added to your cart.`,
-    // });
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 container mx-auto px-4 py-8">
@@ -62,7 +59,7 @@ const ProductDetail = () => {
         {/* Product Detail Layout */}
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12 animate-fade-in">
           {/* Product Image */}
-          <div className="">
+          <div>
             <ProductPreview images={product.images} threshold={4} />
           </div>
 
@@ -177,7 +174,7 @@ const ProductDetail = () => {
 
             {/* Add to Cart */}
             <button
-              onClick={handleAddToCart}
+              onClick={() => handleAddToCart(product)}
               className="w-full md:w-auto h-11 rounded-md px-8 bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary)]/90 inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-[theme(--background)] transition-colors cursor-pointer"
             >
               <LuShoppingCart className="mr-2 h-5 w-5" />

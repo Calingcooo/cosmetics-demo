@@ -3,6 +3,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./app.css";
 
+import AuthProvider from "./context/AuthContext";
+import ToastProvider from "./context/ToastContext";
+import CartProvider from "./context/CartContext";
+
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import CookieConsent from "./components/CookieConsent";
@@ -32,10 +36,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Header />
-        {children}
-        <Footer />
-        <CookieConsent />
+        <ToastProvider>
+          <CartProvider>
+            <AuthProvider>
+              <Header />
+              {children}
+              <Footer />
+              <CookieConsent />
+            </AuthProvider>
+          </CartProvider>
+        </ToastProvider>
       </body>
     </html>
   );
