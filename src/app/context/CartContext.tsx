@@ -1,8 +1,9 @@
 "use client";
 
-import React, { createContext, useState, ReactNode } from "react";
+import React, { createContext, useState, ReactNode, useEffect } from "react";
 import { StaticImageData } from "next/image";
 import { useToast } from "../hooks/useToast";
+import { useAuth } from "../hooks/useAuth";
 
 export interface CartItem {
   id: number;
@@ -16,6 +17,7 @@ export interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
+  setItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
   addToCart: (item: Omit<CartItem, "quantity">) => void;
   removeFromCart: (
     id: number,
@@ -37,49 +39,79 @@ export const CartContext = createContext<CartContextType | undefined>(
 
 const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
-  const { addToast } = useToast(); // 👈 Use the Toast context
+  const { authenticated } = useAuth();
+  const { addToast } = useToast();
 
-  const addToCart = (item: Omit<CartItem, "quantity">) => {
-    setItems((prevItems) => {
-      const existingItem = prevItems.find(
-        (i) =>
-          i.id === item.id &&
-          JSON.stringify(i.selectedVariations) ===
-            JSON.stringify(item.selectedVariations)
-      );
+  // Load guest cart from localStorage on mount                              */
+  useEffect(() => {
+    if (!authenticated) {
+      const stored = localStorage.getItem("guest_cart");
+      if (stored) setItems(JSON.parse(stored));
+    }
+  }, [authenticated]);
 
-      if (existingItem) {
-        // return new state only — don’t trigger toast here
-        return prevItems.map((i) =>
-          i.id === item.id &&
-          JSON.stringify(i.selectedVariations) ===
-            JSON.stringify(item.selectedVariations)
-            ? { ...i, quantity: i.quantity + 1 }
-            : i
-        );
+  // Persist guest cart in localStorage                                      */
+  useEffect(() => {
+    if (!authenticated) {
+      localStorage.setItem("guest_cart", JSON.stringify(items));
+    }
+  }, [items, authenticated]);
+
+  const addToCart = async (item: Omit<CartItem, "quantity">) => {
+    if (authenticated) {
+      // ✅ Authenticated user: send to backend
+      try {
+        const res = await fetch("/api/cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...item, quantity: 1 }),
+        });
+
+        if (!res.ok) throw new Error("Failed to add to cart");
+
+        addToast({
+          title: "Added to Cart",
+          description: `${item.name} added to your cart`,
+        });
+      } catch (err) {
+        console.error(err);
+        addToast({
+          title: "Error",
+          description: "Could not add item to your cart. Please try again.",
+          variant: "destructive",
+        });
       }
-
-      // return new state only — no toast yet
-      return [...prevItems, { ...item, quantity: 1 }];
-    });
-
-    // ✅ Now trigger toast *after* state update
-    const exists = items.find(
-      (i) =>
-        i.id === item.id &&
-        JSON.stringify(i.selectedVariations) ===
-          JSON.stringify(item.selectedVariations)
-    );
-
-    if (exists) {
-      addToast({
-        title: "Updated Cart",
-        description: `${item.name} quantity increased`,
-      });
     } else {
-      addToast({
-        title: "Added to Cart",
-        description: `${item.name} added to your cart`,
+      // Guest cart (local state)
+      setItems((prevItems) => {
+        const existingItem = prevItems.find(
+          (i) =>
+            i.id === item.id &&
+            JSON.stringify(i.selectedVariations) ===
+              JSON.stringify(item.selectedVariations)
+        );
+
+        if (existingItem) {
+          addToast({
+            title: "Updated Cart",
+            description: `${item.name} quantity increased`,
+          });
+
+          return prevItems.map((i) =>
+            i.id === item.id &&
+            JSON.stringify(i.selectedVariations) ===
+              JSON.stringify(item.selectedVariations)
+              ? { ...i, quantity: i.quantity + 1 }
+              : i
+          );
+        }
+
+        addToast({
+          title: "Added to Cart",
+          description: `${item.name} added to your cart`,
+        });
+
+        return [...prevItems, { ...item, quantity: 1 }];
       });
     }
   };
@@ -151,6 +183,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     <CartContext.Provider
       value={{
         items,
+        setItems,
         addToCart,
         removeFromCart,
         updateQuantity,

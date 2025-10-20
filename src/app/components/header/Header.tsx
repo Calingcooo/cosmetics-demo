@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { LuSearch, LuShoppingBag, LuUser, LuMenu } from "react-icons/lu";
+import { useCart } from "@/app/hooks/useCart";
 import Link from "next/link";
 import MobileNav from "./MobileNav";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const totalItems = 0;
+  const { items } = useCart();
+  const totalItems = items.length;
 
   const navItems = [
     { name: "home", href: "/" },
@@ -102,7 +104,9 @@ const Header = () => {
       </header>
 
       {/* Mount only when open */}
-      {isOpen && <MobileNav isOpen={isOpen} toggleNav={handleToggle} items={navItems} />}
+      {isOpen && (
+        <MobileNav isOpen={isOpen} toggleNav={handleToggle} items={navItems} />
+      )}
     </>
   );
 };

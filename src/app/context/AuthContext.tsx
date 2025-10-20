@@ -7,12 +7,15 @@ import type { LoginResponse } from "../types";
 import { useToast } from "../hooks/useToast";
 
 type User = {
+  id: string;
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
-  rememberMe: boolean;
 } | null;
 
 type AuthContextType = {
+  authenticated: boolean,
   user: User;
   authError: string | null;
   login: (formData: User) => Promise<LoginResponse>;
@@ -75,7 +78,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, authError, login, logout }}>
+    <AuthContext.Provider value={{ authenticated, user, authError, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
