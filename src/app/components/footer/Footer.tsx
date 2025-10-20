@@ -3,7 +3,7 @@ import { LuInstagram, LuFacebook, LuTwitter } from "react-icons/lu";
 
 const Footer = () => {
   return (
-    <footer className="border-t bg-[theme(--muted)]/30 mt-20">
+    <footer className="border-t bg-[theme(--muted)]/30">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
