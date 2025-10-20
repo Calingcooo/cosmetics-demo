@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import clsx from "clsx";
 import { LuFacebook } from "react-icons/lu";
 import { SiGoogle } from "react-icons/si";
 
@@ -173,23 +174,28 @@ const LoginPage = () => {
             </div>
           </div>
           {/* Form */}
-          <form action="">
+          <form action="" className="gap-4">
             {isSignUp ? <CreateAccountInputs /> : <LoginInputs />}
 
             {/* Forgot Password */}
-            <div className="text-right my-2">
-              <button
-                type="button"
-                className="text-sm text-[theme(--primary)] hover:underline underline-offset-1 cursor-pointer"
-              >
-                Forgot password?
-              </button>
-            </div>
+            {!isSignUp && (
+              <div className="text-right my-2">
+                <button
+                  type="button"
+                  className="text-sm text-[theme(--primary)] hover:underline underline-offset-1 cursor-pointer"
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full h-10 rounded-md bg-[theme(--primary)] text-[theme(--primary-foreground)] font-medium hover:opacity-90 transition cursor-pointer"
+              className={clsx(
+                "w-full h-10 rounded-md bg-[theme(--primary)] text-[theme(--primary-foreground)] font-medium hover:opacity-90 transition cursor-pointer",
+                isSignUp && "mt-4"
+              )}
             >
               {isSignUp ? "Create Account" : "Sign In"}
             </button>

@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { LuSearch, LuShoppingBag, LuUser, LuMenu } from "react-icons/lu";
+import { useCart } from "@/app/hooks/useCart";
 import Link from "next/link";
 import MobileNav from "./MobileNav";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const totalItems = 0;
+  const { items } = useCart();
+  const totalItems = items.length;
 
   const navItems = [
     { name: "home", href: "/" },
@@ -61,7 +63,7 @@ const Header = () => {
             {/* Icons */}
             <div className="flex items-center gap-2">
               <Link href="/cart">
-                <button className="relative inline-flex items-center justify-center h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] rounded-md">
+                <button className="relative inline-flex items-center justify-center h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] rounded-md cursor-pointer">
                   <LuShoppingBag className="h-5 w-5" />
                   {totalItems > 0 && (
                     <span className="absolute -top-1 -right-1 bg-[theme(--primary)] text-[theme(--primary-foreground)] text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -72,14 +74,14 @@ const Header = () => {
               </Link>
 
               <Link href="/login">
-                <button className="inline-flex items-center justify-center h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] rounded-md">
+                <button className="inline-flex items-center justify-center h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] rounded-md cursor-pointer">
                   <LuUser className="h-5 w-5" />
                 </button>
               </Link>
 
               {/* Mobile Menu Button */}
               <button
-                className="md:hidden inline-flex items-center justify-center h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] rounded-md"
+                className="md:hidden inline-flex items-center justify-center h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] rounded-md cursor-pointer"
                 onClick={handleToggle}
               >
                 <LuMenu className="h-5 w-5" />
@@ -102,7 +104,9 @@ const Header = () => {
       </header>
 
       {/* Mount only when open */}
-      {isOpen && <MobileNav isOpen={isOpen} toggleNav={handleToggle} items={navItems} />}
+      {isOpen && (
+        <MobileNav isOpen={isOpen} toggleNav={handleToggle} items={navItems} />
+      )}
     </>
   );
 };
