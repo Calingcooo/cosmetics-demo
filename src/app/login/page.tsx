@@ -46,10 +46,12 @@ const LoginPage = () => {
           : `Welcome back, ${user.first_name || "user"}!`
       );
 
-      router.push("/"); // redirect to home page
-    } catch (err: any) {
-      console.error(err);
-      alert(err.response?.data?.message || "Something went wrong");
+      router.push("/");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error);
+        alert(error.message || "Something went wrong");
+      }
     } finally {
       setLoading(false);
     }

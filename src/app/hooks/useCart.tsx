@@ -25,7 +25,7 @@ export const useCart = () => {
     };
 
     fetchCart();
-  }, [authenticated, user]);
+  }, [authenticated, user, setItems]);
 
   return context;
 };
