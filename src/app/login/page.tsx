@@ -2,11 +2,79 @@
 
 import React, { useState } from "react";
 import clsx from "clsx";
+import { useRouter } from "next/navigation";
 import { LuFacebook } from "react-icons/lu";
 import { SiGoogle } from "react-icons/si";
+import { publicAxios } from "../guard/axios-interceptor";
 
 const LoginPage = () => {
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+  });
+
+  const router = useRouter();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const endpoint = isSignUp ? "/auth/register" : "/auth/login";
+
+      const res = await publicAxios.post(endpoint, formData, {
+        withCredentials: true, // allow cookies (if you use sessions)
+      });
+
+      const { token, user } = res.data;
+      if (token) {
+        // store token in sessionStorage
+        sessionStorage.setItem("token", token);
+      }
+
+      alert(
+        isSignUp
+          ? "Account created successfully!"
+          : `Welcome back, ${user.first_name || "user"}!`
+      );
+
+      router.push("/"); // redirect to home page
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSocialLogin = (social: "google" | "facebook") => {
+    switch (social) {
+      case "google":
+        window.open(
+          `${process.env.NEXT_PUBLIC_BASE_API}/auth/google`,
+          "_blank",
+          "width=500,height=600"
+        );
+        break;
+      case "facebook":
+        window.open(
+          `${process.env.NEXT_PUBLIC_BASE_API}/auth/facebook`,
+          "_blank",
+          "width=500,height=600"
+        );
+      default:
+        console.log("Invalid social login");
+        break;
+    }
+  };
 
   const LoginInputs = () => {
     return (
@@ -23,6 +91,7 @@ const LoginPage = () => {
             id="email"
             name="email"
             type="email"
+            onChange={handleChange}
             placeholder="example@email.com"
             className="bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border border-input px-3 py-2 text-base ring-offset-[theme(--background)] file:border-0 file:bg-transparent placeholder:text-[theme(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[theme(--ring)] focus-visible:ring-offset-2 md:text-sm"
           />
@@ -40,6 +109,7 @@ const LoginPage = () => {
             id="password"
             name="password"
             type="password"
+            onChange={handleChange}
             placeholder="••••••••"
             className="bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border border-input px-3 py-2 text-base ring-offset-[theme(--background)] file:border-0 file:bg-transparent placeholder:text-[theme(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[theme(--ring)] focus-visible:ring-offset-2 md:text-sm"
           />
@@ -149,11 +219,17 @@ const LoginPage = () => {
 
             {/* Social Login */}
             <div className="flex items-center gap-1">
-              <button className="h-10 capitalize px-4 py-2 border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-[theme(--offset-background)] transition-colors cursor-pointer">
+              <button
+                className="h-10 capitalize px-4 py-2 border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-[theme(--offset-background)] transition-colors cursor-pointer"
+                onClick={() => handleSocialLogin("google")}
+              >
                 <SiGoogle className="w-5 h-5" />
                 google
               </button>
-              <button className="h-10 capitalize px-4 py-2 border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-[theme(--offset-background)] transition-colors cursor-pointer">
+              <button
+                className="h-10 capitalize px-4 py-2 border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-[theme(--offset-background)] transition-colors cursor-pointer"
+                onClick={() => handleSocialLogin("facebook")}
+              >
                 <LuFacebook className="w-5 h-5" />
                 facebook
               </button>
@@ -173,8 +249,9 @@ const LoginPage = () => {
               </span>
             </div>
           </div>
+
           {/* Form */}
-          <form action="" className="gap-4">
+          <form onSubmit={handleSubmit} className="gap-4">
             {isSignUp ? <CreateAccountInputs /> : <LoginInputs />}
 
             {/* Forgot Password */}
@@ -192,12 +269,13 @@ const LoginPage = () => {
             {/* Submit Button */}
             <button
               type="submit"
+              disabled={loading}
               className={clsx(
                 "w-full h-10 rounded-md bg-[theme(--primary)] text-[theme(--primary-foreground)] font-medium hover:opacity-90 transition cursor-pointer",
-                isSignUp && "mt-4"
+                loading && "opacity-60"
               )}
             >
-              {isSignUp ? "Create Account" : "Sign In"}
+              {loading ? "Loading..." : isSignUp ? "Create Account" : "Sign In"}
             </button>
           </form>
 
