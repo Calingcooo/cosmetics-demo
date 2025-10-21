@@ -52,13 +52,6 @@
   animation-delay: 0.4s;
 }
 
-.bouncing-loader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
 .bouncing-loader > div {
   width: 16px;
   height: 16px;

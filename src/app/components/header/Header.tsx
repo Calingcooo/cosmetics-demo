@@ -24,8 +24,6 @@ const Header = () => {
   ];
 
   const handleToggle = () => setIsOpen((prev) => !prev);
-
-  console.log({ user, isAuthenticated });
   
   return (
     <>

@@ -1,6 +1,6 @@
 const Bounce = () => {
   return (
-    <div className="bouncing-loader bg-[theme(--muted)]">
+    <div className="w-full bouncing-loader flex flex-row items-center justify-center">
       <div className="bg-[theme(--primary)]"></div>
       <div className="bg-[theme(--primary)]"></div>
       <div className="bg-[theme(--primary)]"></div>

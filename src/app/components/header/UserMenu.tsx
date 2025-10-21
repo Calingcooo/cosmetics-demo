@@ -69,7 +69,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ full_name, email, logout }) => {
           {/* Menu Items */}
           <div className="py-1">
             <Link
-              href={`/my-account/${email}}`}
+              href="/account"
               className="block px-4 py-2 text-sm text-[theme(--card-foreground)] hover:bg-[theme(--muted)] rounded-md transition-colors"
             >
               My Account

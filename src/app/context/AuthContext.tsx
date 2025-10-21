@@ -3,6 +3,7 @@
 import { createContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
+import { jwtDecode } from "jwt-decode";
 
 import type { ReactNode } from "react";
 import type { AuthResponse, FormData } from "../types";
@@ -10,15 +11,24 @@ import type { AuthResponse, FormData } from "../types";
 import { publicAxios } from "../guard/axios-interceptor";
 import { useToast } from "../hooks/useToast";
 
+interface JwtPayload {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  exp: number;
+  iat: number;
+}
+
 type User = {
   id: string;
   first_name: string;
   last_name: string;
   email: string;
-  password: string;
 } | null;
 
 type AuthContextType = {
+  initialized: boolean;
   loading: boolean;
   isAuthenticated: boolean;
   user: User;
@@ -37,6 +47,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 );
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [initialized, setInitialized] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -45,20 +56,23 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const router = useRouter();
 
+  // ✅ On mount: restore token + user
   useEffect(() => {
-    const storedToken =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
-    const storedUser =
-      localStorage.getItem("user") || sessionStorage.getItem("user");
+    try {
+      const storedToken =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
 
-    if (storedToken && storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
+      if (storedToken) {
+        const decoded = jwtDecode<JwtPayload>(storedToken);
+        setUser(decoded);
         setIsAuthenticated(true);
-      } catch {
-        console.error("Failed to parse stored user");
-        localStorage.removeItem("user");
       }
+    } catch (error) {
+      console.error("Failed to restore session", error);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    } finally {
+      setInitialized(true);
     }
   }, []);
 
@@ -82,26 +96,29 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const endpoint = isSignUp ? "/auth/register" : "/auth/login";
 
-      const res = await publicAxios.post(endpoint, formData, {
+      const { data } = await publicAxios.post(endpoint, formData, {
         withCredentials: true,
       });
 
-      const { token, user } = res.data;
+      const token = data.token;
 
-      if (token && user) {
-        // ✅ Save to storage
+      if (data.token) {
+        // ✅ Decode token payload to get user info
+        const decoded = jwtDecode<JwtPayload>(token);
+
+        // ✅ Save to local storage
         localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("user", JSON.stringify(decoded));
 
         // ✅ Update React state
-        setUser(user);
+        setUser(decoded);
         setIsAuthenticated(true);
 
         addToast({
-          title: "Success",
+          title: "Welcome!",
           description: isSignUp
-            ? "Account created successfully!"
-            : `Welcome back, ${user.first_name || "user"}!`,
+            ? "Your account has been created successfully."
+            : `Welcome back, ${decoded.first_name || "User"}!`,
           variant: "default",
         });
 
@@ -185,6 +202,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
+        initialized,
         loading,
         isAuthenticated,
         user,
