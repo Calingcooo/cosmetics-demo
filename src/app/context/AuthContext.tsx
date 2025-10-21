@@ -179,8 +179,8 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("token");
 
     addToast({
-      title: "Success",
-      description: "Successfully logged out!",
+      title: "Session ended",
+      description: "You’ve been logged out of your account.",
       variant: "default",
     });
   };
