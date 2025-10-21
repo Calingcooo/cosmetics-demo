@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import clsx from "clsx";
-import { useRouter } from "next/navigation";
 
 import { useAuth } from "../hooks/useAuth";
 

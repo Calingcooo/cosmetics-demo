@@ -1,3 +1,5 @@
+import clsx from "clsx";
+
 interface InputFieldProps {
   id: string;
   name: string;
@@ -6,6 +8,7 @@ interface InputFieldProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   autoComplete?: string;
+  error?: string | null;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -16,6 +19,7 @@ const InputField: React.FC<InputFieldProps> = ({
   value,
   onChange,
   autoComplete,
+  error,
 }) => {
   return (
     <div className="space-y-1">
@@ -33,7 +37,14 @@ const InputField: React.FC<InputFieldProps> = ({
         onChange={onChange}
         placeholder={placeholder}
         autoComplete={autoComplete}
-        className="bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border border-input px-3 py-2 text-base ring-offset-[theme(--background)] placeholder:text-[theme(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[theme(--ring)] focus-visible:ring-offset-2 md:text-sm"
+        className={clsx(
+          "bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border px-3 py-2 text-base ring-offset-[theme(--background)] placeholder:text-[theme(--muted-foreground)]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:text-sm",
+          {
+            "border-[theme(--destructive)] focus-visible:ring-[theme(--destructive)]":
+              error,
+            "border-input focus-visible:ring-[theme(--ring)]": !error,
+          }
+        )}
       />
     </div>
   );

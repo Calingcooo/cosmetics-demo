@@ -1,11 +1,15 @@
 import React from "react";
 import type { LoginFormData } from "@/app/types";
+
+import { useAuth } from "@/app/hooks/useAuth";
+
 import InputField from "../../ui/input/InputField";
 
 const LoginForm: React.FC<{
   formData: LoginFormData;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }> = ({ formData, handleChange }) => {
+  const {authError} = useAuth()
   return (
     <div className="space-y-4">
       <InputField
@@ -16,6 +20,7 @@ const LoginForm: React.FC<{
         onChange={handleChange}
         autoComplete="email"
         placeholder="example@email.com"
+        error={authError}
       />
       <InputField
         id="password"
@@ -25,7 +30,9 @@ const LoginForm: React.FC<{
         onChange={handleChange}
         autoComplete="current-password"
         placeholder="••••••••"
+        error={authError}
       />
+      {authError && <p role="alert" className="text-xs italic ml-1 text-[theme(--destructive)]">{authError}</p>}
     </div>
   );
 };
