@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useState, useCallback } from "react";
-import ToastViewport from "../components/toast/ToastViewPort";
+import ToastViewport from "../components/ui/toast/ToastViewPort";
 
 // TYPES
 export type ToastVariant = "default" | "destructive";

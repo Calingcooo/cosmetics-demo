@@ -2,14 +2,20 @@
 
 import { useState } from "react";
 import { LuSearch, LuShoppingBag, LuUser, LuMenu } from "react-icons/lu";
-import { useCart } from "@/app/hooks/useCart";
 import Link from "next/link";
+
+import { useCart } from "@/app/hooks/useCart";
+import { useAuth } from "@/app/hooks/useAuth";
+
 import MobileNav from "./MobileNav";
+import UserMenu from "./UserMenu";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { items } = useCart();
   const totalItems = items.length;
+
+  const { user, isAuthenticated, logout } = useAuth();
 
   const navItems = [
     { name: "home", href: "/" },
@@ -18,7 +24,7 @@ const Header = () => {
   ];
 
   const handleToggle = () => setIsOpen((prev) => !prev);
-
+  
   return (
     <>
       {/* HEADER */}
@@ -53,6 +59,7 @@ const Header = () => {
               <div className="relative w-full">
                 <LuSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[theme(--muted-foreground)]" />
                 <input
+                  name="search"
                   type="search"
                   placeholder="Search products..."
                   className="pl-9 bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border border-input px-3 py-2 text-base ring-offset-[theme(--background)] file:border-0 file:bg-transparent placeholder:text-[theme(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[theme(--ring)] focus-visible:ring-offset-2 md:text-sm"
@@ -73,11 +80,19 @@ const Header = () => {
                 </button>
               </Link>
 
-              <Link href="/login">
-                <button className="inline-flex items-center justify-center h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] rounded-md cursor-pointer">
-                  <LuUser className="h-5 w-5" />
-                </button>
-              </Link>
+              {isAuthenticated && user ? (
+                <UserMenu
+                  full_name={`${user.first_name} ${user.last_name}`}
+                  email={user.email}
+                  logout={logout}
+                />
+              ) : (
+                <Link href="/login">
+                  <button className="inline-flex items-center justify-center h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] rounded-md cursor-pointer">
+                    <LuUser className="h-5 w-5" />
+                  </button>
+                </Link>
+              )}
 
               {/* Mobile Menu Button */}
               <button
@@ -94,6 +109,7 @@ const Header = () => {
             <div className="relative">
               <LuSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[theme(--muted-foreground)]" />
               <input
+                name="search"
                 type="search"
                 placeholder="Search products..."
                 className="pl-9 bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border border-input px-3 py-2 text-base ring-offset-[theme(--background)] file:border-0 file:bg-transparent placeholder:text-[theme(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[theme(--ring)] focus-visible:ring-offset-2 md:text-sm"

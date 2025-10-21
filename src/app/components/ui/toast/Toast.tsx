@@ -53,7 +53,7 @@ const Toast: React.FC<{ toast: ToastData; onClose: () => void }> = ({
         variant === "default",
 
       // 💔 Destructive version — elegant red tone
-      "border-[theme(--destructive)] bg-[theme(--destructive)] text-[theme(--destructive-foreground)]":
+      "border-[theme(--destructive)] bg-[theme(--destructive)]/50 text-[theme(--destructive-foreground)]":
         variant === "destructive",
     }
   );

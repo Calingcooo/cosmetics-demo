@@ -39,26 +39,26 @@ export const CartContext = createContext<CartContextType | undefined>(
 
 const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
-  const { authenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { addToast } = useToast();
 
   // Load guest cart from localStorage on mount                              */
   useEffect(() => {
-    if (!authenticated) {
+    if (!isAuthenticated) {
       const stored = localStorage.getItem("guest_cart");
       if (stored) setItems(JSON.parse(stored));
     }
-  }, [authenticated]);
+  }, [isAuthenticated]);
 
   // Persist guest cart in localStorage                                      */
   useEffect(() => {
-    if (!authenticated) {
+    if (!isAuthenticated) {
       localStorage.setItem("guest_cart", JSON.stringify(items));
     }
-  }, [items, authenticated]);
+  }, [items, isAuthenticated]);
 
   const addToCart = async (item: Omit<CartItem, "quantity">) => {
-    if (authenticated) {
+    if (isAuthenticated) {
       // ✅ Authenticated user: send to backend
       try {
         const res = await fetch("/api/cart", {

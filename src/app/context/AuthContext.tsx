@@ -1,24 +1,44 @@
 "use client";
 
 import { createContext, useState, useEffect } from "react";
-import type { ReactNode } from "react";
-import type { LoginResponse } from "../types";
+import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
+import { jwtDecode } from "jwt-decode";
 
+import type { ReactNode } from "react";
+import type { AuthResponse, FormData } from "../types";
+
+import { publicAxios } from "../guard/axios-interceptor";
 import { useToast } from "../hooks/useToast";
+
+interface JwtPayload {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  exp: number;
+  iat: number;
+}
 
 type User = {
   id: string;
   first_name: string;
   last_name: string;
   email: string;
-  password: string;
 } | null;
 
 type AuthContextType = {
-  authenticated: boolean;
+  initialized: boolean;
+  loading: boolean;
+  isAuthenticated: boolean;
   user: User;
   authError: string | null;
-  login: (formData: User) => Promise<LoginResponse>;
+  hanndleSubmit: (
+    formData: FormData,
+    e: React.FormEvent,
+    isSignUp: string
+  ) => Promise<AuthResponse>;
+  handleSocialLogin: (social: "google" | "facebook") => void;
   logout: () => void;
 };
 
@@ -27,65 +47,172 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 );
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [authenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [initialized, setInitialized] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const { addToast } = useToast();
 
-  // Load user from localStorage on mount
+  const router = useRouter();
+
+  // ✅ On mount: restore token + user
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    try {
+      const storedToken =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      if (storedToken) {
+        const decoded = jwtDecode<JwtPayload>(storedToken);
+        console.log({ decoded });
+        
+        setUser(decoded);
+        setIsAuthenticated(true);
+      }
+    } catch (error) {
+      console.error("Failed to restore session", error);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    } finally {
+      setInitialized(true);
     }
   }, []);
 
-  const login = async (formData: User): Promise<LoginResponse> => {
+  const hanndleSubmit = async (
+    formData: FormData,
+    e: React.FormEvent,
+    isSignUp: string,
+    setLoadingCallback?: (value: boolean) => void
+  ): Promise<AuthResponse> => {
+    e.preventDefault();
+    setLoading(true);
+    setLoadingCallback?.(true);
+
     if (formData?.email.trim() === "" || formData?.password.trim() === "") {
-      setAuthError("Email and password is required.");
-      return { success: false, message: "Email and password is required." };
+      setAuthError("Email and password are required.");
+      setLoading(false);
+      setLoadingCallback?.(false);
+      return { success: false, message: "Email and password are required." };
     }
+
     try {
-      localStorage.setItem("user", JSON.stringify(formData));
-      localStorage.setItem("authenticated", JSON.stringify(true));
+      const endpoint = isSignUp ? "/auth/register" : "/auth/login";
 
-      //   if (formData?.rememberMe) {
-      //     localStorage.setItem("email", JSON.stringify(formData?.email));
-      //   } else {
-      //     localStorage.removeItem("email");
-      //   }
-
-      setUser(formData);
-      setIsAuthenticated(true);
-      addToast({
-        title: "Success",
-        description: "Login success!",
-        variant: "default",
+      const { data } = await publicAxios.post(endpoint, formData, {
+        withCredentials: true,
       });
-      return { success: true, message: "Login success!" };
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error(error);
-        setAuthError(error.message);
-        return { success: false, message: error.message };
-      } else {
-        console.error(error);
-        setAuthError("An unknown error occurred");
-        return { success: false, message: "An unknown error occurred" };
+
+      const token = data.token;
+
+      if (data.token) {
+        // ✅ Decode token payload to get user info
+        const decoded = jwtDecode<JwtPayload>(token);
+
+        // ✅ Save to local storage
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(decoded));
+
+        // ✅ Update React state
+        setUser(decoded);
+        setIsAuthenticated(true);
+
+        addToast({
+          title: "Welcome!",
+          description: isSignUp
+            ? "Your account has been created successfully."
+            : `Welcome back, ${decoded.first_name || "User"}!`,
+          variant: "default",
+        });
+
+        // Wait for state to update, THEN redirect
+        setTimeout(() => {
+          router.push("/");
+        }, 50);
       }
+      return { success: true, message: "Login success!" };
+    } catch (err: unknown) {
+      let message = "An unknown error occurred";
+
+      if (err instanceof AxiosError) {
+        // AxiosError type is safe to access response
+        message = err.response?.data?.message || message;
+      } else if (err instanceof Error) {
+        message = err.message;
+      }
+
+      setAuthError(message);
+      return { success: false, message };
     } finally {
-      setAuthError(null);
+      setLoading(false);
+      setLoadingCallback?.(false);
+    }
+  };
+
+  const handleSocialLogin = async (social: "google" | "facebook") => {
+    try {
+      const width = 500;
+      const height = 600;
+      const left = window.screen.width / 2 - width / 2;
+      const top = window.screen.height / 2 - height / 2;
+
+      const url = `${process.env.NEXT_PUBLIC_BASE_API}/auth/${social}`;
+
+      const popup = window.open(
+        url,
+        "_blank",
+        `width=${width},height=${height},top=${top},left=${left}`
+      );
+
+      if (!popup) {
+        console.error("Popup blocked!");
+        return;
+      }
+
+      // Listen for message from popup
+      const handleMessage = (event: MessageEvent) => {
+        // if (event.origin !== window.origin) return;
+
+        const { success, token, user } = event.data;
+        if (success) {
+          sessionStorage.setItem("token", token);
+          setUser(user);
+          setIsAuthenticated(true);
+          router.push("/");
+        }
+      };
+
+      window.addEventListener("message", handleMessage, { once: true });
+    } catch (error) {
+      console.error("Social login error: ", error);
     }
   };
 
   const logout = () => {
+    setIsAuthenticated(false);
     setUser(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
+
+    router.push("/");
+    addToast({
+      title: "Session ended",
+      description: "You've been logged out of your account.",
+      variant: "default",
+    });
   };
 
   return (
     <AuthContext.Provider
-      value={{ authenticated, user, authError, login, logout }}
+      value={{
+        initialized,
+        loading,
+        isAuthenticated,
+        user,
+        authError,
+        hanndleSubmit,
+        handleSocialLogin,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
