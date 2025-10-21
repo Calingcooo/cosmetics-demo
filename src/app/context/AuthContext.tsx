@@ -180,7 +180,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     addToast({
       title: "Session ended",
-      description: "You’ve been logged out of your account.",
+      description: "You've been logged out of your account.",
       variant: "default",
     });
   };
