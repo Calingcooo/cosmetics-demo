@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { LuLogOut } from "react-icons/lu";
 import Link from "next/link";
-import { useAuth } from "@/app/hooks/useAuth";
 
 interface UserMenuProps {
   full_name?: string;
