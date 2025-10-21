@@ -10,13 +10,14 @@ import LoginForm from "../components/pages/login/LoginForm";
 import CreateAccountForm from "../components/pages/login/CreateAccountForm";
 
 const LoginPage = () => {
-  const { loading, handleLogin } = useAuth();
+  const { loading, hanndleSubmit } = useAuth();
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     email: "",
     password: "",
+    confirm_password: ""
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,7 +68,7 @@ const LoginPage = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={(e) => handleLogin(formData, e, isSignUp ? "signup" : "")}  className="gap-4">
+          <form onSubmit={(e) => hanndleSubmit(formData, e, isSignUp ? "signup" : "")}  className="gap-4">
             {isSignUp ? <CreateAccountForm formData={formData} handleChange={handleChange}/> : <LoginForm formData={formData} handleChange={handleChange}/>}
 
             {/* Forgot Password */}

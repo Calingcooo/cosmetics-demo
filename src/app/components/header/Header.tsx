@@ -15,7 +15,7 @@ const Header = () => {
   const { items } = useCart();
   const totalItems = items.length;
 
-  const { user, isAuthenticated, logout } = useAuth();
+  const { initialized, user, isAuthenticated, logout } = useAuth();
 
   const navItems = [
     { name: "home", href: "/" },
@@ -25,6 +25,8 @@ const Header = () => {
 
   const handleToggle = () => setIsOpen((prev) => !prev);
 
+  console.log({ user, isAuthenticated });
+  
   return (
     <>
       {/* HEADER */}
@@ -80,7 +82,7 @@ const Header = () => {
                 </button>
               </Link>
 
-              {isAuthenticated && user ? (
+              {initialized && isAuthenticated && user ? (
                 <UserMenu
                   full_name={`${user.first_name} ${user.last_name}`}
                   email={user.email}

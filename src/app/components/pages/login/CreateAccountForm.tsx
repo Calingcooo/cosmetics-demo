@@ -1,9 +1,9 @@
 import React from "react";
-import type { SignupFormData } from "@/app/types";
+import type { FormData } from "@/app/types";
 import InputField from "../../ui/input/InputField";
 
 const CreateAccountForm: React.FC<{
-  formData: SignupFormData;
+  formData: FormData;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }> = ({ formData, handleChange }) => {
   return (
@@ -36,6 +36,15 @@ const CreateAccountForm: React.FC<{
         name="password"
         type="password"
         value={formData.password}
+        onChange={handleChange}
+        autoComplete="new-password"
+        placeholder="••••••••"
+      />
+      <InputField
+        id="confirm_password"
+        name="confirm_password"
+        type="password"
+        value={formData.confirm_password}
         onChange={handleChange}
         autoComplete="new-password"
         placeholder="••••••••"

@@ -36,13 +36,18 @@ const UserMenu: React.FC<UserMenuProps> = ({ full_name, email, logout }) => {
 
   return (
     <AuthGuard>
-      <div className="relative inline-block text-left" ref={menuRef}>
+      <div className="relative inline-block text-start" ref={menuRef}>
         {/* Avatar Button */}
         <button
           onClick={() => setOpen(!open)}
-          className="relative h-10 w-10 rounded-full bg-card hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          className="relative h-10 w-10 rounded-full bg-[theme(--card)] hover:bg-[theme(--muted)]
+             transition-colors focus:outline-none focus:ring-2 focus:ring-[theme(--ring)]
+             focus:ring-offset-1 flex items-center justify-center cursor-pointer"
         >
-          <div className="h-9 w-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+          <div
+            className="h-9 w-9 rounded-full bg-[theme(--primary)] hover:bg-[theme(--primary)]/90 text-[theme(--primary-foreground)]
+                  flex items-center justify-center font-bold transition-colors"
+          >
             {initials}
           </div>
           {/* Online Dot */}
@@ -51,24 +56,24 @@ const UserMenu: React.FC<UserMenuProps> = ({ full_name, email, logout }) => {
 
         {/* Dropdown */}
         {open && (
-          <div className="absolute right-0 mt-2 w-56 bg-card text-card-foreground rounded-md shadow-shadow-card ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+          <div className="absolute right-0 mt-2 w-56 bg-[theme(--card)] text-[theme(--card-foreground)] rounded-md shadow-[theme(--shadow-card)] ring-1 ring-[theme(--ring)]/40 ring-opacity-5 focus:outline-none z-50">
             {/* User Info */}
-            <div className="px-4 py-3 border-b border-border">
-              <p className="text-sm font-medium leading-none">{full_name}</p>
-              <p className="text-xs text-muted-foreground truncate">{email}</p>
+            <div className="px-4 py-3 border-b border-[theme(--border)]">
+              <p className="text-sm font-medium capitalize leading-none">{full_name}</p>
+              <p className="text-xs text-[theme(--muted-foreground)] truncate">{email}</p>
             </div>
 
             {/* Menu Items */}
             <div className="py-1">
               <Link
                 href="/account"
-                className="block px-4 py-2 text-sm text-card-foreground hover:bg-muted rounded-md transition-colors"
+                className="block px-4 py-2 text-sm text-[theme(--card-foreground)] hover:bg-[theme(--muted)] rounded-md transition-colors"
               >
                 My Account
               </Link>
               <button
                 onClick={logout}
-                className="flex items-center w-full px-4 py-2 text-sm text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                className="flex items-center w-full px-4 py-2 text-sm text-[theme(--destructive)] hover:bg-[theme(--destructive)]/10 rounded-md transition-colors"
               >
                 <LuLogOut className="mr-2 h-4 w-4" />
                 Logout
