@@ -19,7 +19,6 @@ type User = {
 } | null;
 
 type AuthContextType = {
-  initialized: boolean;
   loading: boolean;
   isAuthenticated: boolean;
   user: User;
@@ -38,7 +37,6 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 );
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [initialized, setInitialized] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -62,8 +60,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem("user");
       }
     }
-
-    setInitialized(true);
   }, []);
 
   const hanndleSubmit = async (
@@ -178,6 +174,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
 
+    router.push("/");
     addToast({
       title: "Session ended",
       description: "You've been logged out of your account.",
@@ -188,7 +185,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
-        initialized,
         loading,
         isAuthenticated,
         user,

@@ -1,27 +1,45 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import clsx from "clsx";
 
 import { useAuth } from "../hooks/useAuth";
-
 import Social from "../components/pages/login/Social";
 import LoginForm from "../components/pages/login/LoginForm";
 import CreateAccountForm from "../components/pages/login/CreateAccountForm";
 
 const LoginPage = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const modeParam = searchParams.get("mode") || "login";
+
+  // keep mode synced with URL
+  const [mode, setMode] = useState<"login" | "signup">(
+    modeParam as "login" | "signup"
+  );
+
   const { loading, hanndleSubmit } = useAuth();
-  const [isSignUp, setIsSignUp] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     email: "",
     password: "",
-    confirm_password: ""
+    confirm_password: "",
   });
+
+  // Update mode when URL param changes
+  useEffect(() => {
+    setMode(modeParam as "login" | "signup");
+  }, [modeParam]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const toggleMode = () => {
+    const newMode = mode === "login" ? "signup" : "login";
+    router.replace(`/login?mode=${newMode}`);
   };
 
   return (
@@ -41,10 +59,10 @@ const LoginPage = () => {
           {/* Header */}
           <div>
             <h1 className="text-2xl text-center font-semibold leading-none tracking-tight">
-              {isSignUp ? "Create an account" : "Welcome back"}
+              {mode === "signup" ? "Create an account" : "Welcome back"}
             </h1>
             <h3 className="text-center p-6 pt-2">
-              {isSignUp
+              {mode === "signup"
                 ? "Sign up to start shopping"
                 : "Enter your credentials to access your account"}
             </h3>
@@ -54,12 +72,10 @@ const LoginPage = () => {
           </div>
 
           <div className="relative my-5">
-            {/* Horizontal line */}
+            {/* Divider */}
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-[theme(--border)]" />
             </div>
-
-            {/* Center text */}
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-[theme(--card)] px-2 text-[theme(--muted-foreground)]">
                 Or continue with
@@ -68,11 +84,20 @@ const LoginPage = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={(e) => hanndleSubmit(formData, e, isSignUp ? "signup" : "")}  className="gap-4">
-            {isSignUp ? <CreateAccountForm formData={formData} handleChange={handleChange}/> : <LoginForm formData={formData} handleChange={handleChange}/>}
+          <form
+            onSubmit={(e) =>
+              hanndleSubmit(formData, e, mode === "signup" ? "signup" : "")
+            }
+            className="gap-4"
+          >
+            {mode === "signup" ? (
+              <CreateAccountForm formData={formData} handleChange={handleChange} />
+            ) : (
+              <LoginForm formData={formData} handleChange={handleChange} />
+            )}
 
             {/* Forgot Password */}
-            {!isSignUp && (
+            {mode === "login" && (
               <div className="text-right my-2">
                 <button
                   type="button"
@@ -92,16 +117,21 @@ const LoginPage = () => {
                 loading && "opacity-60"
               )}
             >
-              {loading ? "Loading..." : isSignUp ? "Create Account" : "Sign In"}
+              {loading
+                ? "Loading..."
+                : mode === "signup"
+                ? "Create Account"
+                : "Sign In"}
             </button>
           </form>
 
+          {/* Toggle mode */}
           <div className="text-center text-sm mt-2">
             <button
-              onClick={() => setIsSignUp(!isSignUp)}
+              onClick={toggleMode}
               className="text-[theme(--primary)] hover:underline underline-offset-1 cursor-pointer"
             >
-              {isSignUp
+              {mode === "signup"
                 ? "Already have an account? Sign in"
                 : "Don't have an account? Sign up"}
             </button>
