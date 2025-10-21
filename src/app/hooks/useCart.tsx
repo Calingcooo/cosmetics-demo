@@ -7,7 +7,7 @@ import axios from "axios";
 
 export const useCart = () => {
   const context = useContext(CartContext);
-  const { authenticated, user } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   if (!context) {
     throw new Error("useCart must be used within a CartProvider");
@@ -18,14 +18,14 @@ export const useCart = () => {
   // Fetch authenticated user's cart from backend
   useEffect(() => {
     const fetchCart = async () => {
-      if (authenticated && user) {
+      if (isAuthenticated && user) {
         const { data } = await axios.get(`/api/cart/${user.id}`);
         setItems(data.items);
       }
     };
 
     fetchCart();
-  }, [authenticated, user, setItems]);
+  }, [isAuthenticated, user, setItems]);
 
   return context;
 };
