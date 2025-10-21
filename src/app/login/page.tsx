@@ -3,13 +3,16 @@
 import React, { useState } from "react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
-import { LuFacebook } from "react-icons/lu";
-import { SiGoogle } from "react-icons/si";
-import { publicAxios } from "../guard/axios-interceptor";
+
+import { useAuth } from "../hooks/useAuth";
+
+import Social from "../components/pages/login/Social";
+import LoginForm from "../components/pages/login/LoginForm";
+import CreateAccountForm from "../components/pages/login/CreateAccountForm";
 
 const LoginPage = () => {
+  const { loading, handleLogin } = useAuth();
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -17,181 +20,8 @@ const LoginPage = () => {
     password: "",
   });
 
-  const router = useRouter();
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const endpoint = isSignUp ? "/auth/register" : "/auth/login";
-
-      const res = await publicAxios.post(endpoint, formData, {
-        withCredentials: true, // allow cookies (if you use sessions)
-      });
-
-      const { token, user } = res.data;
-      if (token) {
-        // store token in sessionStorage
-        sessionStorage.setItem("token", token);
-      }
-
-      alert(
-        isSignUp
-          ? "Account created successfully!"
-          : `Welcome back, ${user.first_name || "user"}!`
-      );
-
-      router.push("/");
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error(error);
-        alert(error.message || "Something went wrong");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSocialLogin = (social: "google" | "facebook") => {
-    switch (social) {
-      case "google":
-        window.open(
-          `${process.env.NEXT_PUBLIC_BASE_API}/auth/google`,
-          "_blank",
-          "width=500,height=600"
-        );
-        break;
-      case "facebook":
-        window.open(
-          `${process.env.NEXT_PUBLIC_BASE_API}/auth/facebook`,
-          "_blank",
-          "width=500,height=600"
-        );
-      default:
-        console.log("Invalid social login");
-        break;
-    }
-  };
-
-  const LoginInputs = () => {
-    return (
-      <div className="space-y-4">
-        {/* Email */}
-        <div className="space-y-1">
-          <label
-            htmlFor="email"
-            className="text-sm capitalize font-medium leading-none"
-          >
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            onChange={handleChange}
-            placeholder="example@email.com"
-            className="bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border border-input px-3 py-2 text-base ring-offset-[theme(--background)] file:border-0 file:bg-transparent placeholder:text-[theme(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[theme(--ring)] focus-visible:ring-offset-2 md:text-sm"
-          />
-        </div>
-
-        {/* Password */}
-        <div className="space-y-1">
-          <label
-            htmlFor="password"
-            className="text-sm capitalize font-medium leading-none"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            onChange={handleChange}
-            placeholder="••••••••"
-            className="bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border border-input px-3 py-2 text-base ring-offset-[theme(--background)] file:border-0 file:bg-transparent placeholder:text-[theme(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[theme(--ring)] focus-visible:ring-offset-2 md:text-sm"
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const CreateAccountInputs = () => {
-    return (
-      <div className="space-y-4">
-        {/* First Name */}
-        <div className="space-y-1">
-          <label
-            htmlFor="first_name"
-            className="text-sm capitalize font-medium leading-none"
-          >
-            first name
-          </label>
-          <input
-            id="first_name"
-            name="first_name"
-            type="text"
-            placeholder="John"
-            className="bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border border-input px-3 py-2 text-base ring-offset-[theme(--background)] file:border-0 file:bg-transparent placeholder:text-[theme(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[theme(--ring)] focus-visible:ring-offset-2 md:text-sm"
-          />
-        </div>
-
-        {/* Last Name */}
-        <div className="space-y-1">
-          <label
-            htmlFor="last_name"
-            className="text-sm capitalize font-medium leading-none"
-          >
-            first name
-          </label>
-          <input
-            id="last_name"
-            name="last_name"
-            type="text"
-            placeholder="Doe"
-            className="bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border border-input px-3 py-2 text-base ring-offset-[theme(--background)] file:border-0 file:bg-transparent placeholder:text-[theme(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[theme(--ring)] focus-visible:ring-offset-2 md:text-sm"
-          />
-        </div>
-
-        {/* Email */}
-        <div className="space-y-1">
-          <label
-            htmlFor="email"
-            className="text-sm capitalize font-medium leading-none"
-          >
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="example@email.com"
-            className="bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border border-input px-3 py-2 text-base ring-offset-[theme(--background)] file:border-0 file:bg-transparent placeholder:text-[theme(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[theme(--ring)] focus-visible:ring-offset-2 md:text-sm"
-          />
-        </div>
-
-        {/* Password */}
-        <div className="space-y-1">
-          <label
-            htmlFor="password"
-            className="text-sm capitalize font-medium leading-none"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="••••••••"
-            className="bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border border-input px-3 py-2 text-base ring-offset-[theme(--background)] file:border-0 file:bg-transparent placeholder:text-[theme(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[theme(--ring)] focus-visible:ring-offset-2 md:text-sm"
-          />
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -220,22 +50,7 @@ const LoginPage = () => {
             </h3>
 
             {/* Social Login */}
-            <div className="flex items-center gap-1">
-              <button
-                className="h-10 capitalize px-4 py-2 border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-[theme(--offset-background)] transition-colors cursor-pointer"
-                onClick={() => handleSocialLogin("google")}
-              >
-                <SiGoogle className="w-5 h-5" />
-                google
-              </button>
-              <button
-                className="h-10 capitalize px-4 py-2 border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-[theme(--offset-background)] transition-colors cursor-pointer"
-                onClick={() => handleSocialLogin("facebook")}
-              >
-                <LuFacebook className="w-5 h-5" />
-                facebook
-              </button>
-            </div>
+            <Social />
           </div>
 
           <div className="relative my-5">
@@ -253,8 +68,8 @@ const LoginPage = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="gap-4">
-            {isSignUp ? <CreateAccountInputs /> : <LoginInputs />}
+          <form onSubmit={(e) => handleLogin(formData, e, isSignUp ? "signup" : "")}  className="gap-4">
+            {isSignUp ? <CreateAccountForm formData={formData} handleChange={handleChange}/> : <LoginForm formData={formData} handleChange={handleChange}/>}
 
             {/* Forgot Password */}
             {!isSignUp && (

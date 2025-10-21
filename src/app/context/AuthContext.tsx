@@ -1,9 +1,12 @@
 "use client";
 
-import { createContext, useState, useEffect } from "react";
-import type { ReactNode } from "react";
-import type { LoginResponse } from "../types";
+import { createContext, useState } from "react";
+import { useRouter } from "next/navigation";
 
+import type { ReactNode } from "react";
+import type { LoginResponse, LoginFormData } from "../types";
+
+import { publicAxios } from "../guard/axios-interceptor";
 import { useToast } from "../hooks/useToast";
 
 type User = {
@@ -15,10 +18,16 @@ type User = {
 } | null;
 
 type AuthContextType = {
-  authenticated: boolean;
+  loading: boolean;
+  isAuthenticated: boolean;
   user: User;
   authError: string | null;
-  login: (formData: User) => Promise<LoginResponse>;
+  handleLogin: (
+    formData: LoginFormData,
+    e: React.FormEvent,
+    isSignUp: string
+  ) => Promise<LoginResponse>;
+  handleSocialLogin: (social: "google" | "facebook") => void;
   logout: () => void;
 };
 
@@ -27,41 +36,51 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 );
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [authenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const { addToast } = useToast();
 
-  // Load user from localStorage on mount
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
+  const router = useRouter();
 
-  const login = async (formData: User): Promise<LoginResponse> => {
+  const handleLogin = async (
+    formData: LoginFormData,
+    e: React.FormEvent,
+    isSignUp: string,
+    setLoadingCallback?: (value: boolean) => void
+  ): Promise<LoginResponse> => {
+    e.preventDefault();
+    setLoading(true);
+    setLoadingCallback?.(true);
+
     if (formData?.email.trim() === "" || formData?.password.trim() === "") {
       setAuthError("Email and password is required.");
       return { success: false, message: "Email and password is required." };
     }
     try {
-      localStorage.setItem("user", JSON.stringify(formData));
-      localStorage.setItem("authenticated", JSON.stringify(true));
+      const endpoint = isSignUp ? "/auth/register" : "/auth/login";
 
-      //   if (formData?.rememberMe) {
-      //     localStorage.setItem("email", JSON.stringify(formData?.email));
-      //   } else {
-      //     localStorage.removeItem("email");
-      //   }
+      const res = await publicAxios.post(endpoint, formData, {
+        withCredentials: true, // allow cookies
+      });
 
-      setUser(formData);
-      setIsAuthenticated(true);
+      const { token, user } = res.data;
+      if (token) {
+        // store token in sessionStorage
+        sessionStorage.setItem("token", token);
+      }
+
       addToast({
         title: "Success",
-        description: "Login success!",
+        description: isSignUp
+          ? "Account created successfully!"
+          : `Welcome back, ${user.first_name || "user"}!`,
         variant: "default",
       });
+
+      router.push("/");
+
       return { success: true, message: "Login success!" };
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -75,17 +94,47 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     } finally {
       setAuthError(null);
+      setLoading(false);
+    }
+  };
+
+  const handleSocialLogin = (social: "google" | "facebook") => {
+    switch (social) {
+      case "google":
+        window.open(
+          `${process.env.NEXT_PUBLIC_BASE_API}/auth/google`,
+          "_blank",
+          "width=500,height=600"
+        );
+        break;
+      case "facebook":
+        window.open(
+          `${process.env.NEXT_PUBLIC_BASE_API}/auth/facebook`,
+          "_blank",
+          "width=500,height=600"
+        );
+      default:
+        break;
     }
   };
 
   const logout = () => {
+    setIsAuthenticated(false);
     setUser(null);
     localStorage.removeItem("user");
   };
 
   return (
     <AuthContext.Provider
-      value={{ authenticated, user, authError, login, logout }}
+      value={{
+        loading,
+        isAuthenticated,
+        user,
+        authError,
+        handleLogin,
+        handleSocialLogin,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
