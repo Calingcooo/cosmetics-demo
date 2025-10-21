@@ -71,6 +71,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ full_name, email, logout }) => {
             <Link
               href="/account"
               className="block px-4 py-2 text-sm text-[theme(--card-foreground)] hover:bg-[theme(--muted)] rounded-md transition-colors"
+              onClick={() => setOpen(false)}
             >
               My Account
             </Link>

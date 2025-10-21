@@ -64,6 +64,8 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (storedToken) {
         const decoded = jwtDecode<JwtPayload>(storedToken);
+        console.log({ decoded });
+        
         setUser(decoded);
         setIsAuthenticated(true);
       }

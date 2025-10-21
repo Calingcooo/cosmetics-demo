@@ -1,12 +1,14 @@
-import React from "react";
-import AccountGuard from "../guard/auth-guard";
+import AuthGuard from "../guard/auth-guard";
+import MyAccountPage from "./MyAccountPage";
 
-const MyAccountPage = () => {
+interface AccountLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function AccountLayout({ children }: AccountLayoutProps) {
   return (
-    <AccountGuard>
-      <div>My account</div>
-    </AccountGuard>
+    <AuthGuard>
+      <MyAccountPage />
+    </AuthGuard>
   );
-};
-
-export default MyAccountPage;
+}

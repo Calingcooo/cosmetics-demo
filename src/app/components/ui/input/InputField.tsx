@@ -21,13 +21,20 @@ const InputField: React.FC<InputFieldProps> = ({
   autoComplete,
   error,
 }) => {
+  const formatLabel = (id: string) => {
+    return id
+      .split("_") // split by underscore
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // capitalize
+      .join(" "); // join back with spaces
+  };
+
   return (
     <div className="space-y-1">
       <label
         htmlFor={id}
         className="text-sm capitalize font-medium leading-none"
       >
-        {id.replace("_", " ")}
+        {formatLabel(id)}
       </label>
       <input
         id={id}

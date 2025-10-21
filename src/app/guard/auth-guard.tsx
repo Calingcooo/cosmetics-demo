@@ -10,7 +10,7 @@ interface AuthGuardProps {
 }
 
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const { initialized, isAuthenticated } = useAuth();
+  const { user, initialized, isAuthenticated } = useAuth();
   const [checking, setChecking] = useState(true);
   const router = useRouter();
 
@@ -24,7 +24,8 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     }
   }, [initialized, isAuthenticated, router]);
 
-  if (checking || !initialized) {
+  if (checking || !initialized || !user) {
+    console.log("...")
     return (
       <div className="flex-1 flex justify-center items-center">
         <Bounce />
