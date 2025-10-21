@@ -1,12 +1,12 @@
 import React from "react";
-import type { LoginFormData } from "@/app/types";
+import type { FormData } from "@/app/types";
 
 import { useAuth } from "@/app/hooks/useAuth";
 
 import InputField from "../../ui/input/InputField";
 
 const LoginForm: React.FC<{
-  formData: LoginFormData;
+  formData: FormData;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }> = ({ formData, handleChange }) => {
   const {authError} = useAuth()
