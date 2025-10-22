@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { LuX } from "react-icons/lu";
-import type { ToastData, ToastVariant } from "@/app/context/ToastContext";
+import type { ToastData, ToastVariant } from "@/context/ToastContext";
 
 const ToastTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="text-sm font-semibold text-[theme(--card-foreground)]">

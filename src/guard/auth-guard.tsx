@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../hooks/useAuth";
-import Bounce from "../components/ui/loading/Bounce";
+import { useAuth } from "../app/hooks/useAuth";
+import Bounce from "@/components/ui/loading/Bounce";
 
 interface AuthGuardProps {
   children: React.ReactNode;

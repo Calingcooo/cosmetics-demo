@@ -1,4 +1,4 @@
-import { ToastData } from "@/app/context/ToastContext";
+import { ToastData } from "@/context/ToastContext";
 import Toast from "./Toast";
 
 // VIEWPORT (container for all toasts)

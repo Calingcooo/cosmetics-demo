@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { usePathname, useRouter } from "next/navigation";
 import { LuCheck, LuShoppingCart, LuArrowLeft } from "react-icons/lu";
 
-import { allProducts, Product } from "@/app/data/products";
+import { allProducts, Product } from "@/data/products";
 import { useCart } from "@/app/hooks/useCart";
 import ProductPreview from "@/app/components/product/ProductPreview";
 

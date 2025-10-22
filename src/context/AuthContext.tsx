@@ -6,10 +6,10 @@ import { AxiosError } from "axios";
 import { jwtDecode } from "jwt-decode";
 
 import type { ReactNode } from "react";
-import type { AuthResponse, FormData } from "../types";
+import type { AuthResponse, FormData } from "../app/types";
 
 import { publicAxios } from "../guard/axios-interceptor";
-import { useToast } from "../hooks/useToast";
+import { useToast } from "../app/hooks/useToast";
 
 interface JwtPayload {
   id: string;

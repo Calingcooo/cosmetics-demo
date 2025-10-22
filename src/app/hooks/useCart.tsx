@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useEffect } from "react";
-import { CartContext } from "../context/CartContext";
+import { CartContext } from "../../context/CartContext";
 import { useAuth } from "./useAuth";
 import axios from "axios";
 

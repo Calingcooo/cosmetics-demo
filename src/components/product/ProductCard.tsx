@@ -46,6 +46,7 @@ const ProductCard = ({
           <Image
             src={images[0]}
             alt={name}
+            fill
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           {category && (

@@ -1,7 +1,7 @@
 // import { featuredProducts } from "./data/featuredProducts";
-import { allProducts, type Product } from "@/app/data/products";
-import HeroCarousel from "./components/pages/home/HeroCarousel";
-import ProductCard from "./components/product/ProductCard";
+import { allProducts, type Product } from "@/data/products";
+import HeroCarousel from "@/components/pages/home/HeroCarousel";
+import ProductCard from "@/components/product/ProductCard";
 
 export default function Home() {
   function getFeaturedProducts(limit: number = 4): Product[] {

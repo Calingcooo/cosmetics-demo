@@ -5,8 +5,8 @@ import clsx from "clsx";
 
 import { useAuth } from "../hooks/useAuth";
 
-import AccountGuard from "../guard/auth-guard";
-import InputField from "../components/ui/input/InputField";
+import AccountGuard from "@/guard/auth-guard";
+import InputField from "@/components/ui/input/InputField";
 
 const MyAccountPage = () => {
   const { user } = useAuth();

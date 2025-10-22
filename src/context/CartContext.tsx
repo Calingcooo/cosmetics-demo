@@ -2,8 +2,8 @@
 
 import React, { createContext, useState, ReactNode, useEffect } from "react";
 import { StaticImageData } from "next/image";
-import { useToast } from "../hooks/useToast";
-import { useAuth } from "../hooks/useAuth";
+import { useToast } from "../app/hooks/useToast";
+import { useAuth } from "../app/hooks/useAuth";
 
 export interface CartItem {
   id: number;
