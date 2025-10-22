@@ -7,7 +7,7 @@ import { LuCheck, LuShoppingCart, LuArrowLeft } from "react-icons/lu";
 
 import { allProducts, Product } from "@/data/products";
 import { useCart } from "@/app/hooks/useCart";
-import ProductPreview from "@/app/components/product/ProductPreview";
+import ProductPreview from "@/components/product/ProductPreview";
 
 const ProductDetail = () => {
   const pathname = usePathname();

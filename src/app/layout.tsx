@@ -3,9 +3,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./app.css";
 
-import AuthProvider from "../context/AuthContext";
-import ToastProvider from "../context/ToastContext";
-import CartProvider from "../context/CartContext";
+import AuthProvider from "@/context/AuthContext";
+import ProductProvider from "@/context/ProductContext";
+import ToastProvider from "@/context/ToastContext";
+import CartProvider from "@/context/CartContext";
 
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
@@ -36,16 +37,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <ToastProvider>
-          <AuthProvider>
-            <CartProvider>
-              <Header />
-              <main className="flex-1 flex flex-col">{children}</main>
-              <Footer />
-              <CookieConsent />
-            </CartProvider>
-          </AuthProvider>
-        </ToastProvider>
+        <ProductProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <CartProvider>
+                <Header />
+                <main className="flex-1 flex flex-col">{children}</main>
+                <Footer />
+                <CookieConsent />
+              </CartProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </ProductProvider>
       </body>
     </html>
   );

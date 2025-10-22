@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { allProducts } from "../../data/products";
+
+import { useProduct } from "../hooks/useProduct";
 
 import ProductCard from "@/components/product/ProductCard";
 
@@ -10,11 +12,16 @@ const categories = ["All", "Makeup", "Skincare", "Fragrance", "Tools"];
 
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const { products, handleFetchProducts } = useProduct();
 
   const filteredProducts =
     selectedCategory === "All"
-      ? allProducts
-      : allProducts.filter((product) => product.category === selectedCategory);
+      ? products
+      : products.filter((product) => product.category === selectedCategory);
+  
+  useEffect(() => {
+    handleFetchProducts();
+  }, []);
 
   return (
     <div className="flex-1 container mx-auto px-4 py-8 flex flex-col">
@@ -47,7 +54,7 @@ const Products = () => {
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
         {filteredProducts.map((product) => (
-          <ProductCard key={product.id} {...product} />
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </div>
