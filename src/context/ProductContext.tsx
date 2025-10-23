@@ -13,7 +13,10 @@ interface ProductContextType {
   products: Product[];
   featureProducts: Product[];
   product: Product | null;
-  handleFetchProducts: () => Promise<void>;
+  page: number;
+  hasMore: boolean;
+  isLoading: boolean;
+  handleFetchProducts: (page?: number, category?: string, reset?: boolean) => Promise<void>;
   handleFetchFeaturedProducts: () => Promise<void>;
   handleFetchSingleProduct: (id: string | undefined) => Promise<void>;
 }
@@ -27,15 +30,35 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
   const [product, setProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [featureProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleFetchProducts = useCallback(async () => {
-    try {
-      const productData = await getAllProducts();
-      setProducts(productData.data.products || []);
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
+  const handleFetchProducts = useCallback(
+    async (pageNumber = 1, category = "All", reset = false) => {
+      if (isLoading || !hasMore) return;
+
+      setIsLoading(true);
+      try {
+        const res = await getAllProducts(pageNumber, category);
+        const { products: newProducts, totalPages } = res.data;
+
+        // If category changed (reset = true), replace products
+        setProducts((prev) =>
+          reset ? newProducts : [...prev, ...newProducts]
+        );
+
+        // Check if more pages exist
+        setHasMore(pageNumber < totalPages);
+        setPage(pageNumber);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isLoading, hasMore]
+  );
 
   const handleFetchFeaturedProducts = useCallback(async () => {
     try {
@@ -64,6 +87,9 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
         products,
         featureProducts,
         product,
+        page,
+        hasMore,
+        isLoading,
         handleFetchProducts,
         handleFetchFeaturedProducts,
         handleFetchSingleProduct,

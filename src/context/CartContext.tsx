@@ -23,14 +23,23 @@ interface CartContextType {
   items: CartItem[];
   setItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
   addToCart: (item: Omit<CartItem, "quantity">) => Promise<void>;
-  removeFromCart: (id: number, selectedVariations?: Record<string, string>) => void;
-  updateQuantity: (id: number, quantity: number, selectedVariations?: Record<string, string>) => void;
+  removeFromCart: (
+    id: number,
+    selectedVariations?: Record<string, string>
+  ) => void;
+  updateQuantity: (
+    id: number,
+    quantity: number,
+    selectedVariations?: Record<string, string>
+  ) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
 }
 
-export const CartContext = createContext<CartContextType | undefined>(undefined);
+export const CartContext = createContext<CartContextType | undefined>(
+  undefined
+);
 
 const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -48,7 +57,8 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
           console.error("❌ Failed to fetch cart:", err);
           addToast({
             title: "Error loading cart",
-            description: "Unable to load your cart items. Please try again later.",
+            description:
+              "Unable to load your cart items. Please try again later.",
             variant: "destructive",
           });
         }
@@ -82,11 +92,14 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
         const updatedCart = await getMyCart(user.id);
         setItems(updatedCart.items || []);
       } catch (error) {
-        const err = error as AxiosError;
+        const err = error as AxiosError<{ message?: string }>;
+
+        const message =
+          err.response?.data?.message || "Failed to add item to your cart.";
+
         addToast({
           title: "Error",
-          description:
-            (err.response?.data as any)?.message || "Failed to add item to your cart.",
+          description: message,
           variant: "destructive",
         });
       }
@@ -96,7 +109,8 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
         const existingItem = prevItems.find(
           (i) =>
             i.id === item.id &&
-            JSON.stringify(i.selectedVariations) === JSON.stringify(item.selectedVariations)
+            JSON.stringify(i.selectedVariations) ===
+              JSON.stringify(item.selectedVariations)
         );
 
         if (existingItem) {
@@ -106,7 +120,8 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
           });
           return prevItems.map((i) =>
             i.id === item.id &&
-            JSON.stringify(i.selectedVariations) === JSON.stringify(item.selectedVariations)
+            JSON.stringify(i.selectedVariations) ===
+              JSON.stringify(item.selectedVariations)
               ? { ...i, quantity: i.quantity + 1 }
               : i
           );
@@ -123,13 +138,17 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // ✅ Remove from cart (guest only for now)
-  const removeFromCart = (id: number, selectedVariations?: Record<string, string>) => {
+  const removeFromCart = (
+    id: number,
+    selectedVariations?: Record<string, string>
+  ) => {
     setItems((prevItems) =>
       prevItems.filter(
         (item) =>
           !(
             item.id === id &&
-            JSON.stringify(item.selectedVariations) === JSON.stringify(selectedVariations)
+            JSON.stringify(item.selectedVariations) ===
+              JSON.stringify(selectedVariations)
           )
       )
     );
@@ -141,7 +160,11 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const updateQuantity = (id: number, quantity: number, selectedVariations?: Record<string, string>) => {
+  const updateQuantity = (
+    id: number,
+    quantity: number,
+    selectedVariations?: Record<string, string>
+  ) => {
     if (quantity <= 0) {
       removeFromCart(id, selectedVariations);
       return;
@@ -150,7 +173,8 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     setItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id &&
-        JSON.stringify(item.selectedVariations) === JSON.stringify(selectedVariations)
+        JSON.stringify(item.selectedVariations) ===
+          JSON.stringify(selectedVariations)
           ? { ...item, quantity }
           : item
       )
@@ -172,7 +196,10 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   return (
     <CartContext.Provider

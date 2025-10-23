@@ -1,26 +1,40 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import clsx from "clsx";
 
 import { useProduct } from "../hooks/useProduct";
 
 import ProductCard from "@/components/product/ProductCard";
 
-const categories = ["All", "Makeup", "Skincare", "Fragrance", "Tools"];
+const categories = ["all", "makeup", "skincare", "fragrance", "tools"];
 
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const { products, handleFetchProducts } = useProduct();
+  const { products, handleFetchProducts, page, hasMore, isLoading } =
+    useProduct();
 
-  const filteredProducts =
-    selectedCategory === "All"
-      ? products
-      : products.filter((product) => product.category === selectedCategory);
-  
+  // Infinite scroll handler
+  const handleScroll = useCallback(() => {
+    if (isLoading || !hasMore) return;
+    if (
+      window.innerHeight + window.scrollY >=
+      document.body.offsetHeight - 200
+    ) {
+      handleFetchProducts(page + 1, selectedCategory);
+    }
+  }, [isLoading, hasMore, page, selectedCategory, handleFetchProducts]);
+
+  // Initial load
   useEffect(() => {
-    handleFetchProducts();
-  }, [products, handleFetchProducts]);
+    handleFetchProducts(1, selectedCategory, true);
+  }, [selectedCategory, handleFetchProducts]);
+
+  // Scroll listener
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   return (
     <div className="flex-1 container mx-auto px-4 py-8 flex flex-col">
@@ -39,7 +53,7 @@ const Products = () => {
             key={category}
             onClick={() => setSelectedCategory(category)}
             className={clsx(
-              "rounded-full h-10 px-4 py-2 inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-[theme(--background)] transition-colors cursor-pointer",
+              "rounded-full capitalize h-10 px-4 py-2 inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-[theme(--background)] transition-colors cursor-pointer",
               selectedCategory === category
                 ? "bg-[theme(--primary)] text-[theme(--primary-foreground )]hover:bg-[theme(--primary)]/90"
                 : "border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)]"
@@ -52,9 +66,15 @@ const Products = () => {
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
-        {filteredProducts.map((product) => (
+        {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
+      </div>
+
+      {/* Loading / End indicator */}
+      <div className="text-center mt-6 text-sm text-muted-foreground">
+        {isLoading && <p>Loading more products...</p>}
+        {!hasMore && !isLoading && <p>No more products to load.</p>}
       </div>
     </div>
   );
