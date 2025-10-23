@@ -26,7 +26,7 @@ const Products = () => {
 
   useEffect(() => {
     handleFetchCategories();
-  }, [handleFetchCategories]);
+  }, []);
 
   // Fetch products
   useEffect(() => {
@@ -35,7 +35,7 @@ const Products = () => {
       handleFetchProducts(1, selectedCategory, true);
       isFirstLoad = false;
     }
-  }, [selectedCategory, handleFetchProducts]);
+  }, [selectedCategory]);
 
   // Infinite scroll
   useEffect(() => {
@@ -60,7 +60,7 @@ const Products = () => {
 
     // Cleanup
     return () => observer.disconnect();
-  }, [page, selectedCategory, hasMore, isLoading, handleFetchProducts]);
+  }, [page, selectedCategory, hasMore, isLoading]);
 
   return (
     <div className="flex-1 container mx-auto px-4 py-8 flex flex-col">

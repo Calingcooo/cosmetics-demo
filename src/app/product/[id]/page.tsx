@@ -25,7 +25,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (id) handleFetchSingleProduct(id);
-  }, [id, handleFetchSingleProduct]);
+  }, [id]);
 
   const handleAddToCart = () => {
     if (!product) return;
