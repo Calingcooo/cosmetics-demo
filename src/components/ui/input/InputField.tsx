@@ -9,6 +9,9 @@ interface InputFieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   autoComplete?: string;
   error?: string | null;
+  pattern?: string;
+  inputMode?: "text" | "numeric" | "decimal" | "tel" | "email" | "search" | "url";
+  maxLength?: number;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -20,6 +23,9 @@ const InputField: React.FC<InputFieldProps> = ({
   onChange,
   autoComplete,
   error,
+  pattern,
+  inputMode,
+  maxLength,
 }) => {
   const formatLabel = (id: string) => {
     return id
@@ -44,6 +50,9 @@ const InputField: React.FC<InputFieldProps> = ({
         onChange={onChange}
         placeholder={placeholder}
         autoComplete={autoComplete}
+        pattern={pattern}
+        inputMode={inputMode}
+        maxLength={maxLength}
         className={clsx(
           "bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border px-3 py-2 text-base ring-offset-[theme(--background)] placeholder:text-[theme(--muted-foreground)]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:text-sm",
           {

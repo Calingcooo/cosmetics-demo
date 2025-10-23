@@ -1,0 +1,198 @@
+import React, { useState, useEffect } from "react";
+import PSGC from "@efdiaz/psgc";
+
+import Header from "./Header";
+import InputField from "@/components/ui/input/InputField";
+import SelectField from "@/components/ui/select/SelectField";
+
+interface FormData {
+  house_number: string;
+  street_name: string;
+  region: string;
+  province: string;
+  city: string;
+  barangay: string;
+  zip_code: string;
+  landmark: string;
+}
+
+const ShippingDetailsForm = () => {
+  const [formData, setFormData] = useState<FormData>({
+    house_number: "",
+    street_name: "",
+    region: "",
+    province: "",
+    city: "",
+    barangay: "",
+    zip_code: "",
+    landmark: "",
+  });
+
+  const [regions, setRegions] = useState<any[]>([]);
+  const [provinces, setProvinces] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+  const [barangays, setBarangays] = useState<any[]>([]);
+
+  // Handle form input
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Load regions
+  useEffect(() => {
+    const data = PSGC.getRegions().map((r: any) => ({
+      label: r.regDesc,
+      value: r.regCode,
+    }));
+    setRegions(data);
+  }, []);
+
+  // Update provinces
+  useEffect(() => {
+    if (formData.region) {
+      const data = PSGC.getProvinces(formData.region).map((p: any) => ({
+        label: p.provDesc,
+        value: p.provCode,
+      }));
+      setProvinces(data);
+      setCities([]);
+      setBarangays([]);
+      setFormData((prev) => ({
+        ...prev,
+        province: "",
+        city: "",
+        barangay: "",
+      }));
+    }
+  }, [formData.region]);
+
+  // Update cities
+  useEffect(() => {
+    if (formData.province) {
+      const data = PSGC.getCityMuns(formData.province).map((c: any) => ({
+        label: c.citymunDesc,
+        value: c.citymunCode,
+      }));
+      setCities(data);
+      setBarangays([]);
+      setFormData((prev) => ({ ...prev, city: "", barangay: "" }));
+    }
+  }, [formData.province]);
+
+  // Update barangays
+  useEffect(() => {
+    if (formData.city) {
+      const data = PSGC.getBarangays(formData.city).map((b: any) => ({
+        label: b.brgyDesc,
+        value: b.brgyCode,
+      }));
+      setBarangays(data);
+      setFormData((prev) => ({ ...prev, barangay: "" }));
+    }
+  }, [formData.city]);
+
+  // Submit form
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Submitted shipping details:", formData);
+  };
+
+  return (
+    <div className="space-y-4 bg-[theme(--card)] p-5">
+      <Header
+        title="Shipping Details"
+        subtitle="Manage your shipping address"
+      />
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <InputField
+            id="house_number"
+            name="house_number"
+            value={formData.house_number}
+            onChange={handleChange}
+            placeholder="Blk 12 Lot 5 / Unit 3A"
+          />
+          <InputField
+            id="street_name"
+            name="street_name"
+            value={formData.street_name}
+            onChange={handleChange}
+            placeholder="Mabini Street"
+          />
+        </div>
+
+        {/* --- Region --- */}
+        <SelectField
+          id="region"
+          name="region"
+          value={formData.region}
+          onChange={handleChange}
+          placeholder="Select Region"
+          options={regions}
+        />
+
+        {/* --- Province --- */}
+        <SelectField
+          id="province"
+          name="province"
+          value={formData.province}
+          onChange={handleChange}
+          placeholder="Select Province"
+          options={provinces}
+        />
+
+        {/* --- City --- */}
+        <SelectField
+          id="city"
+          name="city"
+          value={formData.city}
+          onChange={handleChange}
+          placeholder="Select City"
+          options={cities}
+        />
+
+        {/* --- Barangay --- */}
+        <SelectField
+          id="barangay"
+          name="barangay"
+          value={formData.barangay}
+          onChange={handleChange}
+          placeholder="Select Barangay"
+          options={barangays}
+        />
+
+        {/* --- Zip Code & Landmark --- */}
+        <InputField
+          id="zip_code"
+          name="zip_code"
+          value={formData.zip_code}
+          onChange={handleChange}
+          placeholder="1101"
+        />
+
+        <InputField
+          id="landmark"
+          name="landmark"
+          value={formData.landmark}
+          onChange={handleChange}
+          placeholder="(optional)"
+        />
+
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="inline-flex capitalize items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors disabled:pointer-events-none disabled:opacity-50 bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary)]/90 h-10 px-4 py-2 cursor-pointer"
+          >
+            save shipping details
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default ShippingDetailsForm;

@@ -19,7 +19,7 @@ const LoginPage = () => {
     modeParam as "login" | "signup"
   );
 
-  const { loading, hanndleSubmit } = useAuth();
+  const { loading, hanndleSubmit, setAuthError } = useAuth();
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -40,6 +40,14 @@ const LoginPage = () => {
   const toggleMode = () => {
     const newMode = mode === "login" ? "signup" : "login";
     router.replace(`/login?mode=${newMode}`);
+    setAuthError(null)
+    setFormData({
+      first_name: "",
+      last_name: "",
+      email: "",
+      password: "",
+      confirm_password: "",
+    })
   };
 
   return (

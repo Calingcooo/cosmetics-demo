@@ -41,3 +41,12 @@ export type Product = {
     images: ProductImage[];
     variations?: ProductVariation[];
 }
+
+export type User = {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+    dob: Date;
+} | null;

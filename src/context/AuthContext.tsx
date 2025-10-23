@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import { jwtDecode } from "jwt-decode";
 
-import type { ReactNode } from "react";
-import type { AuthResponse, FormData } from "../app/types";
+import type { ReactNode, SetStateAction } from "react";
+import type { AuthResponse, FormData, User } from "../app/types";
 
 import { publicAxios } from "../guard/axios-interceptor";
 import { useToast } from "../app/hooks/useToast";
@@ -16,16 +16,11 @@ interface JwtPayload {
   email: string;
   first_name: string;
   last_name: string;
+  phone: string;
+  dob: Date;
   exp: number;
   iat: number;
 }
-
-type User = {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-} | null;
 
 type AuthContextType = {
   initialized: boolean;
@@ -33,6 +28,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   user: User;
   authError: string | null;
+  setAuthError: React.Dispatch<SetStateAction<string | null>>
   hanndleSubmit: (
     formData: FormData,
     e: React.FormEvent,
@@ -209,6 +205,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated,
         user,
         authError,
+        setAuthError,
         hanndleSubmit,
         handleSocialLogin,
         logout,

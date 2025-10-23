@@ -55,11 +55,12 @@ const Products = () => {
       { threshold: 1.0 }
     );
 
-    observer.observe(sentinelRef.current);
-    observerRef.current = observer;
+    const sentinel = sentinelRef.current;
+    if (sentinel) observer.observe(sentinel);
 
-    // Cleanup
-    return () => observer.disconnect();
+    return () => {
+      if (sentinel) observer.unobserve(sentinel);
+    };
   }, [page, selectedCategory, hasMore, isLoading]);
 
   return (
@@ -124,7 +125,11 @@ const Products = () => {
             ))}
           </div>
         )}
-        {!hasMore && !isLoading && <p>No more products to load.</p>}
+        {!hasMore && !isLoading && (
+          <p className="text-[theme(--muted-foreground)] max-w-2xl mx-auto">
+            - End of result -
+          </p>
+        )}
       </div>
     </div>
   );
