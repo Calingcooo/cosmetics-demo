@@ -5,6 +5,11 @@ import Header from "./Header";
 import InputField from "@/components/ui/input/InputField";
 import SelectField from "@/components/ui/select/SelectField";
 
+type Address = {
+  label: string;
+  value: string;
+};
+
 interface FormData {
   house_number: string;
   street_name: string;
@@ -28,10 +33,10 @@ const ShippingDetailsForm = () => {
     landmark: "",
   });
 
-  const [regions, setRegions] = useState<any[]>([]);
-  const [provinces, setProvinces] = useState<any[]>([]);
-  const [cities, setCities] = useState<any[]>([]);
-  const [barangays, setBarangays] = useState<any[]>([]);
+  const [regions, setRegions] = useState<Address[]>([]);
+  const [provinces, setProvinces] = useState<Address[]>([]);
+  const [cities, setCities] = useState<Address[]>([]);
+  const [barangays, setBarangays] = useState<Address[]>([]);
 
   // Handle form input
   const handleChange = (
@@ -43,20 +48,24 @@ const ShippingDetailsForm = () => {
 
   // Load regions
   useEffect(() => {
-    const data = PSGC.getRegions().map((r: any) => ({
-      label: r.regDesc,
-      value: r.regCode,
-    }));
+    const data = PSGC.getRegions().map(
+      (r: { regDesc: string; regCode: string }) => ({
+        label: r.regDesc,
+        value: r.regCode,
+      })
+    );
     setRegions(data);
   }, []);
 
   // Update provinces
   useEffect(() => {
     if (formData.region) {
-      const data = PSGC.getProvinces(formData.region).map((p: any) => ({
-        label: p.provDesc,
-        value: p.provCode,
-      }));
+      const data = PSGC.getProvinces(formData.region).map(
+        (p: { provDesc: string; provCode: string }) => ({
+          label: p.provDesc,
+          value: p.provCode,
+        })
+      );
       setProvinces(data);
       setCities([]);
       setBarangays([]);
@@ -72,10 +81,12 @@ const ShippingDetailsForm = () => {
   // Update cities
   useEffect(() => {
     if (formData.province) {
-      const data = PSGC.getCityMuns(formData.province).map((c: any) => ({
-        label: c.citymunDesc,
-        value: c.citymunCode,
-      }));
+      const data = PSGC.getCityMuns(formData.province).map(
+        (c: { citymunDesc: string; citymunCode: string }) => ({
+          label: c.citymunDesc,
+          value: c.citymunCode,
+        })
+      );
       setCities(data);
       setBarangays([]);
       setFormData((prev) => ({ ...prev, city: "", barangay: "" }));
@@ -85,10 +96,12 @@ const ShippingDetailsForm = () => {
   // Update barangays
   useEffect(() => {
     if (formData.city) {
-      const data = PSGC.getBarangays(formData.city).map((b: any) => ({
-        label: b.brgyDesc,
-        value: b.brgyCode,
-      }));
+      const data = PSGC.getBarangays(formData.city).map(
+        (b: { brgyDesc: string; brgyCode: string }) => ({
+          label: b.brgyDesc,
+          value: b.brgyCode,
+        })
+      );
       setBarangays(data);
       setFormData((prev) => ({ ...prev, barangay: "" }));
     }
@@ -108,6 +121,7 @@ const ShippingDetailsForm = () => {
       />
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Address line */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <InputField
             id="house_number"
@@ -125,7 +139,7 @@ const ShippingDetailsForm = () => {
           />
         </div>
 
-        {/* --- Region --- */}
+        {/* Region */}
         <SelectField
           id="region"
           name="region"
@@ -135,59 +149,70 @@ const ShippingDetailsForm = () => {
           options={regions}
         />
 
-        {/* --- Province --- */}
+        {/* Province */}
         <SelectField
           id="province"
           name="province"
           value={formData.province}
           onChange={handleChange}
-          placeholder="Select Province"
-          options={provinces}
+          placeholder={
+            formData.region ? "Select Province" : "Choose region first"
+          }
+          options={provinces.length > 0 ? provinces : []}
+          disabled={!formData.region}
         />
 
-        {/* --- City --- */}
+        {/* City / Municipality */}
         <SelectField
-          id="city"
+          id="City / Municipality"
           name="city"
           value={formData.city}
           onChange={handleChange}
-          placeholder="Select City"
-          options={cities}
+          placeholder={
+            formData.province
+              ? "Select City / Municipality"
+              : "Choose province first"
+          }
+          options={cities.length > 0 ? cities : []}
+          disabled={!formData.province}
         />
 
-        {/* --- Barangay --- */}
+        {/* Barangay */}
         <SelectField
           id="barangay"
           name="barangay"
           value={formData.barangay}
           onChange={handleChange}
-          placeholder="Select Barangay"
-          options={barangays}
+          placeholder={formData.city ? "Select Barangay" : "Choose city first"}
+          options={barangays.length > 0 ? barangays : []}
+          disabled={!formData.city}
         />
 
-        {/* --- Zip Code & Landmark --- */}
-        <InputField
-          id="zip_code"
-          name="zip_code"
-          value={formData.zip_code}
-          onChange={handleChange}
-          placeholder="1101"
-        />
+        {/* Postal info */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <InputField
+            id="zip_code"
+            name="zip_code"
+            value={formData.zip_code}
+            onChange={handleChange}
+            placeholder="1101"
+          />
+          <InputField
+            id="landmark"
+            name="landmark"
+            value={formData.landmark}
+            onChange={handleChange}
+            placeholder="(optional)"
+          />
+        </div>
 
-        <InputField
-          id="landmark"
-          name="landmark"
-          value={formData.landmark}
-          onChange={handleChange}
-          placeholder="(optional)"
-        />
-
-        <div className="flex justify-end">
+        {/* Submit */}
+        <div className="flex justify-end mt-4">
           <button
             type="submit"
             className="inline-flex capitalize items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors disabled:pointer-events-none disabled:opacity-50 bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary)]/90 h-10 px-4 py-2 cursor-pointer"
           >
-            save shipping details
+            Save Shipping Details
           </button>
         </div>
       </form>

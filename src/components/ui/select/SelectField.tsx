@@ -8,6 +8,7 @@ interface SelectFieldProps {
   placeholder?: string; // Optional placeholder like "Select Region"
   options: { label: string; value: string }[];
   error?: string | null;
+  disabled?: boolean;
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -18,6 +19,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   placeholder,
   options,
   error,
+  disabled,
 }) => {
   const formatLabel = (id: string) => {
     return id
@@ -39,11 +41,16 @@ const SelectField: React.FC<SelectFieldProps> = ({
         name={name}
         value={value}
         onChange={onChange}
+        disabled={disabled}
         className={clsx(
-          "bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border px-3 py-2 text-base ring-offset-[theme(--background)] placeholder:text-[theme(--muted-foreground)]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:text-sm",
+          "bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border px-3 py-2 text-base ring-offset-[theme(--background)] capitalize placeholder:text-[theme(--muted-foreground)]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:text-sm",
           {
-            "border-[theme(--destructive)] focus-visible:ring-[theme(--destructive)]": error,
+            "border-[theme(--destructive)] focus-visible:ring-[theme(--destructive)]":
+              error,
             "border-input focus-visible:ring-[theme(--ring)]": !error,
+
+            "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200":
+              disabled,
           }
         )}
       >
