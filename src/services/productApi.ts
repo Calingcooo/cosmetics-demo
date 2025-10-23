@@ -13,3 +13,9 @@ export const getFeaturedProducts = async () => {
 
     return res.data;
 }
+
+export const getSingleProduct = async (id: string | undefined) => {
+    const res = await publicAxios.get(`${BASE_URL}/${id}`);
+
+    return res.data;
+}

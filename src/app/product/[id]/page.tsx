@@ -1,27 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import clsx from "clsx";
 import { usePathname, useRouter } from "next/navigation";
 import { LuCheck, LuShoppingCart, LuArrowLeft } from "react-icons/lu";
 
-import { allProducts, Product } from "@/data/products";
+import { Product } from "@/data/products";
 import { useCart } from "@/app/hooks/useCart";
+import { useProduct } from "@/app/hooks/useProduct";
+
 import ProductPreview from "@/components/product/ProductPreview";
 
 const ProductDetail = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const id = pathname.split("/").pop();
+  const id = pathname?.split("/").pop();
+  const { product, handleFetchSingleProduct } = useProduct();
+
   const { addToCart } = useCart();
+
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariations, setSelectedVariations] = useState<
-    Record<string, string>
-  >({});
+  const [selectedVariations, setSelectedVariations] = useState<Record<string, string>>({});
 
-  const product = allProducts.find((p) => p.id === Number(id));
+  useEffect(() => {
+    if (id) handleFetchSingleProduct(id);
+  }, [id, handleFetchSingleProduct]);
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = () => {
+    if (!product) return;
+
     addToCart({
       id: product.id,
       name: product.name,
@@ -37,9 +44,9 @@ const ProductDetail = () => {
         <h1 className="text-3xl font-bold mb-4">Product Not Found</h1>
         <button
           onClick={() => router.push("/products")}
-          className="inline-flex items-center justify-center gap-2 whitespace-nowrap h-10 px-4 py-2 rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary)]/90"
+          className="inline-flex items-center justify-center gap-2 h-10 px-4 py-2 rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary)]/90"
         >
-          ← Back to Products
+          <LuArrowLeft className="mr-2 h-4 w-4" /> Back to Products
         </button>
       </div>
     );
@@ -51,7 +58,7 @@ const ProductDetail = () => {
       <div>
         <button
           onClick={() => router.push("/products")}
-          className="mb-6 h-10 px-4 py-2 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors cursor-pointer"
+          className="mb-6 h-10 px-4 py-2 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors cursor-pointer"
         >
           <LuArrowLeft className="mr-2 h-4 w-4" /> Back to Products
         </button>
@@ -73,7 +80,7 @@ const ProductDetail = () => {
           <h1 className="text-4xl md:text-5xl font-bold">{product.name}</h1>
 
           <p className="text-3xl font-bold text-[theme(--primary)]">
-            ₱{product.price.toFixed(2)}
+            ₱{product.price}
           </p>
 
           <p className="text-[theme(--muted-foreground)] text-lg leading-relaxed">
@@ -109,7 +116,6 @@ const ProductDetail = () => {
                             className="peer sr-only"
                           />
 
-                          {/* 🔹 Label container */}
                           <label
                             htmlFor={`${variation.name}-${option.name}`}
                             className={clsx(
@@ -128,20 +134,16 @@ const ProductDetail = () => {
                                 : undefined
                             }
                           >
-                            {/* 🟢 Color Circle */}
-                            {option.color ? (
+                            {option.color && (
                               <span
                                 className="relative w-8 h-8 rounded-full border-2 border-[theme(--border)] flex items-center justify-center"
                                 style={{ backgroundColor: option.color }}
                               >
-                                {/* ✅ Check Icon Inside Circle */}
                                 {isSelected && (
                                   <LuCheck className="w-4 h-4 text-white" />
                                 )}
                               </span>
-                            ) : null}
-
-                            {/* 🏷️ Text Label */}
+                            )}
                             <span>{option.name}</span>
                           </label>
                         </div>
@@ -159,14 +161,14 @@ const ProductDetail = () => {
             <div className="flex items-center border rounded-md">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors cursor-pointer"
+                className="h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors cursor-pointer"
               >
                 -
               </button>
               <span className="px-6 py-2 font-semibold">{quantity}</span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors cursor-pointer"
+                className="h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors cursor-pointer"
               >
                 +
               </button>
@@ -175,8 +177,8 @@ const ProductDetail = () => {
 
           {/* Add to Cart */}
           <button
-            onClick={() => handleAddToCart(product)}
-            className="w-full md:w-auto h-11 rounded-md px-8 bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary)]/90 inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-[theme(--background)] transition-colors cursor-pointer"
+            onClick={handleAddToCart}
+            className="w-full md:w-auto h-11 rounded-md px-8 bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary)]/90 inline-flex items-center justify-center gap-2 text-sm font-medium transition-colors cursor-pointer"
           >
             <LuShoppingCart className="mr-2 h-5 w-5" />
             Add to Cart
