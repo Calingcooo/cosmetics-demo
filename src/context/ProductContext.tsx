@@ -92,12 +92,16 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   const handleFetchFeaturedProducts = useCallback(async () => {
+    setIsLoading(true);
     try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       const featuredData = await getFeaturedProducts();
 
       setFeaturedProducts(featuredData.data.products || []);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 

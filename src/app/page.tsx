@@ -6,9 +6,11 @@ import { useProduct } from "./hooks/useProduct";
 
 import HeroCarousel from "@/components/pages/home/HeroCarousel";
 import ProductCard from "@/components/product/ProductCard";
+import ProductCardSkeleton from "@/components/ui/loading/ProducCardSkeleton";
 
 export default function Home() {
-  const { featureProducts, handleFetchFeaturedProducts } = useProduct();
+  const { isLoading, featureProducts, handleFetchFeaturedProducts } =
+    useProduct();
 
   useEffect(() => {
     handleFetchFeaturedProducts();
@@ -32,9 +34,13 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
-          {featureProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))
+            : featureProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
         </div>
       </section>
 
