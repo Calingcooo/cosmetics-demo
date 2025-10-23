@@ -6,10 +6,10 @@ import { AxiosError } from "axios";
 import { jwtDecode } from "jwt-decode";
 
 import type { ReactNode } from "react";
-import type { AuthResponse, FormData } from "../types";
+import type { AuthResponse, FormData } from "../app/types";
 
 import { publicAxios } from "../guard/axios-interceptor";
-import { useToast } from "../hooks/useToast";
+import { useToast } from "../app/hooks/useToast";
 
 interface JwtPayload {
   id: string;
@@ -64,8 +64,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (storedToken) {
         const decoded = jwtDecode<JwtPayload>(storedToken);
-        console.log({ decoded });
-        
+
         setUser(decoded);
         setIsAuthenticated(true);
       }
@@ -101,10 +100,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { data } = await publicAxios.post(endpoint, formData, {
         withCredentials: true,
       });
+      
+      const token = data.data.token
 
-      const token = data.token;
-
-      if (data.token) {
+      if (data.success && token) {
+        console.log("logging in...")
         // ✅ Decode token payload to get user info
         const decoded = jwtDecode<JwtPayload>(token);
 

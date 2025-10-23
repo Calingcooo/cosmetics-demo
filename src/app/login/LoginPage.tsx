@@ -5,9 +5,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import clsx from "clsx";
 
 import { useAuth } from "../hooks/useAuth";
-import Social from "../components/pages/login/Social";
-import LoginForm from "../components/pages/login/LoginForm";
-import CreateAccountForm from "../components/pages/login/CreateAccountForm";
+import Social from "@/components/pages/login/Social";
+import LoginForm from "@/components/pages/login/LoginForm";
+import CreateAccountForm from "@/components/pages/login/CreateAccountForm";
 
 const LoginPage = () => {
   const searchParams = useSearchParams();

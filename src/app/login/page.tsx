@@ -3,7 +3,7 @@
 
 import { Suspense } from "react";
 import LoginPage from "./LoginPage";
-import Bounce from "../components/ui/loading/Bounce";
+import Bounce from "@/components/ui/loading/Bounce";
 
 export default function LoginPageLayout() {
   return (

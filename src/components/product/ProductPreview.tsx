@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import { createPortal } from "react-dom";
+import type { ProductImage } from "@/app/types";
 
 type ProductImagePreviewProps = {
-  images: (string | StaticImageData)[];
+  images: ProductImage[];
   threshold?: number;
 };
 
@@ -13,7 +14,7 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
   images,
   threshold = 3,
 }) => {
-  const [selectedImage, setSelectedImage] = useState(images[0]);
+  const [selectedImage, setSelectedImage] = useState(images[0].url);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const visibleImages = images.slice(0, threshold);
@@ -27,8 +28,9 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
         onClick={() => setIsModalOpen(true)}
       >
         <Image
-          src={selectedImage}
+          src={`${selectedImage}`}
           alt="Selected product image"
+          loading="lazy"
           fill
           className="object-cover transition-transform duration-300 hover:scale-105"
         />
@@ -40,15 +42,16 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
           <button
             key={idx}
             className={`relative w-16 h-16 rounded-md border overflow-hidden transition-all ${
-              selectedImage === img
+              selectedImage === img.url
                 ? "ring-2 ring-[theme(--ring)]"
                 : "hover:opacity-80"
             }`}
-            onClick={() => setSelectedImage(img)}
+            onClick={() => setSelectedImage(img.url)}
           >
             <Image
-              src={img}
+              src={`${img.url}`}
               alt={`product-thumb-${idx}`}
+              loading="lazy"
               fill
               className="object-cover"
             />
@@ -86,8 +89,9 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
               onClick={(e) => e.stopPropagation()} // prevent closing when clicking image
             >
               <Image
-                src={selectedImage}
+                src={`${selectedImage}`}
                 alt="Expanded product image"
+                loading="lazy"
                 fill
                 className="object-contain bg-black"
               />
@@ -102,15 +106,16 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
                 <button
                   key={idx}
                   className={`relative flex-shrink-0 w-20 h-20 rounded-md border overflow-hidden transition-all ${
-                    selectedImage === img
+                    selectedImage === img.url
                       ? "ring-2 ring-[theme(--ring)]"
                       : "hover:opacity-80"
                   }`}
-                  onClick={() => setSelectedImage(img)}
+                  onClick={() => setSelectedImage(img.url)}
                 >
                   <Image
-                    src={img}
+                    src={`${img}`}
                     alt={`thumb-${idx}`}
+                    loading="lazy"
                     fill
                     className="object-cover"
                   />

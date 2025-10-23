@@ -1,14 +1,18 @@
-// import { featuredProducts } from "./data/featuredProducts";
-import { allProducts, type Product } from "@/app/data/products";
-import HeroCarousel from "./components/pages/home/HeroCarousel";
-import ProductCard from "./components/product/ProductCard";
+"use client";
+
+import { useEffect } from "react";
+
+import { useProduct } from "./hooks/useProduct";
+
+import HeroCarousel from "@/components/pages/home/HeroCarousel";
+import ProductCard from "@/components/product/ProductCard";
 
 export default function Home() {
-  function getFeaturedProducts(limit: number = 4): Product[] {
-    // Shuffle the array randomly and slice the first 'limit' products
-    const shuffled = [...allProducts].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, limit);
-  }
+  const { featureProducts, handleFetchFeaturedProducts } = useProduct();
+
+  useEffect(() => {
+    handleFetchFeaturedProducts();
+  }, [handleFetchFeaturedProducts]);
 
   return (
     <div className="flex-1 flex-col">
@@ -28,8 +32,8 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
-          {getFeaturedProducts().map((product) => (
-            <ProductCard key={product.id} {...product} />
+          {featureProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>

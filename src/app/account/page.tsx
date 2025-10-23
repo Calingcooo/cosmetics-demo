@@ -1,4 +1,4 @@
-import AuthGuard from "../guard/auth-guard";
+import AuthGuard from "../../guard/auth-guard";
 import MyAccountPage from "./MyAccountPage";
 
 export default function AccountLayout() {

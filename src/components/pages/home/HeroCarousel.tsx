@@ -3,31 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
-import heroBanner from "../../../../../public/assets/products/hero-banner.jpg";
-
-const slides = [
-  {
-    id: 1,
-    image: heroBanner,
-    title: "Luxury Skincare",
-    subtitle: "Discover our new collection",
-    cta: "Shop Now",
-  },
-  {
-    id: 2,
-    image: heroBanner,
-    title: "Natural Beauty",
-    subtitle: "Pure ingredients, stunning results",
-    cta: "Explore",
-  },
-  {
-    id: 3,
-    image: heroBanner,
-    title: "Glow Up",
-    subtitle: "Premium cosmetics for every occasion",
-    cta: "View Collection",
-  },
-];
+import { slides } from "@/data/products";
 
 const HeroCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -46,6 +22,7 @@ const HeroCarousel = () => {
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
+  
 
   return (
     <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden rounded-lg">
@@ -57,11 +34,8 @@ const HeroCarousel = () => {
             index === currentSlide ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Image
-            src={slide.image}
-            alt={slide.title}
-            className="w-full h-full object-fit"
-          />
+          <Image src={slide.image} loading="lazy" alt={slide.title} width={1920} height={1080} className="object-cover w-full h-full" />
+
 
           <div className="absolute inset-0 bg-gradient-to-r from-[theme(--background)]/80 to-transparent">
             <div className="container mx-auto px-4 h-full flex items-center">

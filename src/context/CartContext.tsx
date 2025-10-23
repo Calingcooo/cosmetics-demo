@@ -1,15 +1,19 @@
 "use client";
 
 import React, { createContext, useState, ReactNode, useEffect } from "react";
-import { StaticImageData } from "next/image";
-import { useToast } from "../hooks/useToast";
-import { useAuth } from "../hooks/useAuth";
+import { AxiosError } from "axios";
+
+import { useToast } from "../app/hooks/useToast";
+import { useAuth } from "../app/hooks/useAuth";
+import { getMyCart, addToCart as apiAddToCart } from "@/services/cartApi";
+
+import { ProductImage } from "@/app/types";
 
 export interface CartItem {
   id: number;
   name: string;
   price: number;
-  image: string | StaticImageData;
+  image: ProductImage;
   category?: string;
   quantity: number;
   selectedVariations?: Record<string, string>;
@@ -18,7 +22,7 @@ export interface CartItem {
 interface CartContextType {
   items: CartItem[];
   setItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
-  addToCart: (item: Omit<CartItem, "quantity">) => void;
+  addToCart: (item: Omit<CartItem, "quantity">) => Promise<void>;
   removeFromCart: (
     id: number,
     selectedVariations?: Record<string, string>
@@ -39,50 +43,68 @@ export const CartContext = createContext<CartContextType | undefined>(
 
 const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { addToast } = useToast();
 
-  // Load guest cart from localStorage on mount                              */
+  // ✅ Load cart when authenticated
   useEffect(() => {
-    if (!isAuthenticated) {
-      const stored = localStorage.getItem("guest_cart");
-      if (stored) setItems(JSON.parse(stored));
-    }
-  }, [isAuthenticated]);
+    const loadCart = async () => {
+      if (isAuthenticated && user) {
+        try {
+          const cartData = await getMyCart(user.id);
+          setItems(cartData.items || []); // assuming backend returns { items: [...] }
+        } catch (err) {
+          console.error("❌ Failed to fetch cart:", err);
+          addToast({
+            title: "Error loading cart",
+            description:
+              "Unable to load your cart items. Please try again later.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        // Load guest cart
+        const stored = localStorage.getItem("guest_cart");
+        if (stored) setItems(JSON.parse(stored));
+      }
+    };
 
-  // Persist guest cart in localStorage                                      */
+    loadCart();
+  }, [isAuthenticated, user, addToast]);
+
+  // ✅ Persist guest cart in localStorage
   useEffect(() => {
     if (!isAuthenticated) {
       localStorage.setItem("guest_cart", JSON.stringify(items));
     }
   }, [items, isAuthenticated]);
 
+  // ✅ Add to cart
   const addToCart = async (item: Omit<CartItem, "quantity">) => {
-    if (isAuthenticated) {
-      // ✅ Authenticated user: send to backend
+    if (isAuthenticated && user) {
       try {
-        const res = await fetch("/api/cart", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...item, quantity: 1 }),
-        });
-
-        if (!res.ok) throw new Error("Failed to add to cart");
-
+        await apiAddToCart(item.id.toString(), 1);
         addToast({
           title: "Added to Cart",
           description: `${item.name} added to your cart`,
         });
-      } catch (err) {
-        console.error(err);
+        // Optionally refresh cart after add
+        const updatedCart = await getMyCart(user.id);
+        setItems(updatedCart.items || []);
+      } catch (error) {
+        const err = error as AxiosError<{ message?: string }>;
+
+        const message =
+          err.response?.data?.message || "Failed to add item to your cart.";
+
         addToast({
           title: "Error",
-          description: "Could not add item to your cart. Please try again.",
+          description: message,
           variant: "destructive",
         });
       }
     } else {
-      // Guest cart (local state)
+      // Guest user cart
       setItems((prevItems) => {
         const existingItem = prevItems.find(
           (i) =>
@@ -96,7 +118,6 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
             title: "Updated Cart",
             description: `${item.name} quantity increased`,
           });
-
           return prevItems.map((i) =>
             i.id === item.id &&
             JSON.stringify(i.selectedVariations) ===
@@ -116,6 +137,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // ✅ Remove from cart (guest only for now)
   const removeFromCart = (
     id: number,
     selectedVariations?: Record<string, string>

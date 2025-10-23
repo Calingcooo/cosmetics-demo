@@ -1,29 +1,22 @@
 "use client";
 
 import { LuShoppingCart, LuEye } from "react-icons/lu";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+
 import { useCart } from "@/app/hooks/useCart";
+import { Product } from "@/app/types";
 
 interface ProductCardProps {
-  id: number;
-  name: string;
-  price: number;
-  images: (string | StaticImageData)[];
-  category?: string;
+  product: Product;
 }
 
-const ProductCard = ({
-  id,
-  name,
-  price,
-  images,
-  category,
-}: ProductCardProps) => {
+const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
   const router = useRouter();
 
-  const image = images[0];
+  const image = product.images[0];
+  const { id, name, price, category } = product;  
 
   const handleAddToCart = () => {
     addToCart({
@@ -31,7 +24,7 @@ const ProductCard = ({
       name,
       price,
       image,
-      category: category ?? "Uncategorized",
+      category: category.name ?? "Uncategorized",
     });
   };
 
@@ -44,13 +37,15 @@ const ProductCard = ({
           //   onClick={() => navigate(`/product/${id}`)}
         >
           <Image
-            src={images[0]}
+            src={`${image.url}`}
             alt={name}
+            loading="lazy"
+            fill
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           {category && (
             <span className="absolute top-2 left-2 px-3 py-1 text-xs font-medium bg-[theme(--primary)]/90 text-[theme(--primary-foreground)] rounded-full">
-              {category}
+              {category.name}
             </span>
           )}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
@@ -72,7 +67,7 @@ const ProductCard = ({
           <div>
             <h3 className="font-semibold text-sm line-clamp-1">{name}</h3>
             <p className="text-lg font-bold text-[theme(--primary)] mt-1">
-              ${price.toFixed(2)}
+              ${price}
             </p>
           </div>
 

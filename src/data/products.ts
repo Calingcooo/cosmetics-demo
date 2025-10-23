@@ -1,11 +1,4 @@
-import { StaticImageData } from "next/image";
-
-import productLipstick from "../../../public/assets/products/product-lipstick.jpg";
-import productSerum from "../../../public/assets/products/product-serum.jpg";
-import productPalette from "../../../public/assets/products/product-palette.jpg";
-import productCream from "../../../public/assets/products/product-cream.jpg";
-import productPerfume from "../../../public/assets/products/product-perfume.jpg";
-import productBrushes from "../../../public/assets/products/product-brushes.jpg";
+import { StaticImageData } from "next/image"
 
 export interface ProductVariationOption {
   name: string;
@@ -28,17 +21,41 @@ export interface Product {
 }
 
 // All possible product images
-const allImages: StaticImageData[] = [
-  productLipstick,
-  productSerum,
-  productPalette,
-  productCream,
-  productPerfume,
-  productBrushes,
+const allImages: string[] = [
+  "/assets/products/product-lipstick.jpg",
+  "/assets/products/product-serum.jpg",
+  "/assets/products/product-palette.jpg",
+  "/assets/products/product-cream.jpg",
+  "/assets/products/product-perfume.jpg",
+  "/assets/products/product-brushes.jpg",
 ];
 
-const getImages = (start: number, count: number): StaticImageData[] =>
+const getImages = (start: number, count: number): (string | StaticImageData)[] =>
   allImages.slice(start, start + count);
+
+export const slides = [
+  {
+    id: 1,
+    image: "/assets/products/hero-banner.jpg",
+    title: "Luxury Skincare",
+    subtitle: "Discover our new collection",
+    cta: "Shop Now",
+  },
+  {
+    id: 2,
+    image: "/assets/products/hero-banner.jpg",
+    title: "Natural Beauty",
+    subtitle: "Pure ingredients, stunning results",
+    cta: "Explore",
+  },
+  {
+    id: 3,
+    image: "/assets/products/hero-banner.jpg",
+    title: "Glow Up",
+    subtitle: "Premium cosmetics for every occasion",
+    cta: "View Collection",
+  },
+];
 
 export const allProducts: Product[] = [
   {
