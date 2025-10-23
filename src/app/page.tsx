@@ -8,12 +8,12 @@ import HeroCarousel from "@/components/pages/home/HeroCarousel";
 import ProductCard from "@/components/product/ProductCard";
 
 export default function Home() {
-  const { featureProducts, handleFetchFeaturedProducts } = useProduct()
+  const { featureProducts, handleFetchFeaturedProducts } = useProduct();
 
   useEffect(() => {
-    handleFetchFeaturedProducts()
-  }, [])
-  
+    handleFetchFeaturedProducts();
+  }, [featureProducts, handleFetchFeaturedProducts]);
+
   return (
     <div className="flex-1 flex-col">
       {/* Hero Section */}

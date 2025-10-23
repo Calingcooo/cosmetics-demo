@@ -1,8 +1,9 @@
 "use client";
 
 import { LuShoppingCart, LuEye } from "react-icons/lu";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+
 import { useCart } from "@/app/hooks/useCart";
 import { Product } from "@/app/types";
 
@@ -14,20 +15,17 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
   const router = useRouter();
 
-  console.log(product);
-  
-
-  const image = product.images[0].url;
+  const image = product.images[0];
   const { id, name, price, category } = product;
 
   const handleAddToCart = () => {
-    // addToCart({
-    //   id,
-    //   name,
-    //   price,
-    //   image,
-    //   category: category ?? "Uncategorized",
-    // });
+    addToCart({
+      id,
+      name,
+      price,
+      image,
+      category: category ?? "Uncategorized",
+    });
   };
 
   return (
@@ -39,7 +37,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           //   onClick={() => navigate(`/product/${id}`)}
         >
           <Image
-            src={`${image}`}
+            src={`${image.url}`}
             alt={name}
             fill
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"

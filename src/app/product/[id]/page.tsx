@@ -20,7 +20,9 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
 
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariations, setSelectedVariations] = useState<Record<string, string>>({});
+  const [selectedVariations, setSelectedVariations] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     if (id) handleFetchSingleProduct(id);
@@ -40,11 +42,11 @@ const ProductDetail = () => {
 
   if (!product) {
     return (
-      <div className="flex flex-col items-center justify-center text-center p-8">
+      <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
         <h1 className="text-3xl font-bold mb-4">Product Not Found</h1>
         <button
           onClick={() => router.push("/products")}
-          className="inline-flex items-center justify-center gap-2 h-10 px-4 py-2 rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary)]/90"
+          className="inline-flex items-center justify-center gap-2 h-10 px-4 py-2 rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary)]/90 cursor-pointer"
         >
           <LuArrowLeft className="mr-2 h-4 w-4" /> Back to Products
         </button>

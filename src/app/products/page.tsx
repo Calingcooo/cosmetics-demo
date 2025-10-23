@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import clsx from "clsx";
-import { allProducts } from "../../data/products";
 
 import { useProduct } from "../hooks/useProduct";
 
@@ -21,7 +20,7 @@ const Products = () => {
   
   useEffect(() => {
     handleFetchProducts();
-  }, []);
+  }, [products, handleFetchProducts]);
 
   return (
     <div className="flex-1 container mx-auto px-4 py-8 flex flex-col">

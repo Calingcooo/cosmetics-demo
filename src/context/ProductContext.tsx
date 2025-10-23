@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useCallback } from "react";
 import type { Product } from "@/app/types";
 
 import {
@@ -28,35 +28,35 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [featureProducts, setFeaturedProducts] = useState<Product[]>([]);
 
-  const handleFetchProducts = async () => {
+  const handleFetchProducts = useCallback(async () => {
     try {
       const productData = await getAllProducts();
-      console.log(productData);
       setProducts(productData.data.products || []);
     } catch (error) {
       console.error(error);
     }
-  };
+  }, []);
 
-  const handleFetchFeaturedProducts = async () => {
+  const handleFetchFeaturedProducts = useCallback(async () => {
     try {
       const featuredData = await getFeaturedProducts();
-
       setFeaturedProducts(featuredData.data.products || []);
     } catch (error) {
       console.error(error);
     }
-  };
+  }, []);
 
-  const handleFetchSingleProduct = async (id: string | undefined) => {
-    try {
-      const featuredData = await getSingleProduct(id);
-
-      setProduct(featuredData.data.product || []);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const handleFetchSingleProduct = useCallback(
+    async (id: string | undefined) => {
+      try {
+        const singleData = await getSingleProduct(id);
+        setProduct(singleData.data.product || null);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    []
+  );
 
   return (
     <ProductContext.Provider

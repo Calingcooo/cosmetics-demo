@@ -60,7 +60,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     };
 
     loadCart();
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, addToast]);
 
   // ✅ Persist guest cart in localStorage
   useEffect(() => {
@@ -73,7 +73,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
   const addToCart = async (item: Omit<CartItem, "quantity">) => {
     if (isAuthenticated && user) {
       try {
-        const res = await apiAddToCart(item.id.toString(), 1);
+        await apiAddToCart(item.id.toString(), 1);
         addToast({
           title: "Added to Cart",
           description: `${item.name} added to your cart`,
