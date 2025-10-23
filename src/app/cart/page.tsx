@@ -44,8 +44,9 @@ const CartPage = () => {
               className="flex gap-4 bg-[theme(--card)] p-4 rounded-lg border border-[theme(--border)]/40 shadow-sm"
             >
               <Image
-                src={item.image}
+                src={`${item.image}`}
                 alt={item.name}
+                loading="lazy"
                 className="w-24 h-24 object-cover rounded"
               />
               <div className="flex-1">

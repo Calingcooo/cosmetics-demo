@@ -34,7 +34,7 @@ const HeroCarousel = () => {
             index === currentSlide ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Image src={slide.image} alt={slide.title} width={1920} height={1080} className="object-cover w-full h-full" />
+          <Image src={slide.image} loading="lazy" alt={slide.title} width={1920} height={1080} className="object-cover w-full h-full" />
 
 
           <div className="absolute inset-0 bg-gradient-to-r from-[theme(--background)]/80 to-transparent">

@@ -30,6 +30,7 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
         <Image
           src={`${selectedImage}`}
           alt="Selected product image"
+          loading="lazy"
           fill
           className="object-cover transition-transform duration-300 hover:scale-105"
         />
@@ -50,6 +51,7 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
             <Image
               src={`${img.url}`}
               alt={`product-thumb-${idx}`}
+              loading="lazy"
               fill
               className="object-cover"
             />
@@ -89,6 +91,7 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
               <Image
                 src={`${selectedImage}`}
                 alt="Expanded product image"
+                loading="lazy"
                 fill
                 className="object-contain bg-black"
               />
@@ -112,6 +115,7 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
                   <Image
                     src={`${img}`}
                     alt={`thumb-${idx}`}
+                    loading="lazy"
                     fill
                     className="object-cover"
                   />
