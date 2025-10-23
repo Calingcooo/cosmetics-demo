@@ -29,8 +29,9 @@ export type Product = {
     id: number;
     name: string;
     price: number;
-    images: ProductImage[];
-    category: string;
     description: string;
+    category: string;
+    featured: boolean;
+    images: ProductImage[];
     variations?: ProductVariation[];
 }

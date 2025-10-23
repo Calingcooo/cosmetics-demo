@@ -14,11 +14,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
   const router = useRouter();
 
+  console.log(product);
+  
+
   const image = product.images[0].url;
   const { id, name, price, category } = product;
-
-  console.log(image);
-  
 
   const handleAddToCart = () => {
     // addToCart({
