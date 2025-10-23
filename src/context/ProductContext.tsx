@@ -1,22 +1,29 @@
 "use client";
 
 import React, { createContext, useState, useCallback } from "react";
-import type { Product } from "@/app/types";
+import type { Product, Category } from "@/app/types";
 
 import {
+  getProductCategories,
   getAllProducts,
   getFeaturedProducts,
   getSingleProduct,
 } from "@/services/productApi";
 
 interface ProductContextType {
+  categories: Category[];
   products: Product[];
   featureProducts: Product[];
   product: Product | null;
   page: number;
   hasMore: boolean;
   isLoading: boolean;
-  handleFetchProducts: (page?: number, category?: string, reset?: boolean) => Promise<void>;
+  handleFetchCategories: () => Promise<void>;
+  handleFetchProducts: (
+    page?: number,
+    category?: string,
+    reset?: boolean
+  ) => Promise<void>;
   handleFetchFeaturedProducts: () => Promise<void>;
   handleFetchSingleProduct: (id: string | undefined) => Promise<void>;
 }
@@ -27,6 +34,7 @@ export const ProductContext = createContext<ProductContextType | undefined>(
 );
 
 const ProductProvider = ({ children }: { children: React.ReactNode }) => {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [product, setProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [featureProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -34,21 +42,44 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleFetchCategories = useCallback(async () => {
+    try {
+      const res = await getProductCategories();
+
+      setCategories(res.data.categories || []);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   const handleFetchProducts = useCallback(
-    async (pageNumber = 1, category = "All", reset = false) => {
-      if (isLoading || !hasMore) return;
+    async (pageNumber = 1, category = "all", reset = false) => {
+      // ⚙️ Always allow reset calls even if isLoading or hasMore are false
+      if (!reset && (isLoading || !hasMore)) return;
+
+      console.log("Fetching page:", pageNumber, "category:", category);
+
+      // If resetting (new category), clear pagination state
+      if (reset) {
+        setProducts([]);
+        setPage(1);
+        setHasMore(true);
+      }
 
       setIsLoading(true);
+
       try {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+
         const res = await getAllProducts(pageNumber, category);
         const { products: newProducts, totalPages } = res.data;
 
-        // If category changed (reset = true), replace products
+        // If category changed, replace; otherwise append
         setProducts((prev) =>
           reset ? newProducts : [...prev, ...newProducts]
         );
 
-        // Check if more pages exist
+        // Update pagination
         setHasMore(pageNumber < totalPages);
         setPage(pageNumber);
       } catch (error) {
@@ -63,6 +94,7 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
   const handleFetchFeaturedProducts = useCallback(async () => {
     try {
       const featuredData = await getFeaturedProducts();
+
       setFeaturedProducts(featuredData.data.products || []);
     } catch (error) {
       console.error(error);
@@ -84,12 +116,14 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <ProductContext.Provider
       value={{
+        categories,
         products,
         featureProducts,
         product,
         page,
         hasMore,
         isLoading,
+        handleFetchCategories,
         handleFetchProducts,
         handleFetchFeaturedProducts,
         handleFetchSingleProduct,

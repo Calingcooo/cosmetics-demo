@@ -16,7 +16,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
 
   const image = product.images[0];
-  const { id, name, price, category } = product;
+  const { id, name, price, category } = product;  
 
   const handleAddToCart = () => {
     addToCart({
@@ -24,7 +24,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       name,
       price,
       image,
-      category: category ?? "Uncategorized",
+      category: category.name ?? "Uncategorized",
     });
   };
 
@@ -45,7 +45,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           />
           {category && (
             <span className="absolute top-2 left-2 px-3 py-1 text-xs font-medium bg-[theme(--primary)]/90 text-[theme(--primary-foreground)] rounded-full">
-              {category}
+              {category.name}
             </span>
           )}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">

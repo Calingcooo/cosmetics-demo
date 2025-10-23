@@ -25,12 +25,18 @@ export type ProductImage = {
     url: string;
 }
 
+export type Category = {
+    id: string;
+    name: string;
+    slug: string;
+}
+
 export type Product = {
     id: number;
     name: string;
     price: number;
     description: string;
-    category: string;
+    category: Category;
     featured: boolean;
     images: ProductImage[];
     variations?: ProductVariation[];

@@ -12,7 +12,7 @@ export default function Home() {
 
   useEffect(() => {
     handleFetchFeaturedProducts();
-  }, [featureProducts, handleFetchFeaturedProducts]);
+  }, [handleFetchFeaturedProducts]);
 
   return (
     <div className="flex-1 flex-col">
