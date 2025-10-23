@@ -3,11 +3,11 @@
 
 import { Suspense } from "react";
 import LoginPage from "./LoginPage";
-import Bounce from "@/components/ui/loading/Bounce";
+import LoginFormSkeleton from "@/components/ui/loading/LoginFormSkeleton";
 
 export default function LoginPageLayout() {
   return (
-    <Suspense fallback={<Bounce />}>
+    <Suspense fallback={<LoginFormSkeleton />}>
       <LoginPage />
     </Suspense>
   );

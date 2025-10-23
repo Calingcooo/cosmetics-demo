@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../app/hooks/useAuth";
-import Bounce from "@/components/ui/loading/Bounce";
+import MyAccountPage from "@/app/account/MyAccountPage";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -25,12 +25,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   }, [initialized, isAuthenticated, router]);
 
   if (checking || !initialized || !user) {
-    console.log("...")
-    return (
-      <div className="flex-1 flex justify-center items-center">
-        <Bounce />
-      </div>
-    );
+    return <MyAccountPage />;
   }
 
   return <>{children}</>;
