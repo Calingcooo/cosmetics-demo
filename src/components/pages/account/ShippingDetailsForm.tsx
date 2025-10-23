@@ -110,7 +110,18 @@ const ShippingDetailsForm = () => {
   // Submit form
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitted shipping details:", formData);
+    
+    const dataToSave = {
+      ...formData,
+      region_label: regions.find((r) => r.value === formData.region)?.label,
+      province_label: provinces.find((p) => p.value === formData.province)
+        ?.label,
+      city_label: cities.find((c) => c.value === formData.city)?.label,
+      barangay_label: barangays.find((b) => b.value === formData.barangay)
+        ?.label,
+    };
+
+    console.log("Submitted shipping details:", dataToSave);
   };
 
   return (
