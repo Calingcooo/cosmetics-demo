@@ -75,7 +75,7 @@ const ProductDetail = () => {
         {/* Product Info */}
         <div className="flex flex-col justify-center space-y-6">
           <span className="inline-block w-fit px-4 py-1.5 text-sm font-medium bg-[theme(--primary)]/10 text-[theme(--primary)] rounded-full">
-            {product.category}
+            {product.category.name}
           </span>
 
           <h1 className="text-4xl md:text-5xl font-bold">{product.name}</h1>

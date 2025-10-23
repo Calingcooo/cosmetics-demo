@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import clsx from "clsx";
 
 import type { Category } from "@/app/types";
@@ -26,7 +26,7 @@ const Products = () => {
 
   useEffect(() => {
     handleFetchCategories();
-  }, []);
+  }, [handleFetchCategories]);
 
   // Fetch products
   useEffect(() => {
@@ -35,7 +35,7 @@ const Products = () => {
       handleFetchProducts(1, selectedCategory, true);
       isFirstLoad = false;
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, handleFetchProducts]);
 
   // Infinite scroll
   useEffect(() => {
@@ -60,7 +60,7 @@ const Products = () => {
 
     // Cleanup
     return () => observer.disconnect();
-  }, [page, selectedCategory, hasMore, isLoading]);
+  }, [page, selectedCategory, hasMore, isLoading, handleFetchProducts]);
 
   return (
     <div className="flex-1 container mx-auto px-4 py-8 flex flex-col">
