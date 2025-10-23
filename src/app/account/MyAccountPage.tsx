@@ -11,6 +11,9 @@ import PaymentMethod from "@/components/pages/account/PaymentMethod";
 const MyAccountPage = () => {
   const [activeTab, setActiveTab] = useState("personal");
 
+  console.log("gg");
+  
+
   return (
     <AccountGuard>
       <div className="flex-1 flex flex-col">

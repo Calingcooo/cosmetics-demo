@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../app/hooks/useAuth";
-import MyAccountPage from "@/app/account/MyAccountPage";
+import MyAccountSkeleton from "@/components/ui/loading/AccountPageSkeleton";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -25,7 +25,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   }, [initialized, isAuthenticated, router]);
 
   if (checking || !initialized || !user) {
-    return <MyAccountPage />;
+    return <MyAccountSkeleton />;
   }
 
   return <>{children}</>;
