@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 
 import type { Category } from "@/app/types";
@@ -8,6 +8,7 @@ import type { Category } from "@/app/types";
 import { useProduct } from "@/app/hooks/useProduct";
 import ProductCard from "@/components/product/ProductCard";
 import ProductCardSkeleton from "@/components/ui/loading/ProducCardSkeleton";
+import Pagination from "@/components/ui/pagination/Pagination";
 
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -16,13 +17,11 @@ const Products = () => {
     products,
     handleFetchCategories,
     handleFetchProducts,
+    totalPages,
     page,
-    hasMore,
+    setPage,
     isLoading,
   } = useProduct();
-
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     handleFetchCategories();
@@ -30,38 +29,8 @@ const Products = () => {
 
   // Fetch products
   useEffect(() => {
-    let isFirstLoad = true;
-    if (isFirstLoad) {
-      handleFetchProducts(1, selectedCategory, true);
-      isFirstLoad = false;
-    }
+    handleFetchProducts(1, selectedCategory);
   }, [selectedCategory]);
-
-  // Infinite scroll
-  useEffect(() => {
-    if (page === 1 && products.length === 0) return;
-    if (!sentinelRef.current) return;
-
-    // Disconnect previous observer
-    if (observerRef.current) observerRef.current.disconnect();
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting && hasMore && !isLoading) {
-          handleFetchProducts(page + 1, selectedCategory);
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    const sentinel = sentinelRef.current;
-    if (sentinel) observer.observe(sentinel);
-
-    return () => {
-      if (sentinel) observer.unobserve(sentinel);
-    };
-  }, [page, selectedCategory, hasMore, isLoading]);
 
   return (
     <div className="flex-1 container mx-auto px-4 py-8 flex flex-col">
@@ -105,7 +74,7 @@ const Products = () => {
       {/* Product Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
         {isLoading && products.length === 0
-          ? Array.from({ length: 8 }).map((_, i) => (
+          ? Array.from({ length: 4 }).map((_, i) => (
               <ProductCardSkeleton key={i} />
             ))
           : products.map((product) => (
@@ -113,11 +82,19 @@ const Products = () => {
             ))}
       </div>
 
-      {/* Sentinel */}
-      <div ref={sentinelRef} className="h-10 w-full"></div>
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={(newPage) => {
+            setPage(newPage);
+            handleFetchProducts(newPage, selectedCategory, false);
+          }}
+        />
+      )}
 
       {/* Status */}
-      <div className="text-center mt-6 text-sm text-muted-foreground">
+      {/* <div className="text-center mt-6 text-sm text-muted-foreground">
         {isLoading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -130,7 +107,7 @@ const Products = () => {
             - End of result -
           </p>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
