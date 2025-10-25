@@ -6,34 +6,24 @@ import { AxiosError } from "axios";
 import { jwtDecode } from "jwt-decode";
 
 import type { ReactNode, SetStateAction } from "react";
-import type { AuthResponse, FormData, User } from "../app/types";
+import type { AuthResponse, FormData, MinimalUser } from "../app/types";
 
-import { publicAxios } from "../guard/axios-interceptor";
 import { useToast } from "../app/hooks/useToast";
 
-interface JwtPayload {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  phone: string;
-  dob: Date;
-  exp: number;
-  iat: number;
-}
+import { authService } from "@/lib/api/authService";
 
 type AuthContextType = {
   initialized: boolean;
   loading: boolean;
   isAuthenticated: boolean;
-  user: User;
+  minimalUser: MinimalUser;
   authError: string | null;
-  setAuthError: React.Dispatch<SetStateAction<string | null>>
+  setAuthError: React.Dispatch<SetStateAction<string | null>>;
   hanndleSubmit: (
     formData: FormData,
     e: React.FormEvent,
     isSignUp: string
-  ) => Promise<AuthResponse>;
+  ) => void;
   handleSocialLogin: (social: "google" | "facebook") => void;
   logout: () => void;
 };
@@ -45,32 +35,37 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<User>(null);
+  const [minimalUser, setMinimalUser] = useState<MinimalUser>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const { addToast } = useToast();
 
   const router = useRouter();
 
-  // ✅ On mount: restore token + user
+  // ✅ On mount: restore user
   useEffect(() => {
-    try {
-      const storedToken =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
+    const restoreSession = async () => {
+      try {
+        const res = await fetch("/api/auth/me", {
+          method: "GET",
+          credentials: "include",
+        });
 
-      if (storedToken) {
-        const decoded = jwtDecode<JwtPayload>(storedToken);
+        if (!res.ok) throw new Error("Not authenticated");
 
-        setUser(decoded);
+        const data = await res.json();
+
+        setMinimalUser(data.user);
         setIsAuthenticated(true);
+      } catch {
+        setIsAuthenticated(false);
+        router.push("/login");
+      } finally {
+        setInitialized(true);
       }
-    } catch (error) {
-      console.error("Failed to restore session", error);
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-    } finally {
-      setInitialized(true);
-    }
+    };
+
+    restoreSession();
   }, []);
 
   const hanndleSubmit = async (
@@ -78,7 +73,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     e: React.FormEvent,
     isSignUp: string,
     setLoadingCallback?: (value: boolean) => void
-  ): Promise<AuthResponse> => {
+  ) => {
     e.preventDefault();
     setLoading(true);
     setLoadingCallback?.(true);
@@ -87,54 +82,38 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       setAuthError("Email and password are required.");
       setLoading(false);
       setLoadingCallback?.(false);
-      return { success: false, message: "Email and password are required." };
     }
 
     try {
-      const endpoint = isSignUp ? "/auth/register" : "/auth/login";
+      const { data } = isSignUp
+        ? await authService.register("/api/auth/register", { ...formData })
+        : await authService.login("/api/auth/login", { ...formData });
 
-      const { data } = await publicAxios.post(endpoint, formData, {
-        withCredentials: true,
+      if (!data.success) {
+        throw new Error(data.message || "Authentication failed");
+      }
+
+      setMinimalUser(data.user);
+      setIsAuthenticated(true);
+
+      addToast({
+        title: isSignUp ? "Account Created" : "Welcome Back!",
+        description: isSignUp
+          ? "Your account has been created successfully."
+          : `Welcome back, ${data.user.first_name || "User"}!`,
       });
-      
-      const token = data.data.token
 
-      if (data.success && token) {
-        console.log("logging in...")
-        // ✅ Decode token payload to get user info
-        const decoded = jwtDecode<JwtPayload>(token);
-
-        // ✅ Save to local storage
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(decoded));
-
-        // ✅ Update React state
-        setUser(decoded);
-        setIsAuthenticated(true);
-
-        addToast({
-          title: "Welcome!",
-          description: isSignUp
-            ? "Your account has been created successfully."
-            : `Welcome back, ${decoded.first_name || "User"}!`,
-          variant: "default",
-        });
-
-        // Wait for state to update, THEN redirect
-        setTimeout(() => {
-          router.push("/");
-        }, 50);
-      }
-      return { success: true, message: "Login success!" };
+      // Wait for the user to be set before redirecting
+      setTimeout(() => {
+        router.push("/");
+      }, 50);
     } catch (err: unknown) {
-      let message = "An unknown error occurred";
-
-      if (err instanceof AxiosError) {
-        // AxiosError type is safe to access response
-        message = err.response?.data?.message || message;
-      } else if (err instanceof Error) {
-        message = err.message;
-      }
+      const message =
+        err instanceof AxiosError
+          ? err.response?.data?.message
+          : err instanceof Error
+          ? err.message
+          : "An unknown error occurred";
 
       setAuthError(message);
       return { success: false, message };
@@ -171,7 +150,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         const { success, token, user } = event.data;
         if (success) {
           sessionStorage.setItem("token", token);
-          setUser(user);
+          setMinimalUser(user);
           setIsAuthenticated(true);
           router.push("/");
         }
@@ -185,7 +164,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setIsAuthenticated(false);
-    setUser(null);
+    setMinimalUser(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
 
@@ -203,7 +182,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         initialized,
         loading,
         isAuthenticated,
-        user,
+        minimalUser,
         authError,
         setAuthError,
         hanndleSubmit,

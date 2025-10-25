@@ -9,13 +9,14 @@ import { useCart } from "@/app/hooks/useCart";
 import { useProduct } from "@/app/hooks/useProduct";
 
 import ProductPreview from "@/components/product/ProductPreview";
+import ProductDetailSkeleton from "@/components/ui/loading/ProductDetailSkeleton";
 
 const ProductDetail = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const id = pathname?.split("/").pop();
+  const slug = pathname?.split("/").pop();
   const { product, handleFetchSingleProduct } = useProduct();
-
+  
   const { addToCart } = useCart();
 
   const [quantity, setQuantity] = useState(1);
@@ -24,12 +25,14 @@ const ProductDetail = () => {
   >({});
 
   useEffect(() => {
-    if (id) handleFetchSingleProduct(id);
-  }, [id]);
+    if (slug) handleFetchSingleProduct(slug);
+  }, [slug]);
+
+  if (!product) return <ProductDetailSkeleton/>
+
+  console.log(product)
 
   const handleAddToCart = () => {
-    if (!product) return;
-
     addToCart({
       id: product.id,
       name: product.name,
@@ -52,6 +55,9 @@ const ProductDetail = () => {
       </div>
     );
   }
+
+  console.log(product);
+  
 
   return (
     <div className="flex flex-1 flex-col container mx-auto px-4 py-8">

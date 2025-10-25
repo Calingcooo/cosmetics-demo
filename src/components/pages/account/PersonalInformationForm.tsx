@@ -6,7 +6,7 @@ import Header from "./Header";
 import InputField from "@/components/ui/input/InputField";
 
 const PersonalInformationForm = () => {
-  const { user } = useAuth();
+  const { minimalUser } = useAuth();
   return (
     <div className="space-y-4 bg-[theme(--card)] p-5">
       {/* Header */}
@@ -20,14 +20,14 @@ const PersonalInformationForm = () => {
         <InputField
           id="first_name"
           name="first_name"
-          value={user!.first_name ?? ""}
+          value={minimalUser!.first_name ?? ""}
           onChange={() => {}}
           placeholder="John"
         />
         <InputField
           id="last_name"
           name="last_name"
-          value={user!.last_name ?? ""}
+          value={minimalUser!.last_name ?? ""}
           onChange={() => {}}
           placeholder="Doe"
         />
@@ -35,7 +35,7 @@ const PersonalInformationForm = () => {
           id="email"
           name="email"
           type="email"
-          value={user!.email ?? ""}
+          value={minimalUser!.email ?? ""}
           onChange={() => {}}
           autoComplete="email"
           placeholder="example@email.com"

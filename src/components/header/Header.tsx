@@ -15,7 +15,7 @@ const Header = () => {
   const { items } = useCart();
   const totalItems = items.length;
 
-  const { user, isAuthenticated, logout } = useAuth();
+  const { initialized, minimalUser, isAuthenticated, logout } = useAuth();
 
   const navItems = [
     { name: "home", href: "/" },
@@ -24,7 +24,7 @@ const Header = () => {
   ];
 
   const handleToggle = () => setIsOpen((prev) => !prev);
-  
+
   return (
     <>
       {/* HEADER */}
@@ -80,10 +80,18 @@ const Header = () => {
                 </button>
               </Link>
 
-              {isAuthenticated && user ? (
+              {!initialized ? (
+                // Skeleton while checking auth
+                <div
+                  className="h-8 w-8 rounded-lg animate-pulse border"
+                  style={{
+                    backgroundImage: "var(--gradient-primary)",
+                  }}
+                />
+              ) : isAuthenticated && minimalUser ? (
                 <UserMenu
-                  full_name={`${user.first_name} ${user.last_name}`}
-                  email={user.email}
+                  full_name={`${minimalUser.first_name} ${minimalUser.last_name}`}
+                  email={minimalUser.email}
                   logout={logout}
                 />
               ) : (

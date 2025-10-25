@@ -16,8 +16,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
 
   const image = product.images[0];
-  const { id, name, price, category } = product;  
-
+  const { id, name, slug, price, category } = product;  
+  
   const handleAddToCart = () => {
     addToCart({
       id,
@@ -34,7 +34,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
         {/* Image */}
         <div
           className="relative aspect-square overflow-hidden bg-[theme(--muted)]/30 cursor-pointer"
-          //   onClick={() => navigate(`/product/${id}`)}
         >
           <Image
             src={`${image.url}`}
@@ -53,7 +52,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               className="opacity-0 h-9 rounded-md px-3 group-hover:opacity-100 transition-opacity duration-300 bg-[theme(--secondary)] text-[theme(--secondary-foreground)] hover:bg-[theme(--secondary)]/80 inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
-                router.push(`/product/${id}`);
+                router.push(`/product/${slug}`);
               }}
             >
               <LuEye className="mr-2 h-4 w-4" />

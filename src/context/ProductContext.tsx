@@ -10,6 +10,8 @@ import {
   getSingleProduct,
 } from "@/services/productApi";
 
+import { productService } from "@/lib/api/productService";
+
 interface ProductContextType {
   categories: Category[];
   products: Product[];
@@ -25,7 +27,7 @@ interface ProductContextType {
     reset?: boolean
   ) => Promise<void>;
   handleFetchFeaturedProducts: () => Promise<void>;
-  handleFetchSingleProduct: (id: string | undefined) => Promise<void>;
+  handleFetchSingleProduct: (id: string | null) => Promise<void>;
 }
 
 // CONTEXT
@@ -57,8 +59,6 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
       // ⚙️ Always allow reset calls even if isLoading or hasMore are false
       if (!reset && (isLoading || !hasMore)) return;
 
-      console.log("Fetching page:", pageNumber, "category:", category);
-
       // If resetting (new category), clear pagination state
       if (reset) {
         setProducts([]);
@@ -71,8 +71,13 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
-        const res = await getAllProducts(pageNumber, category);
-        const { products: newProducts, totalPages } = res.data;
+        const { data } = await productService.getProducts(
+          "/api/product/products",
+          pageNumber,
+          category
+        );
+
+        const { products: newProducts, totalPages } = data;
 
         // If category changed, replace; otherwise append
         setProducts((prev) =>
@@ -95,7 +100,9 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      const featuredData = await getFeaturedProducts();
+      const featuredData = await productService.getFeatured(
+        "/api/product/featured"
+      );
 
       setFeaturedProducts(featuredData.data.products || []);
     } catch (error) {
@@ -105,17 +112,18 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  const handleFetchSingleProduct = useCallback(
-    async (id: string | undefined) => {
-      try {
-        const singleData = await getSingleProduct(id);
-        setProduct(singleData.data.product || null);
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    []
-  );
+  const handleFetchSingleProduct = useCallback(async (slug: string | null) => {
+    try {
+      const {data} = await productService.getProduct(
+        "/api/product/product",
+        slug
+      );
+      
+      setProduct(data.product || null);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
 
   return (
     <ProductContext.Provider

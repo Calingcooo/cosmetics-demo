@@ -10,7 +10,7 @@ interface AuthGuardProps {
 }
 
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const { user, initialized, isAuthenticated } = useAuth();
+  const { minimalUser, initialized, isAuthenticated } = useAuth();
   const [checking, setChecking] = useState(true);
   const router = useRouter();
 
@@ -24,7 +24,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     }
   }, [initialized, isAuthenticated, router]);
 
-  if (checking || !initialized || !user) {
+  if (checking || !initialized || !minimalUser) {
     return <MyAccountSkeleton />;
   }
 

@@ -34,6 +34,7 @@ export type Category = {
 export type Product = {
     id: number;
     name: string;
+    slug: string;
     price: number;
     description: string;
     category: Category;
@@ -42,11 +43,9 @@ export type Product = {
     variations?: ProductVariation[];
 }
 
-export type User = {
+export type MinimalUser = {
     id: string;
     first_name: string;
     last_name: string;
     email: string;
-    phone: string;
-    dob: Date;
 } | null;

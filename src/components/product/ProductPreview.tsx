@@ -15,28 +15,33 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
   threshold = 3,
 }) => {
   const [selectedImage, setSelectedImage] = useState(images[0].url);
+  const [modalSelectedImage, setModalSelectedImage] = useState(images[0].url);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setModalSelectedImage(selectedImage); // sync current preview to modal
+    setIsModalOpen(true);
+  };
 
   const visibleImages = images.slice(0, threshold);
   const remainingCount = images.length - threshold;
 
   return (
     <>
-      {/* --- Main Image Preview --- */}
+      {/* Main Image */}
       <div
         className="relative w-full aspect-square rounded-xl overflow-hidden border border-[theme(--border)] bg-[theme(--card)] cursor-pointer"
-        onClick={() => setIsModalOpen(true)}
+        onClick={openModal}
       >
         <Image
-          src={`${selectedImage}`}
+          src={selectedImage}
           alt="Selected product image"
-          loading="lazy"
           fill
           className="object-cover transition-transform duration-300 hover:scale-105"
         />
       </div>
 
-      {/* --- Thumbnails --- */}
+      {/* Thumbnails */}
       <div className="flex justify-center gap-2 mt-3">
         {visibleImages.map((img, idx) => (
           <button
@@ -48,19 +53,13 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
             }`}
             onClick={() => setSelectedImage(img.url)}
           >
-            <Image
-              src={`${img.url}`}
-              alt={`product-thumb-${idx}`}
-              loading="lazy"
-              fill
-              className="object-cover"
-            />
+            <Image src={img.url} fill alt="" className="object-cover" />
           </button>
         ))}
 
         {remainingCount > 0 && (
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={openModal}
             className="relative w-16 h-16 rounded-md border bg-black/60 text-white text-sm font-medium flex items-center justify-center"
           >
             +{remainingCount} more
@@ -68,14 +67,13 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
         )}
       </div>
 
-      {/* --- Fullscreen Gallery Modal --- */}
+      {/* Modal */}
       {isModalOpen &&
         createPortal(
           <div
             className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center p-6"
             onClick={() => setIsModalOpen(false)}
           >
-            {/* Close Button */}
             <button
               className="absolute top-6 right-8 text-white text-4xl font-light hover:opacity-80 cursor-pointer"
               onClick={() => setIsModalOpen(false)}
@@ -83,21 +81,20 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
               &times;
             </button>
 
-            {/* Large Main Image */}
+            {/* Modal Main Image */}
             <div
               className="relative w-full max-w-4xl aspect-[4/3] rounded-lg overflow-hidden shadow-lg"
-              onClick={(e) => e.stopPropagation()} // prevent closing when clicking image
+              onClick={(e) => e.stopPropagation()}
             >
               <Image
-                src={`${selectedImage}`}
-                alt="Expanded product image"
-                loading="lazy"
+                src={modalSelectedImage}
+                alt="Modal product image"
                 fill
                 className="object-contain bg-black"
               />
             </div>
 
-            {/* Thumbnail strip below the main image */}
+            {/* Modal Thumbnails */}
             <div
               className="flex gap-3 mt-6 overflow-x-auto max-w-4xl px-4"
               onClick={(e) => e.stopPropagation()}
@@ -106,19 +103,13 @@ const ProductPreview: React.FC<ProductImagePreviewProps> = ({
                 <button
                   key={idx}
                   className={`relative flex-shrink-0 w-20 h-20 rounded-md border overflow-hidden transition-all ${
-                    selectedImage === img.url
+                    modalSelectedImage === img.url
                       ? "ring-2 ring-[theme(--ring)]"
                       : "hover:opacity-80"
                   }`}
-                  onClick={() => setSelectedImage(img.url)}
+                  onClick={() => setModalSelectedImage(img.url)}
                 >
-                  <Image
-                    src={`${img}`}
-                    alt={`thumb-${idx}`}
-                    loading="lazy"
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={img.url} alt="" fill className="object-cover" />
                 </button>
               ))}
             </div>
