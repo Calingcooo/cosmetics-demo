@@ -1,20 +1,26 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import PSGC from "@efdiaz/psgc";
+
+import { useUser } from "@/app/hooks/useUser";
+import type { User } from "@/app/types";
 
 import Header from "./Header";
 import InputField from "@/components/ui/input/InputField";
 import SelectField from "@/components/ui/select/SelectField";
 
-type CurrentAddress = {
-  house_number?: string;
-  street_name?: string;
-  region_label?: string;
-  province_label?: string;
-  city_label?: string;
-  barangay_label?: string;
-  zip_code?: string;
-  landmark?: string;
-};
+type ShippingUser = Pick<
+  User,
+  | "house_number"
+  | "street_name"
+  | "region_label"
+  | "province_label"
+  | "city_label"
+  | "barangay_label"
+  | "zip_code"
+  | "landmark"
+>;
 
 type Address = {
   label: string;
@@ -33,12 +39,13 @@ interface FormData {
 }
 
 type ShippingDetailsFormProps = {
-  shipping: CurrentAddress;
+  shipping: ShippingUser;
 };
 
 const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
   shipping,
 }) => {
+  const { updateMe } = useUser();
   const [formData, setFormData] = useState<FormData>({
     house_number: "",
     street_name: "",
@@ -63,10 +70,10 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Prefill shipping data
   useEffect(() => {
     if (shipping) {
-      setFormData((prev) => ({
-        ...prev,
+      setFormData({
         house_number: shipping.house_number ?? "",
         street_name: shipping.street_name ?? "",
         region: shipping.region_label ?? "",
@@ -75,7 +82,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
         barangay: shipping.barangay_label ?? "",
         zip_code: shipping.zip_code ?? "",
         landmark: shipping.landmark ?? "",
-      }));
+      });
     }
   }, [shipping]);
 
@@ -141,20 +148,23 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
   }, [formData.city]);
 
   // Submit form
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const dataToSave = {
-      ...formData,
+    const dataToSave: Partial<User> = {
+      house_number: formData.house_number,
+      street_name: formData.street_name,
       region_label: regions.find((r) => r.value === formData.region)?.label,
       province_label: provinces.find((p) => p.value === formData.province)
         ?.label,
       city_label: cities.find((c) => c.value === formData.city)?.label,
       barangay_label: barangays.find((b) => b.value === formData.barangay)
         ?.label,
+      zip_code: formData.zip_code,
+      landmark: formData.landmark,
     };
 
-    console.log("Submitted shipping details:", dataToSave);
+    await updateMe(dataToSave);
   };
 
   return (
@@ -202,13 +212,13 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
           placeholder={
             formData.region ? "Select Province" : "Choose region first"
           }
-          options={provinces.length > 0 ? provinces : []}
+          options={provinces}
           disabled={!formData.region}
         />
 
-        {/* City / Municipality */}
+        {/* City */}
         <SelectField
-          id="City / Municipality"
+          id="city"
           name="city"
           value={formData.city}
           onChange={handleChange}
@@ -217,7 +227,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
               ? "Select City / Municipality"
               : "Choose province first"
           }
-          options={cities.length > 0 ? cities : []}
+          options={cities}
           disabled={!formData.province}
         />
 
@@ -228,7 +238,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
           value={formData.barangay}
           onChange={handleChange}
           placeholder={formData.city ? "Select Barangay" : "Choose city first"}
-          options={barangays.length > 0 ? barangays : []}
+          options={barangays}
           disabled={!formData.city}
         />
 

@@ -32,22 +32,22 @@ const MyAccountPage = () => {
   }, [activeTab]);
 
   const personal = {
-    first_name: user?.first_name,
-    last_name: user?.last_name,
-    email: user?.email,
-    phone: user?.phone,
-    dob: user?.dob,
+    first_name: user?.first_name ?? "",
+    last_name: user?.last_name ?? "",
+    email: user?.email ?? "",
+    phone: user?.phone ?? "",
+    dob: user?.dob ?? undefined,
   };
 
   const shipping = {
-    house_number: user?.house_number,
-    street_name: user?.street_name,
-    region_label: user?.region_label,
-    province_label: user?.province_label,
-    city_label: user?.city_label,
-    barangay_label: user?.barangay_label,
-    zip_code: user?.zip_code,
-    landmark: user?.landmark,
+    house_number: user?.house_number ?? "",
+    street_name: user?.street_name ?? "",
+    region_label: user?.region_label ?? "",
+    province_label: user?.province_label ?? "",
+    city_label: user?.city_label ?? "",
+    barangay_label: user?.barangay_label ?? "",
+    zip_code: user?.zip_code ?? "",
+    landmark: user?.landmark ?? "",
   };
 
   const tabs = [

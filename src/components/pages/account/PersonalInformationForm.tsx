@@ -1,17 +1,18 @@
-import React from "react";
+"use client";
 
-import { useAuth } from "@/app/hooks/useAuth";
+import React, { useState, useEffect } from "react";
+
+import { User } from "@/app/types";
+
+import { useUser } from "@/app/hooks/useUser";
 
 import Header from "./Header";
 import InputField from "@/components/ui/input/InputField";
 
-type PersonalUser = {
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-  phone?: string;
-  dob?: Date;
-};
+type PersonalUser = Pick<
+  User,
+  "first_name" | "last_name" | "email" | "phone" | "dob"
+>;
 
 type PersonalInformationFormProps = {
   user: PersonalUser;
@@ -20,6 +21,42 @@ type PersonalInformationFormProps = {
 const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
   user,
 }) => {
+  const { updateMe } = useUser();
+  const [formData, setFormData] = useState<PersonalUser>({
+    first_name: user.first_name ?? "",
+    last_name: user.last_name ?? "",
+    email: user.email ?? "",
+    phone: user.phone ?? "",
+    dob: user.dob ?? undefined,
+  });
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        first_name: user.first_name ?? "",
+        last_name: user.last_name ?? "",
+        email: user.email ?? "",
+        phone: user.phone ?? "",
+        dob: user.dob ?? undefined,
+      });
+    }
+  }, [user]);
+
+  // Handle input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "dob" && value ? new Date(value) : value,
+    }));
+  };
+
+  // Handle submit
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await updateMe(formData);
+  };
+
   return (
     <div className="space-y-4 bg-[theme(--card)] p-5">
       {/* Header */}
@@ -29,27 +66,27 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
       />
 
       {/* Personal form content here */}
-      <form action="" className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <InputField
           id="first_name"
           name="first_name"
-          value={user.first_name ?? ""}
-          onChange={() => {}}
+          value={formData.first_name ?? ""}
+          onChange={handleChange}
           placeholder="John"
         />
         <InputField
           id="last_name"
           name="last_name"
-          value={user.last_name ?? ""}
-          onChange={() => {}}
+          value={formData.last_name ?? ""}
+          onChange={handleChange}
           placeholder="Doe"
         />
         <InputField
           id="email"
           name="email"
           type="email"
-          value={user.email ?? ""}
-          onChange={() => {}}
+          value={formData.email ?? ""}
+          onChange={handleChange}
           autoComplete="email"
           placeholder="example@email.com"
         />
@@ -59,8 +96,8 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
           type="tel"
           inputMode="numeric"
           pattern="[0-9+ ]*"
-          value={user.phone ?? ""}
-          onChange={() => {}}
+          value={formData.phone ?? ""}
+          onChange={handleChange}
           placeholder="+63 917 123 4567"
         />
         <InputField
@@ -68,11 +105,11 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
           name="date_of_birth"
           type="date"
           value={
-            user?.dob
+            formData?.dob
               ? new Date(String(user.dob)).toISOString().split("T")[0]
               : ""
           }
-          onChange={() => {}}
+          onChange={handleChange}
           placeholder="Select your birth date"
         />
 

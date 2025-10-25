@@ -1,5 +1,12 @@
-export type ApiErrorResponse  = {
+export type ApiResponse<T> = {
+    success: boolean;
     message?: string;
+    data: T;
+};
+
+export type ApiErrorResponse = {
+    success: false;
+    message: string;
 };
 
 export type FormData = {
@@ -47,7 +54,7 @@ export type User = {
     first_name: string;
     last_name: string;
     email: string;
-    phone?: string ;
+    phone?: string;
     dob?: Date;
     house_number?: string;
     street_name?: string;

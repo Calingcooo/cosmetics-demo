@@ -1,12 +1,25 @@
 import { api } from "../axios/instance";
+import type { ApiResponse } from "@/app/types";
+import type { Product, Category } from "@/app/types";
 
 export const productService = {
-    getProducts: (endpoint: string, page: number, category: string) => api.get(endpoint, {
-        params: { page, category }
+  // Fetch paginated products
+  getProducts: (endpoint: string, page: number, category: string) =>
+    api.get<ApiResponse<{ products: Product[]; totalPages: number }>>(endpoint, {
+      params: { page, category },
     }),
-    getProduct: (endpoint: string, slug: string | null) => api.get(endpoint, {
-        params: { slug }
+
+  // Fetch a single product by slug
+  getProduct: (endpoint: string, slug: string | null) =>
+    api.get<ApiResponse<{ product: Product }>>(endpoint, {
+      params: { slug },
     }),
-    getCategories: (endpoint: string) => api.get(endpoint),
-    getFeatured: (endpoint: string) => api.get(endpoint)
+
+  // Fetch all categories
+  getCategories: (endpoint: string) =>
+    api.get<ApiResponse<{ categories: Category[] }>>(endpoint),
+
+  // Fetch featured products
+  getFeatured: (endpoint: string) =>
+    api.get<ApiResponse<{ products: Product[] }>>(endpoint),
 };

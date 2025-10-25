@@ -4,7 +4,7 @@ import { serverApi } from "@/lib/axios/instance";
 import type { AxiosError } from "axios";
 import type { ApiResponse, ApiErrorResponse, User } from "@/app/types";
 
-export async function GET(req: Request) {
+export async function POST(req: Request) {
     const cookie = await cookies()
     const token = cookie.get("token")?.value;
 
@@ -13,9 +13,11 @@ export async function GET(req: Request) {
     }
 
     try {
-        const { data } = await serverApi.get<ApiResponse<{ user: User }>>(`/user/me`, {
+        const updatedData = await req.json();
+        
+        const { data } = await serverApi.post<ApiResponse<{ user: User }>>(`/user/update`, updatedData, {
             headers: { Authorization: `Bearer ${token}` },
-          });
+        });
 
         const response = NextResponse.json({
             success: true,
