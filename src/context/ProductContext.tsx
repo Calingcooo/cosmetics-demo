@@ -52,9 +52,9 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleFetchCategories = useCallback(async () => {
     try {
-      const res = await getProductCategories();
-
-      setCategories(res.data.categories || []);
+      const { data } = await productService.getCategories("/api/product/categories")
+      
+      setCategories(data.categories || []);
     } catch (error) {
       console.error(error);
     }
