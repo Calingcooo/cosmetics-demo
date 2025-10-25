@@ -69,10 +69,17 @@ const UserMenu: React.FC<UserMenuProps> = ({ full_name, email, logout }) => {
           <div className="py-1">
             <Link
               href="/account"
-              className="block px-4 py-2 text-sm text-[theme(--card-foreground)] hover:bg-[theme(--muted)] rounded-md transition-colors"
+              className="block capitalize px-4 py-2 text-sm text-[theme(--card-foreground)] hover:bg-[theme(--muted)] rounded-md transition-colors"
               onClick={() => setOpen(false)}
             >
-              My Account
+              my account
+            </Link>
+            <Link
+              href="/orders"
+              className="block capitalize px-4 py-2 text-sm text-[theme(--card-foreground)] hover:bg-[theme(--muted)] rounded-md transition-colors"
+              onClick={() => setOpen(false)}
+            >
+              my orders
             </Link>
             <button
               onClick={logout}

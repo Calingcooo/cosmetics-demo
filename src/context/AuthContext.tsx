@@ -3,10 +3,9 @@
 import { createContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
-import { jwtDecode } from "jwt-decode";
 
 import type { ReactNode, SetStateAction } from "react";
-import type { AuthResponse, FormData, MinimalUser } from "../app/types";
+import type { FormData, User } from "../app/types";
 
 import { useToast } from "../app/hooks/useToast";
 
@@ -16,7 +15,7 @@ type AuthContextType = {
   initialized: boolean;
   loading: boolean;
   isAuthenticated: boolean;
-  minimalUser: MinimalUser;
+  minimalUser: Partial<User> | null;
   authError: string | null;
   setAuthError: React.Dispatch<SetStateAction<string | null>>;
   hanndleSubmit: (
@@ -35,7 +34,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [minimalUser, setMinimalUser] = useState<MinimalUser>(null);
+  const [minimalUser, setMinimalUser] = useState<Partial<User | null>>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const { addToast } = useToast();

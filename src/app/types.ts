@@ -1,6 +1,5 @@
-export type AuthResponse = {
-    success: boolean;
-    message: string;
+export type ApiErrorResponse  = {
+    message?: string;
 };
 
 export type FormData = {
@@ -43,9 +42,23 @@ export type Product = {
     variations?: ProductVariation[];
 }
 
-export type MinimalUser = {
+export type User = {
     id: string;
     first_name: string;
     last_name: string;
     email: string;
-} | null;
+    phone: string | null;
+    dob: Date | null;
+    house_number: string | null;
+    street_name: string | null;
+    region_code: string | null;
+    region_label: string | null;
+    province_code: string | null;
+    province_label: string | null;
+    city_code: string | null;
+    city_label: string | null;
+    barangay_code: string | null;
+    barangay_label: string | null;
+    zip_code: string | null;
+    landmark: string | null;
+}

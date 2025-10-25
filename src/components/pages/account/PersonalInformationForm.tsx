@@ -46,7 +46,7 @@ const PersonalInformationForm = () => {
           type="tel"
           inputMode="numeric"
           pattern="[0-9+ ]*"
-          value={user?.phone ?? ""}
+          value={""}
           onChange={() => {}}
           placeholder="+63 917 123 4567"
         />
@@ -54,10 +54,10 @@ const PersonalInformationForm = () => {
           id="date_of_birth"
           name="date_of_birth"
           type="date"
-          value={
-            user?.dob
-              ? new Date(String(user.dob)).toISOString().split("T")[0]
-              : ""
+          value={""
+            // user?.dob
+            //   ? new Date(String(user.dob)).toISOString().split("T")[0]
+            //   : ""
           }
           onChange={() => {}}
           placeholder="Select your birth date"

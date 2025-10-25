@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import { serverApi } from "@/lib/axios/instance";
+import type { ApiErrorResponse } from "@/app/types";
+import type { AxiosError } from "axios";
 
 export async function GET() {
     const cookie = await cookies()
@@ -18,7 +19,20 @@ export async function GET() {
         
         return NextResponse.json({ success: true, user: data?.data?.user });
     } catch (error) {
-        console.error("Me endpoint error:", error);
-        return NextResponse.json({ success: false, message: "Invalid token" }, { status: 401 });
-    }
+        const axiosError = error as AxiosError<ApiErrorResponse>;
+
+        if (axiosError.response) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: axiosError.response.data?.message || "Failed to fetch all products"
+                },
+                { status: axiosError.response.status }
+            );
+        }
+
+        return NextResponse.json(
+            { success: false, message: "Something went wrong" },
+            { status: 500 }
+        );    }
 }

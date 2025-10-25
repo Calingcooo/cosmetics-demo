@@ -8,13 +8,6 @@ import React, {
 } from "react";
 import type { Product, Category } from "@/app/types";
 
-import {
-  getProductCategories,
-  getAllProducts,
-  getFeaturedProducts,
-  getSingleProduct,
-} from "@/services/productApi";
-
 import { productService } from "@/lib/api/productService";
 
 interface ProductContextType {
@@ -52,8 +45,10 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleFetchCategories = useCallback(async () => {
     try {
-      const { data } = await productService.getCategories("/api/product/categories")
-      
+      const { data } = await productService.getCategories(
+        "/api/product/categories"
+      );
+
       setCategories(data.categories || []);
     } catch (error) {
       console.error(error);

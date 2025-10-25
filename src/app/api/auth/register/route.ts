@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { serverApi } from "@/lib/axios/instance";
+import type { ApiErrorResponse } from "@/app/types";
 import type { AxiosError } from "axios";
 
 export async function POST(req: Request) {
@@ -9,17 +10,7 @@ export async function POST(req: Request) {
         console.log({ first_name, last_name, email, password });
         
 
-        const res = await serverApi.post("/auth/register", { first_name, last_name, email, password });
-
-        console.log(res)
-        // const token = res?.data?.data?.token;
-
-        // if (!token) {
-        //     return NextResponse.json(
-        //         { success: false, message: "No token returned" },
-        //         { status: 401 }
-        //     );
-        // }
+        const res = await serverApi.post("/auth/register", { first_name, last_name, email, password })
 
         const response = NextResponse.json({
             success: true,
@@ -37,7 +28,7 @@ export async function POST(req: Request) {
 
         return response;
     } catch (error: unknown) {
-        const axiosError = error as AxiosError<any>;
+        const axiosError = error as AxiosError<ApiErrorResponse>;
 
         if (axiosError.response) {
             return NextResponse.json(

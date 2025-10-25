@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { serverApi } from "@/lib/axios/instance";
+import type { ApiErrorResponse } from "@/app/types";
 import type { AxiosError } from "axios";
 
 export async function POST(req: Request) {
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
 
         return response;
     } catch (error: unknown) {
-        const axiosError = error as AxiosError<any>;
+        const axiosError = error as AxiosError<ApiErrorResponse>;
 
         if (axiosError.response) {
             return NextResponse.json(
