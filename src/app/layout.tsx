@@ -7,6 +7,7 @@ import AuthProvider from "@/context/AuthContext";
 import ProductProvider from "@/context/ProductContext";
 import ToastProvider from "@/context/ToastContext";
 import CartProvider from "@/context/CartContext";
+import UserProvider from "@/context/UserContext";
 
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
@@ -40,12 +41,14 @@ export default function RootLayout({
         <ProductProvider>
           <ToastProvider>
             <AuthProvider>
-              <CartProvider>
-                <Header />
-                <main className="flex-1 flex flex-col">{children}</main>
-                <Footer />
-                <CookieConsent />
-              </CartProvider>
+              <UserProvider>
+                <CartProvider>
+                  <Header />
+                  <main className="flex-1 flex flex-col">{children}</main>
+                  <Footer />
+                  <CookieConsent />
+                </CartProvider>
+              </UserProvider>
             </AuthProvider>
           </ToastProvider>
         </ProductProvider>

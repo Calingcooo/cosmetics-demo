@@ -5,8 +5,21 @@ import { useAuth } from "@/app/hooks/useAuth";
 import Header from "./Header";
 import InputField from "@/components/ui/input/InputField";
 
-const PersonalInformationForm = () => {
-  const { minimalUser } = useAuth();
+type PersonalUser = {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+  dob?: Date;
+};
+
+type PersonalInformationFormProps = {
+  user: PersonalUser;
+};
+
+const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
+  user,
+}) => {
   return (
     <div className="space-y-4 bg-[theme(--card)] p-5">
       {/* Header */}
@@ -20,14 +33,14 @@ const PersonalInformationForm = () => {
         <InputField
           id="first_name"
           name="first_name"
-          value={minimalUser!.first_name ?? ""}
+          value={user.first_name ?? ""}
           onChange={() => {}}
           placeholder="John"
         />
         <InputField
           id="last_name"
           name="last_name"
-          value={minimalUser!.last_name ?? ""}
+          value={user.last_name ?? ""}
           onChange={() => {}}
           placeholder="Doe"
         />
@@ -35,7 +48,7 @@ const PersonalInformationForm = () => {
           id="email"
           name="email"
           type="email"
-          value={minimalUser!.email ?? ""}
+          value={user.email ?? ""}
           onChange={() => {}}
           autoComplete="email"
           placeholder="example@email.com"
@@ -46,7 +59,7 @@ const PersonalInformationForm = () => {
           type="tel"
           inputMode="numeric"
           pattern="[0-9+ ]*"
-          value={""}
+          value={user.phone ?? ""}
           onChange={() => {}}
           placeholder="+63 917 123 4567"
         />
@@ -54,10 +67,10 @@ const PersonalInformationForm = () => {
           id="date_of_birth"
           name="date_of_birth"
           type="date"
-          value={""
-            // user?.dob
-            //   ? new Date(String(user.dob)).toISOString().split("T")[0]
-            //   : ""
+          value={
+            user?.dob
+              ? new Date(String(user.dob)).toISOString().split("T")[0]
+              : ""
           }
           onChange={() => {}}
           placeholder="Select your birth date"

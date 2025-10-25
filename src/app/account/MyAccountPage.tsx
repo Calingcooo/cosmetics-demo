@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import clsx from "clsx";
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { useUser } from "../hooks/useUser";
 
 import AccountGuard from "@/guard/auth-guard";
 import PersonalInformationForm from "@/components/pages/account/PersonalInformationForm";
@@ -10,6 +12,7 @@ import ShippingDetailsForm from "@/components/pages/account/ShippingDetailsForm"
 import PaymentMethod from "@/components/pages/account/PaymentMethod";
 
 const MyAccountPage = () => {
+  const { user, getMe } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -17,12 +20,35 @@ const MyAccountPage = () => {
   const initialTab = searchParams.get("tab") || "personal";
   const [activeTab, setActiveTab] = useState(initialTab);
 
+  useEffect(() => {
+    getMe();
+  }, []);
+
   // Whenever activeTab changes, update the URL
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
     params.set("tab", activeTab);
     router.replace(`?${params.toString()}`, { scroll: false });
   }, [activeTab]);
+
+  const personal = {
+    first_name: user?.first_name,
+    last_name: user?.last_name,
+    email: user?.email,
+    phone: user?.phone,
+    dob: user?.dob,
+  };
+
+  const shipping = {
+    house_number: user?.house_number,
+    street_name: user?.street_name,
+    region_label: user?.region_label,
+    province_label: user?.province_label,
+    city_label: user?.city_label,
+    barangay_label: user?.barangay_label,
+    zip_code: user?.zip_code,
+    landmark: user?.landmark,
+  };
 
   const tabs = [
     { id: "personal", label: "Personal Info" },
@@ -60,8 +86,12 @@ const MyAccountPage = () => {
 
           {/* Tabs Content */}
           <div className="mt-4 border rounded-sm p-4 bg-[theme(--card)] shadow-[theme(--shadow-soft)] transition-all duration-300">
-            {activeTab === "personal" && <PersonalInformationForm />}
-            {activeTab === "shipping" && <ShippingDetailsForm />}
+            {activeTab === "personal" && (
+              <PersonalInformationForm user={personal} />
+            )}
+            {activeTab === "shipping" && (
+              <ShippingDetailsForm shipping={shipping} />
+            )}
             {activeTab === "payment" && <PaymentMethod />}
           </div>
         </div>

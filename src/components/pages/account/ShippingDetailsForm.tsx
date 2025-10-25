@@ -5,6 +5,17 @@ import Header from "./Header";
 import InputField from "@/components/ui/input/InputField";
 import SelectField from "@/components/ui/select/SelectField";
 
+type CurrentAddress = {
+  house_number?: string;
+  street_name?: string;
+  region_label?: string;
+  province_label?: string;
+  city_label?: string;
+  barangay_label?: string;
+  zip_code?: string;
+  landmark?: string;
+};
+
 type Address = {
   label: string;
   value: string;
@@ -21,7 +32,13 @@ interface FormData {
   landmark: string;
 }
 
-const ShippingDetailsForm = () => {
+type ShippingDetailsFormProps = {
+  shipping: CurrentAddress;
+};
+
+const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
+  shipping,
+}) => {
   const [formData, setFormData] = useState<FormData>({
     house_number: "",
     street_name: "",
@@ -45,6 +62,22 @@ const ShippingDetailsForm = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  useEffect(() => {
+    if (shipping) {
+      setFormData((prev) => ({
+        ...prev,
+        house_number: shipping.house_number ?? "",
+        street_name: shipping.street_name ?? "",
+        region: shipping.region_label ?? "",
+        province: shipping.province_label ?? "",
+        city: shipping.city_label ?? "",
+        barangay: shipping.barangay_label ?? "",
+        zip_code: shipping.zip_code ?? "",
+        landmark: shipping.landmark ?? "",
+      }));
+    }
+  }, [shipping]);
 
   // Load regions
   useEffect(() => {
@@ -110,7 +143,7 @@ const ShippingDetailsForm = () => {
   // Submit form
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const dataToSave = {
       ...formData,
       region_label: regions.find((r) => r.value === formData.region)?.label,

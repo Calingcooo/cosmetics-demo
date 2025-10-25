@@ -7,7 +7,6 @@ import React, {
   SetStateAction,
 } from "react";
 import type { Product, Category } from "@/app/types";
-
 import { productService } from "@/lib/api/productService";
 
 interface ProductContextType {
