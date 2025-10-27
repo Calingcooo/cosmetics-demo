@@ -31,6 +31,16 @@ export type ProductImage = {
     url: string;
 }
 
+export interface CartItem {
+    id: number;
+    name: string;
+    price: number;
+    image: ProductImage;
+    category?: string;
+    quantity: number;
+    selectedVariations?: Record<string, string>;
+}
+
 export type Category = {
     id: string;
     name: string;
@@ -69,3 +79,11 @@ export type User = {
     zip_code?: string;
     landmark?: string;
 }
+
+export type MiminalUser = {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    cart_count: number;
+  };

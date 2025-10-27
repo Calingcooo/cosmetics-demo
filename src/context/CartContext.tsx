@@ -1,23 +1,14 @@
 "use client";
 
 import React, { createContext, useState, ReactNode, useEffect } from "react";
-import { AxiosError } from "axios";
+import type { AxiosError } from "axios";
 
 import { useToast } from "../app/hooks/useToast";
 import { useAuth } from "../app/hooks/useAuth";
 import { getMyCart, addToCart as apiAddToCart } from "@/services/cartApi";
+import { cartService } from "@/lib/api/cartService";
 
-import { ProductImage } from "@/app/types";
-
-export interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: ProductImage;
-  category?: string;
-  quantity: number;
-  selectedVariations?: Record<string, string>;
-}
+import type { CartItem } from "@/app/types";
 
 interface CartContextType {
   items: CartItem[];
@@ -43,45 +34,51 @@ export const CartContext = createContext<CartContextType | undefined>(
 
 const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, minimalUser } = useAuth();
   const { addToast } = useToast();
 
-  // ✅ Load cart when authenticated
   useEffect(() => {
     const loadCart = async () => {
-      if (isAuthenticated && user) {
-        try {
-          const cartData = await getMyCart(user.id);
-          setItems(cartData.items || []); // assuming backend returns { items: [...] }
-        } catch (err) {
-          console.error("❌ Failed to fetch cart:", err);
-          addToast({
-            title: "Error loading cart",
-            description:
-              "Unable to load your cart items. Please try again later.",
-            variant: "destructive",
+      try {
+        if (isAuthenticated && minimalUser) {
+          // ✅ Fetch from your Next.js API route (which proxies to Express)
+          const res = await fetch("/api/cart/me", {
+            credentials: "include",
           });
+
+          if (!res.ok) throw new Error("Failed to fetch user cart");
+
+          const data = await res.json();
+          console.log("🛒 Cart fetched:", data);
+
+          // ✅ Assuming backend returns { success, cart }
+          setItems(data.cart?.items || []);
+        } else {
+          // ✅ Load guest cart from localStorage
+          const stored = localStorage.getItem("guest_cart");
+          if (stored) {
+            setItems(JSON.parse(stored));
+            console.log("Guest cart loaded!");
+          }
         }
-      } else {
-        // Load guest cart
-        const stored = localStorage.getItem("guest_cart");
-        if (stored) setItems(JSON.parse(stored));
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+        addToast({
+          title: "Error loading cart",
+          description:
+            "Unable to load your cart items. Please try again later.",
+          variant: "destructive",
+        });
       }
     };
 
+    // Run only when authentication changes
     loadCart();
-  }, [isAuthenticated, user, addToast]);
+  }, [isAuthenticated, minimalUser, addToast]);
 
-  // ✅ Persist guest cart in localStorage
-  useEffect(() => {
-    if (!isAuthenticated) {
-      localStorage.setItem("guest_cart", JSON.stringify(items));
-    }
-  }, [items, isAuthenticated]);
-
-  // ✅ Add to cart
+  // Add to cart
   const addToCart = async (item: Omit<CartItem, "quantity">) => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated && minimalUser) {
       try {
         await apiAddToCart(item.id.toString(), 1);
         addToast({
@@ -89,8 +86,9 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
           description: `${item.name} added to your cart`,
         });
         // Optionally refresh cart after add
-        const updatedCart = await getMyCart(user.id);
+        const updatedCart = await getMyCart(minimalUser.id);
         setItems(updatedCart.items || []);
+        minimalUser;
       } catch (error) {
         const err = error as AxiosError<{ message?: string }>;
 

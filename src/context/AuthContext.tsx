@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 
 import type { ReactNode, SetStateAction } from "react";
-import type { FormData, User } from "../app/types";
+import type { FormData, MiminalUser } from "../app/types";
 
 import { useToast } from "../app/hooks/useToast";
 
@@ -15,7 +15,7 @@ type AuthContextType = {
   initialized: boolean;
   loading: boolean;
   isAuthenticated: boolean;
-  minimalUser: Partial<User> | null;
+  minimalUser: MiminalUser | null;
   authError: string | null;
   setAuthError: React.Dispatch<SetStateAction<string | null>>;
   hanndleSubmit: (
@@ -34,24 +34,30 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [minimalUser, setMinimalUser] = useState<Partial<User | null>>(null);
+  const [minimalUser, setMinimalUser] = useState<MiminalUser | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const { addToast } = useToast();
 
   const router = useRouter();
 
-  // ✅ On mount: restore user
+  // On mount: restore user
   useEffect(() => {
     const restoreSession = async () => {
       const res = await fetch("/api/auth/me", { credentials: "include" });
       if (res.ok) {
         const data = await res.json();
+
         setMinimalUser(data.user);
         setIsAuthenticated(true);
+      } else {
+        setMinimalUser(null);
+        setIsAuthenticated(false);
       }
+
       setInitialized(true);
     };
+
     restoreSession();
   }, []);
 
@@ -79,8 +85,8 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!data.success) {
         throw new Error(data.message || "Authentication failed");
       }
-      
-      const user = data.data.user
+
+      const user = data.data.user;
 
       setMinimalUser(user);
       setIsAuthenticated(true);

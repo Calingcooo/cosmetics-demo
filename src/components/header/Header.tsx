@@ -12,8 +12,6 @@ import UserMenu from "./UserMenu";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { items } = useCart();
-  const totalItems = items.length;
 
   const { initialized, minimalUser, isAuthenticated, logout } = useAuth();
 
@@ -72,9 +70,9 @@ const Header = () => {
               <Link href="/cart">
                 <button className="relative inline-flex items-center justify-center h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] rounded-md cursor-pointer">
                   <LuShoppingBag className="h-5 w-5" />
-                  {totalItems > 0 && (
+                  {minimalUser && minimalUser.cart_count > 0 && (
                     <span className="absolute -top-1 -right-1 bg-[theme(--primary)] text-[theme(--primary-foreground)] text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {totalItems}
+                      {minimalUser?.cart_count}
                     </span>
                   )}
                 </button>

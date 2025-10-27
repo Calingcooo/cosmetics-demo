@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken"
-
 import { serverApi } from "@/lib/axios/instance";
-import type { ApiErrorResponse } from "@/app/types";
 import type { AxiosError } from "axios";
+import type { ApiResponse, ApiErrorResponse } from "@/app/types";
+import type { CartItem } from "@/app/types";
 
-export async function GET() {
+export async function GET(req: Request) {
     const cookie = await cookies()
     const token = cookie.get("token")?.value;
 
@@ -15,21 +14,17 @@ export async function GET() {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret") as any;
-
-        const { cart_count, iat, exp, ...userWithoutCart } = decoded;
-        
-        const res = await serverApi.get("/cart/count", {
+        const { data } = await serverApi.get<ApiResponse<{ cart: CartItem[] }>>("/cart/me", {
             headers: { Authorization: `Bearer ${token}` },
-        })
+        });
 
-        const user = {
-            ...userWithoutCart,
-            cart_count: res?.data?.data.cart_count
-        }
+        const response = NextResponse.json({
+            success: true,
+            data: { cart: data?.data.cart }
+        });
 
-        return NextResponse.json({ success: true, user });
-    } catch (error) {
+        return response
+    } catch (error: unknown) {
         const axiosError = error as AxiosError<ApiErrorResponse>;
 
         if (axiosError.response) {
@@ -47,4 +42,5 @@ export async function GET() {
             { status: 500 }
         );
     }
+
 }

@@ -4,8 +4,6 @@ import type { NextRequest } from "next/server";
 export function middleware(req: NextRequest) {
     const token = req.cookies.get("token")?.value;
 
-    console.log(token);
-    
     // ✅ Define protected routes
     const protectedRoutes = ["/account", "/orders", "/settings"];
 
@@ -25,4 +23,4 @@ export function middleware(req: NextRequest) {
 // ✅ Optional: limit middleware to specific routes for performance
 export const config = {
     matcher: ["/account/:path*", "/account", "/orders/:path*", "/settings/:path*"],
-  };
+};
