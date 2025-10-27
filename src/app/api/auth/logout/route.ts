@@ -1,35 +1,23 @@
 import { NextResponse } from "next/server";
-import { serverApi } from "@/lib/axios/instance";
 import type { ApiErrorResponse } from "@/app/types";
 import type { AxiosError } from "axios";
 
-export async function POST(req: Request) {
+export async function POST() {
     try {
-        const { email, password } = await req.json();
-
-        const res = await serverApi.post("/auth/login", { email, password });
-
-        const token = res?.data?.data?.token;
-
-        if (!token) {
-            return NextResponse.json(
-                { success: false, message: "No token returned" },
-                { status: 401 }
-            );
-        }
-
         const response = NextResponse.json({
             success: true,
-            data: { user: res?.data?.data.user }
+            message: "Logged out successfully",
         });
 
-        // Attach the token as an HttpOnly cookie
-        response.cookies.set("token", token, {
+        // Clear the 'token' cookie
+        response.cookies.set({
+            name: "token",
+            value: "",
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            maxAge: 60 * 60 * 24 * 7,
             sameSite: "strict",
-            path: "/"
+            path: "/",
+            expires: new Date(0),
         });
 
         return response;

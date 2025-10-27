@@ -44,26 +44,14 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   // ✅ On mount: restore user
   useEffect(() => {
     const restoreSession = async () => {
-      try {
-        const res = await fetch("/api/auth/me", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (!res.ok) throw new Error("Not authenticated");
-
+      const res = await fetch("/api/auth/me", { credentials: "include" });
+      if (res.ok) {
         const data = await res.json();
-
         setMinimalUser(data.user);
         setIsAuthenticated(true);
-      } catch {
-        setIsAuthenticated(false);
-        router.push("/login");
-      } finally {
-        setInitialized(true);
       }
+      setInitialized(true);
     };
-
     restoreSession();
   }, []);
 
@@ -91,15 +79,17 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!data.success) {
         throw new Error(data.message || "Authentication failed");
       }
+      
+      const user = data.data.user
 
-      setMinimalUser(data.user);
+      setMinimalUser(user);
       setIsAuthenticated(true);
 
       addToast({
         title: isSignUp ? "Account Created" : "Welcome Back!",
         description: isSignUp
           ? "Your account has been created successfully."
-          : `Welcome back, ${data.user.first_name || "User"}!`,
+          : `Welcome back, ${user.first_name || "User"}!`,
       });
 
       // Wait for the user to be set before redirecting
@@ -161,18 +151,24 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = () => {
-    setIsAuthenticated(false);
-    setMinimalUser(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+  const logout = async () => {
+    try {
+      const { data } = await authService.logout("/api/auth/logout");
 
-    router.push("/");
-    addToast({
-      title: "Session ended",
-      description: "You've been logged out of your account.",
-      variant: "default",
-    });
+      console.log(data);
+
+      setIsAuthenticated(false);
+      setMinimalUser(null);
+
+      router.push("/");
+      addToast({
+        title: "Session ended",
+        description: "You've been logged out of your account.",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

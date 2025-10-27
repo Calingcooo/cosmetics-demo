@@ -22,4 +22,7 @@ export const authService = {
 
     // Get authenticated user
     me: (endpoint: string) => api.get<ApiResponse<{ user: User }>>(endpoint),
+
+    // Logout
+    logout: (endpoint: string) => api.post(endpoint)
 };
