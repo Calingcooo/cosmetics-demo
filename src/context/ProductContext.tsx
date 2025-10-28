@@ -48,7 +48,7 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
         "/api/product/categories"
       );
 
-      setCategories(data.categories || []);
+      setCategories(data.data.categories);
     } catch (error) {
       console.error(error);
     }
@@ -68,7 +68,7 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
           category
         );
 
-        const { products: newProducts, totalPages } = data;
+        const { products: newProducts, totalPages } = data.data;
 
         // If category changed, replace; otherwise append
         setProducts(newProducts);
@@ -93,7 +93,7 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
         "/api/product/featured"
       );
 
-      setFeaturedProducts(featuredData.data.products || []);
+      setFeaturedProducts(featuredData.data.data.products || []);
     } catch (error) {
       console.error(error);
     } finally {
@@ -108,7 +108,7 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
         slug
       );
 
-      setProduct(data.product || null);
+      setProduct(data.data.product || null);
     } catch (error) {
       console.error(error);
     }

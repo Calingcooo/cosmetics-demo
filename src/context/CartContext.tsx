@@ -1,30 +1,35 @@
 "use client";
 
-import React, { createContext, useState, ReactNode, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from "react";
 import type { AxiosError } from "axios";
-
 import { useToast } from "../app/hooks/useToast";
 import { useAuth } from "../app/hooks/useAuth";
-import { getMyCart, addToCart as apiAddToCart } from "@/services/cartApi";
 import { cartService } from "@/lib/api/cartService";
-
 import type { CartItem } from "@/app/types";
 
 interface CartContextType {
   items: CartItem[];
+  cartCount: number;
+  setCartCount: React.Dispatch<React.SetStateAction<number>>;
   setItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
-  addToCart: (item: Omit<CartItem, "quantity">) => Promise<void>;
+  myCart: () => Promise<void>;
+  addToCart: (item: CartItem) => Promise<void>;
   removeFromCart: (
-    id: number,
+    id: string,
     selectedVariations?: Record<string, string>
   ) => void;
   updateQuantity: (
-    id: number,
+    id: string,
     quantity: number,
     selectedVariations?: Record<string, string>
   ) => void;
   clearCart: () => void;
-  totalItems: number;
   totalPrice: number;
 }
 
@@ -34,123 +39,156 @@ export const CartContext = createContext<CartContextType | undefined>(
 
 const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
-  const { isAuthenticated, minimalUser } = useAuth();
+  const [cartCount, setCartCount] = useState<number>(0);
+  const { isAuthenticated } = useAuth();
   const { addToast } = useToast();
 
+  // Get cart items count
   useEffect(() => {
-    const loadCart = async () => {
-      try {
-        if (isAuthenticated && minimalUser) {
-          // ✅ Fetch from your Next.js API route (which proxies to Express)
-          const res = await fetch("/api/cart/me", {
-            credentials: "include",
-          });
+    setCartCount(items.length);
+  }, [items]);
 
-          if (!res.ok) throw new Error("Failed to fetch user cart");
+  // Load guest cart
+  const loadGuestCart = useCallback(() => {
+    const stored = localStorage.getItem("guest_cart");
+    if (stored) {
+      setItems(JSON.parse(stored));
+    }
+  }, []);
 
-          const data = await res.json();
-          console.log("🛒 Cart fetched:", data);
+  const saveGuestCart = (cart: CartItem[]) => {
+    localStorage.setItem("guest_cart", JSON.stringify(cart));
+  };
 
-          // ✅ Assuming backend returns { success, cart }
-          setItems(data.cart?.items || []);
-        } else {
-          // ✅ Load guest cart from localStorage
-          const stored = localStorage.getItem("guest_cart");
-          if (stored) {
-            setItems(JSON.parse(stored));
-            console.log("Guest cart loaded!");
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching cart:", error);
-        addToast({
-          title: "Error loading cart",
-          description:
-            "Unable to load your cart items. Please try again later.",
-          variant: "destructive",
-        });
+  // Load authenticated cart
+  const loadUserCart = useCallback(async () => {
+    try {
+      const { data } = await cartService.me("/api/cart/me");
+
+      const fetchedItems = data.data.cart.items || [];
+
+      setItems(fetchedItems);
+    } catch (error) {
+      console.error("❌ Error fetching user cart:", error);
+      addToast({
+        title: "Error loading cart",
+        description: "Unable to load your cart. Please try again later.",
+        variant: "destructive",
+      });
+    }
+  }, [addToast]);
+
+  // Migrate guest cart -> authenticated cart
+  // const migrateGuestCart = useCallback(async () => {
+  //   const stored = localStorage.getItem("guest_cart");
+  //   if (!stored) return;
+
+  //   const guestItems = JSON.parse(stored) as CartItem[];
+  //   if (guestItems.length === 0) return;
+
+  //   try {
+  //     for (const item of guestItems) {
+  //       await cartService.addCart("/api/cart/add", item);
+  //     }
+  //     localStorage.removeItem("guest_cart");
+  //     await loadUserCart();
+  //   } catch (error) {
+  //     console.error("⚠️ Error migrating guest cart:", error);
+  //   }
+  // }, [loadUserCart]);
+
+  // Determine which cart to load
+  useEffect(
+    () => {
+      if (isAuthenticated) {
+        // migrateGuestCart().then(loadUserCart);
+        loadUserCart();
+      } else {
+        loadGuestCart();
       }
-    };
+    },
+    // [isAuthenticated, migrateGuestCart, loadGuestCart, loadUserCart]
+    [isAuthenticated, loadGuestCart, loadUserCart]
+  );
 
-    // Run only when authentication changes
-    loadCart();
-  }, [isAuthenticated, minimalUser, addToast]);
+  // Fetch user cart
+  const myCart = async () => {
+    if (isAuthenticated) await loadUserCart();
+    else loadGuestCart();
+  };
 
-  // Add to cart
-  const addToCart = async (item: Omit<CartItem, "quantity">) => {
-    if (isAuthenticated && minimalUser) {
+  const addToCart = async (item: CartItem) => {
+    if (isAuthenticated) {
       try {
-        await apiAddToCart(item.id.toString(), 1);
+        const { data } = await cartService.addCart("/api/cart/add", item);
+
+        console.log(data);
+
         addToast({
           title: "Added to Cart",
           description: `${item.name} added to your cart`,
         });
-        // Optionally refresh cart after add
-        const updatedCart = await getMyCart(minimalUser.id);
-        setItems(updatedCart.items || []);
-        minimalUser;
+        await loadUserCart();
       } catch (error) {
         const err = error as AxiosError<{ message?: string }>;
-
-        const message =
-          err.response?.data?.message || "Failed to add item to your cart.";
-
         addToast({
           title: "Error",
-          description: message,
+          description: err.response?.data?.message || "Failed to add to cart.",
           variant: "destructive",
         });
       }
     } else {
-      // Guest user cart
-      setItems((prevItems) => {
-        const existingItem = prevItems.find(
+      // Guest Cart
+      setItems((prev) => {
+        const existing = prev.find(
           (i) =>
             i.id === item.id &&
-            JSON.stringify(i.selectedVariations) ===
-              JSON.stringify(item.selectedVariations)
+            JSON.stringify(i.selected_variations) ===
+              JSON.stringify(item.selected_variations)
         );
+        let newCart: CartItem[];
 
-        if (existingItem) {
+        if (existing) {
+          newCart = prev.map((i) =>
+            i.id === item.id &&
+            JSON.stringify(i.selected_variations) ===
+              JSON.stringify(item.selected_variations)
+              ? { ...i, quantity: i.quantity + 1 }
+              : i
+          );
           addToast({
             title: "Updated Cart",
             description: `${item.name} quantity increased`,
           });
-          return prevItems.map((i) =>
-            i.id === item.id &&
-            JSON.stringify(i.selectedVariations) ===
-              JSON.stringify(item.selectedVariations)
-              ? { ...i, quantity: i.quantity + 1 }
-              : i
-          );
+        } else {
+          newCart = [...prev, { ...item, quantity: 1 }];
+          addToast({
+            title: "Added to Cart",
+            description: `${item.name} added to your cart`,
+          });
         }
-
-        addToast({
-          title: "Added to Cart",
-          description: `${item.name} added to your cart`,
-        });
-
-        return [...prevItems, { ...item, quantity: 1 }];
+        saveGuestCart(newCart);
+        return newCart;
       });
     }
   };
 
-  // ✅ Remove from cart (guest only for now)
   const removeFromCart = (
-    id: number,
-    selectedVariations?: Record<string, string>
+    id: string,
+    selected_variations?: Record<string, string>
   ) => {
-    setItems((prevItems) =>
-      prevItems.filter(
+    setItems((prev) => {
+      const newCart = prev.filter(
         (item) =>
           !(
             item.id === id &&
-            JSON.stringify(item.selectedVariations) ===
-              JSON.stringify(selectedVariations)
+            JSON.stringify(item.selected_variations) ===
+              JSON.stringify(selected_variations)
           )
-      )
-    );
-
+      );
+      if (!isAuthenticated) saveGuestCart(newCart);
+      return newCart;
+    });
     addToast({
       title: "Removed from Cart",
       description: "Item removed from your cart",
@@ -159,33 +197,34 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateQuantity = (
-    id: number,
+    id: string,
     quantity: number,
-    selectedVariations?: Record<string, string>
+    selected_variations?: Record<string, string>
   ) => {
     if (quantity <= 0) {
-      removeFromCart(id, selectedVariations);
+      removeFromCart(id, selected_variations);
       return;
     }
 
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id &&
-        JSON.stringify(item.selectedVariations) ===
-          JSON.stringify(selectedVariations)
-          ? { ...item, quantity }
-          : item
+    setItems((prev) =>
+      prev.map((i) =>
+        i.id === id &&
+        JSON.stringify(i.selected_variations) ===
+          JSON.stringify(selected_variations)
+          ? { ...i, quantity }
+          : i
       )
     );
 
     addToast({
       title: "Quantity Updated",
-      description: "Item quantity has been updated",
+      description: "Item quantity updated",
     });
   };
 
   const clearCart = () => {
     setItems([]);
+    if (!isAuthenticated) localStorage.removeItem("guest_cart");
     addToast({
       title: "Cart Cleared",
       description: "All items removed from your cart",
@@ -193,22 +232,22 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const totalPrice = items?.reduce((sum, i) => {
+    return sum + Number(i.price_at_add) * i.quantity;
+  }, 0);
 
   return (
     <CartContext.Provider
       value={{
         items,
+        cartCount,
+        setCartCount,
         setItems,
         addToCart,
+        myCart,
         removeFromCart,
         updateQuantity,
         clearCart,
-        totalItems,
         totalPrice,
       }}
     >

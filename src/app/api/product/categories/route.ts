@@ -9,7 +9,7 @@ export async function GET(req: Request) {
 
         const response = NextResponse.json({
             success: true,
-            categories: res?.data?.data.categories,
+            data: { categories: res?.data?.data.categories },
         });
 
         return response

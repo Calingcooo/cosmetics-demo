@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LuSearch, LuShoppingBag, LuUser, LuMenu } from "react-icons/lu";
 import Link from "next/link";
 
@@ -12,8 +12,8 @@ import UserMenu from "./UserMenu";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const { initialized, minimalUser, isAuthenticated, logout } = useAuth();
+  const { cartCount, setCartCount } = useCart();
 
   const navItems = [
     { name: "home", href: "/" },
@@ -22,6 +22,10 @@ const Header = () => {
   ];
 
   const handleToggle = () => setIsOpen((prev) => !prev);
+
+  useEffect(() => {
+    setCartCount(minimalUser?.cart_count || 0)
+  }, [])
 
   return (
     <>
@@ -70,9 +74,9 @@ const Header = () => {
               <Link href="/cart">
                 <button className="relative inline-flex items-center justify-center h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] rounded-md cursor-pointer">
                   <LuShoppingBag className="h-5 w-5" />
-                  {minimalUser && minimalUser.cart_count > 0 && (
+                  {cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-[theme(--primary)] text-[theme(--primary-foreground)] text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {minimalUser?.cart_count}
+                      {cartCount}
                     </span>
                   )}
                 </button>

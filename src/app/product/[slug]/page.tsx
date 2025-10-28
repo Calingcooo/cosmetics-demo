@@ -30,15 +30,15 @@ const ProductDetail = () => {
 
   if (!product) return <ProductDetailSkeleton/>
 
-  console.log(product)
-
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
       name: product.name,
-      price: product.price,
-      image: product.images[0],
-      selectedVariations,
+      price_at_add: product.price,
+      image: product.images[0].url,
+      category: product.category.name,
+      quantity: quantity,
+      selected_variations: selectedVariations,
     });
   };
 

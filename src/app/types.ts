@@ -31,14 +31,24 @@ export type ProductImage = {
     url: string;
 }
 
+export type Cart = {
+    id: string;
+    guest_id: string | null;
+    created_at: string;
+    updated_at: string;
+    items: CartItem[];
+}
+
 export interface CartItem {
-    id: number;
+    id: string;
     name: string;
-    price: number;
-    image: ProductImage;
+    price_at_add: number;
+    image: string;
     category?: string;
     quantity: number;
-    selectedVariations?: Record<string, string>;
+    selected_variations?: Record<string, string>;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export type Category = {
@@ -48,7 +58,7 @@ export type Category = {
 }
 
 export type Product = {
-    id: number;
+    id: string;
     name: string;
     slug: string;
     price: number;
@@ -86,4 +96,4 @@ export type MiminalUser = {
     first_name: string;
     last_name: string;
     cart_count: number;
-  };
+};

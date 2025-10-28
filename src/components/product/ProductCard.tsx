@@ -15,16 +15,28 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
   const router = useRouter();
 
-  const image = product.images[0];
-  const { id, name, slug, price, category } = product;  
+  const image = product.images[0].url;
+  const { id, name, slug, price, category, variations } = product;
   
   const handleAddToCart = () => {
+    // Convert variations array into Record<string, string>
+    const selectedVariations: Record<string, string> = {};
+
+    if (variations && variations.length > 0) {
+      variations.forEach((variation) => {
+        // For simplicity, just pick the first option
+        selectedVariations[variation.name] = variation.options[0]?.name || "";
+      });
+    }
+
     addToCart({
-      id,
-      name,
-      price,
-      image,
-      category: category.name ?? "Uncategorized",
+      id: id,
+      name: name,
+      price_at_add: price,
+      image: image,
+      category: category.name,
+      quantity: 1,
+      selected_variations: selectedVariations,
     });
   };
 
@@ -32,11 +44,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
     <div className="group rounded-lg border bg-[theme(--card)] text-[theme(--card-foreground)] shadow-sm overflow-hidden border-[theme(--border)]/40 hover:border-[theme(--primary)]/40 transition-all duration-300 hover:shadow-[theme(--card)]">
       <div className="p-0">
         {/* Image */}
-        <div
-          className="relative aspect-square overflow-hidden bg-[theme(--muted)]/30 cursor-pointer"
-        >
+        <div className="relative aspect-square overflow-hidden bg-[theme(--muted)]/30 cursor-pointer">
           <Image
-            src={`${image.url}`}
+            src={`${image}`}
             alt={name}
             loading="lazy"
             fill

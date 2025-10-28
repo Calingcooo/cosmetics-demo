@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LuMinus, LuPlus, LuTrash2 } from "react-icons/lu";
@@ -7,8 +8,13 @@ import { LuMinus, LuPlus, LuTrash2 } from "react-icons/lu";
 import { useCart } from "../hooks/useCart";
 
 const CartPage = () => {
-  const { items, updateQuantity, removeFromCart, totalPrice } = useCart();
+  const { items, updateQuantity, myCart, removeFromCart, totalPrice } =
+    useCart();
   const router = useRouter();
+
+  useEffect(() => {
+    myCart;
+  }, []);
 
   // ✅ Empty cart
   if (items.length === 0) {
@@ -44,30 +50,35 @@ const CartPage = () => {
               className="flex gap-4 bg-[theme(--card)] p-4 rounded-lg border border-[theme(--border)]/40 shadow-sm"
             >
               <Image
-                src={`${item.image}`}
-                alt={item.name}
+                src={`${item.product.images[0].url}`}
+                alt={item.product.name}
                 loading="lazy"
+                width={250}
+                height={250}
                 className="w-24 h-24 object-cover rounded"
               />
               <div className="flex-1">
-                <h3 className="font-semibold mb-1">{item.name}</h3>
+                <h3 className="font-semibold mb-1">{item.product.name}</h3>
                 <p className="text-sm text-[theme(--muted-foreground)] mb-1">
                   {item.category}
                 </p>
-                {item.selectedVariations &&
-                  Object.keys(item.selectedVariations).length > 0 && (
-                    <div className="text-xs text-[theme(--foreground)] mb-2 space-y-1">
-                      {Object.entries(item.selectedVariations).map(
-                        ([key, value]) => (
-                          <div key={key}>
-                            <span className="font-medium">{key}:</span> {value}
+                {item.selected_variations &&
+                  Object.keys(item.selected_variations).length > 0 && (
+                    <div className="text-xs text-[theme(--foreground)] mb-2">
+                      {Object.entries(item.selected_variations).map(
+                        ([attribute, option]) => (
+                          <div key={attribute} className="flex gap-1">
+                            <span className="font-semibold capitalize">
+                              {attribute}:
+                            </span>
+                            <span>{option}</span>
                           </div>
                         )
                       )}
                     </div>
                   )}
                 <p className="text-[theme(--primary)] font-bold">
-                  ${item.price.toFixed(2)}
+                  ${item.price_at_add}
                 </p>
               </div>
 
@@ -75,7 +86,7 @@ const CartPage = () => {
                 <button
                   className="h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors cursor-pointer"
                   onClick={() =>
-                    removeFromCart(item.id, item.selectedVariations)
+                    removeFromCart(item.id, item.selected_variations)
                   }
                 >
                   <LuTrash2 className="h-4 w-4" />
@@ -87,7 +98,7 @@ const CartPage = () => {
                       updateQuantity(
                         item.id,
                         item.quantity - 1,
-                        item.selectedVariations
+                        item.selected_variations
                       )
                     }
                   >
@@ -100,7 +111,7 @@ const CartPage = () => {
                       updateQuantity(
                         item.id,
                         item.quantity + 1,
-                        item.selectedVariations
+                        item.selected_variations
                       )
                     }
                   >

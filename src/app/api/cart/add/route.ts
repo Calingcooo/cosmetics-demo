@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import jwt, { TokenExpiredError } from "jsonwebtoken"
-
 import { serverApi } from "@/lib/axios/instance";
-import type { ApiErrorResponse } from "@/app/types";
 import type { AxiosError } from "axios";
+import type { ApiResponse, ApiErrorResponse } from "@/app/types";
+import type { CartItem } from "@/app/types";
 
-export async function GET() {
+export async function POST(req: Request) {
     const cookie = await cookies()
     const token = cookie.get("token")?.value;
 
@@ -15,22 +14,20 @@ export async function GET() {
     }
 
     try {
-        jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret") as any;
+        const body = await req.json()        
 
-        const res = await serverApi.get("/auth/me", {
-            headers: { Authorization: `Bearer ${token}` },
-        })
+        const { data } = await serverApi.post("/cart/add", body, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
         
-        return NextResponse.json({ success: true, user: res?.data?.data.user });
-    } catch (error) {
-        const axiosError = error as AxiosError<ApiErrorResponse>;
+        const response = NextResponse.json({
+            success: true,
+            data: { cart: data?.data.cart.items }
+        });
 
-        if (error instanceof TokenExpiredError) {
-            return NextResponse.json(
-                { success: false, message: "Token expired. Please login again." },
-                { status: 401 }
-            );
-        }
+        return response
+    } catch (error: unknown) {
+        const axiosError = error as AxiosError<ApiErrorResponse>;
 
         if (axiosError.response) {
             return NextResponse.json(
@@ -47,4 +44,5 @@ export async function GET() {
             { status: 500 }
         );
     }
+
 }

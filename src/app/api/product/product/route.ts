@@ -13,7 +13,7 @@ export async function GET(req: Request) {
         
         const response = NextResponse.json({
             success: true,
-            product: res?.data?.data.product,
+            data: { product: res?.data?.data.product },
         });
 
         return response

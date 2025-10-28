@@ -10,11 +10,10 @@ export async function GET(req: Request) {
         const category = searchParams.get("category") || "";
 
         const res = await serverApi.get(`/product/all?page=${page}&limit=8&category=${category}`)
-        
+
         const response = NextResponse.json({
             success: true,
-            products: res?.data?.data.products,
-            totalPages: res?.data?.data.totalPages
+            data: { products: res?.data?.data.products, totalPages: res?.data?.data.totalPages }
         });
 
         return response

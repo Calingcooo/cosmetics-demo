@@ -20,7 +20,7 @@ export async function GET(req: Request) {
 
         const response = NextResponse.json({
             success: true,
-            data: { cart: data?.data.cart }
+            data: { cart: data.data.cart }
         });
 
         return response
