@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import type { AxiosError } from "axios";
 import { useToast } from "../app/hooks/useToast";
-import { useAuth } from "../app/hooks/useAuth";
+import { useAuth } from "@/lib/hooks/auth/useAuth";
 import { cartService } from "@/lib/api/cartService";
 import type { CartItem } from "@/app/types";
 
@@ -79,23 +79,23 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [addToast]);
 
   // Migrate guest cart -> authenticated cart
-  // const migrateGuestCart = useCallback(async () => {
-  //   const stored = localStorage.getItem("guest_cart");
-  //   if (!stored) return;
+  const migrateGuestCart = useCallback(async () => {
+    const stored = localStorage.getItem("guest_cart");
+    if (!stored) return;
 
-  //   const guestItems = JSON.parse(stored) as CartItem[];
-  //   if (guestItems.length === 0) return;
+    const guestItems = JSON.parse(stored) as CartItem[];
+    if (guestItems.length === 0) return;
 
-  //   try {
-  //     for (const item of guestItems) {
-  //       await cartService.addCart("/api/cart/add", item);
-  //     }
-  //     localStorage.removeItem("guest_cart");
-  //     await loadUserCart();
-  //   } catch (error) {
-  //     console.error("⚠️ Error migrating guest cart:", error);
-  //   }
-  // }, [loadUserCart]);
+    try {
+      for (const item of guestItems) {
+        await cartService.addCart("/api/cart/add", item);
+      }
+      localStorage.removeItem("guest_cart");
+      await loadUserCart();
+    } catch (error) {
+      console.error("⚠️ Error migrating guest cart:", error);
+    }
+  }, [loadUserCart]);
 
   // Determine which cart to load
   useEffect(

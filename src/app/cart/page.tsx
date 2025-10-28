@@ -5,15 +5,15 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LuMinus, LuPlus, LuTrash2 } from "react-icons/lu";
 
-import { useCart } from "../hooks/useCart";
+import { useCart } from "@/lib/hooks/cart/useCart";
 
 const CartPage = () => {
-  const { items, updateQuantity, myCart, removeFromCart, totalPrice } =
+  const { items, updateQuantity, fetchUserCart, removeFromCart, totalPrice } =
     useCart();
   const router = useRouter();
 
   useEffect(() => {
-    myCart;
+    fetchUserCart();
   }, []);
 
   // ✅ Empty cart
@@ -50,15 +50,15 @@ const CartPage = () => {
               className="flex gap-4 bg-[theme(--card)] p-4 rounded-lg border border-[theme(--border)]/40 shadow-sm"
             >
               <Image
-                src={`${item.product.images[0].url}`}
-                alt={item.product.name}
+                src={`${item.image}`}
+                alt={item.name}
                 loading="lazy"
                 width={250}
                 height={250}
                 className="w-24 h-24 object-cover rounded"
               />
               <div className="flex-1">
-                <h3 className="font-semibold mb-1">{item.product.name}</h3>
+                <h3 className="font-semibold mb-1">{item.name}</h3>
                 <p className="text-sm text-[theme(--muted-foreground)] mb-1">
                   {item.category}
                 </p>
@@ -85,9 +85,7 @@ const CartPage = () => {
               <div className="flex flex-col items-end justify-between">
                 <button
                   className="h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors cursor-pointer"
-                  onClick={() =>
-                    removeFromCart(item.id, item.selected_variations)
-                  }
+                  onClick={() => removeFromCart({ id: item.id })}
                 >
                   <LuTrash2 className="h-4 w-4" />
                 </button>
@@ -95,11 +93,11 @@ const CartPage = () => {
                   <button
                     className="h-10 w-10 border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center rounded-md transition-colors cursor-pointer"
                     onClick={() =>
-                      updateQuantity(
-                        item.id,
-                        item.quantity - 1,
-                        item.selected_variations
-                      )
+                      updateQuantity({
+                        id: item.id,
+                        quantity: item.quantity - 1,
+                        selected_variations: item.selected_variations,
+                      })
                     }
                   >
                     <LuMinus className="h-3 w-3" />
@@ -108,11 +106,11 @@ const CartPage = () => {
                   <button
                     className="h-10 w-10 border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center rounded-md transition-colors cursor-pointer"
                     onClick={() =>
-                      updateQuantity(
-                        item.id,
-                        item.quantity + 1,
-                        item.selected_variations
-                      )
+                      updateQuantity({
+                        id: item.id,
+                        quantity: item.quantity + 1,
+                        selected_variations: item.selected_variations,
+                      })
                     }
                   >
                     <LuPlus className="h-3 w-3" />

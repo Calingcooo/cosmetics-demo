@@ -6,9 +6,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { useUser } from "../hooks/useUser";
 
-import PersonalInformationForm from "@/components/pages/account/PersonalInformationForm";
-import ShippingDetailsForm from "@/components/pages/account/ShippingDetailsForm";
-import PaymentMethod from "@/components/pages/account/PaymentMethod";
+import PersonalInformationForm from "./PersonalInformationForm";
+import ShippingDetailsForm from "./ShippingDetailsForm";
+import PaymentMethod from "./PaymentMethod";
 
 const MyAccountPage = () => {
   const { user, getMe } = useUser();

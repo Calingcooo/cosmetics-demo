@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { serverApi } from "@/lib/axios/instance";
 import type { AxiosError } from "axios";
-import type { ApiResponse, ApiErrorResponse } from "@/app/types";
-import type { CartItem } from "@/app/types";
+import type { ApiResponse, ApiErrorResponse, Cart } from "@/app/types";
 
 export async function POST(req: Request) {
     const cookie = await cookies()
@@ -14,17 +13,18 @@ export async function POST(req: Request) {
     }
 
     try {
-        const body = await req.json()        
-
-        const { data } = await serverApi.post("/cart/add", body, {
-            headers: { Authorization: `Bearer ${token}` }
+        const body = await req.json()
+        console.log(body)
+        const { data } = await serverApi.post<ApiResponse<{ cart: Cart }>>("/cart/remove-item", body, {
+            headers: { Authorization: `Bearer ${token}` },
         });
-        
+
+        console.log(data)
+
         const response = NextResponse.json({
             success: true,
-            data: { cart: data?.data.cart.items }
+            data: { cart: data.data.cart }
         });
-
         return response
     } catch (error: unknown) {
         const axiosError = error as AxiosError<ApiErrorResponse>;
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: axiosError.response.data?.message || "Failed to add the product to cart"
+                    message: axiosError.response.data?.message || "Failed to remove item from cart"
                 },
                 { status: axiosError.response.status }
             );
@@ -44,5 +44,4 @@ export async function POST(req: Request) {
             { status: 500 }
         );
     }
-
 }

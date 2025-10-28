@@ -6,7 +6,7 @@ import { User } from "@/app/types";
 
 import { useUser } from "@/app/hooks/useUser";
 
-import Header from "./Header";
+import TabHeader from "./TabHeader";
 import InputField from "@/components/ui/input/InputField";
 
 type PersonalUser = Pick<
@@ -60,7 +60,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
   return (
     <div className="space-y-4 bg-[theme(--card)] p-5">
       {/* Header */}
-      <Header
+      <TabHeader
         title="Personal Information"
         subtitle="Update your personal details here."
       />

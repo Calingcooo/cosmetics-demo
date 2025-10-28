@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LuSearch, LuShoppingBag, LuUser, LuMenu } from "react-icons/lu";
 import Link from "next/link";
 
-import { useCart } from "@/app/hooks/useCart";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useCart } from "@/lib/hooks/cart/useCart";
+import { useAuth } from "@/lib/hooks/auth/useAuth";
 
 import MobileNav from "./MobileNav";
 import UserMenu from "./UserMenu";
@@ -13,7 +13,7 @@ import UserMenu from "./UserMenu";
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { initialized, minimalUser, isAuthenticated, logout } = useAuth();
-  const { cartCount, setCartCount } = useCart();
+  const { cartCount } = useCart();
 
   const navItems = [
     { name: "home", href: "/" },
@@ -22,11 +22,7 @@ const Header = () => {
   ];
 
   const handleToggle = () => setIsOpen((prev) => !prev);
-
-  useEffect(() => {
-    setCartCount(minimalUser?.cart_count || 0)
-  }, [])
-
+  
   return (
     <>
       {/* HEADER */}

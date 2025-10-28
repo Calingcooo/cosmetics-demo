@@ -1,3 +1,5 @@
+"use client;"
+
 import Image from "next/image";
 import aboutBanner from "../../../public/assets/products/about-banner.jpg";
 

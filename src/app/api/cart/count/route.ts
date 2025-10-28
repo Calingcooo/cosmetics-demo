@@ -2,10 +2,9 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { serverApi } from "@/lib/axios/instance";
 import type { AxiosError } from "axios";
-import type { ApiResponse, ApiErrorResponse } from "@/app/types";
-import type { CartItem } from "@/app/types";
+import type { ApiErrorResponse } from "@/app/types";
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
     const cookie = await cookies()
     const token = cookie.get("token")?.value;
 
@@ -14,15 +13,15 @@ export async function POST(req: Request) {
     }
 
     try {
-        const body = await req.json()        
-
-        const { data } = await serverApi.post("/cart/add", body, {
+        const { data } = await serverApi.get("/cart/count", {
             headers: { Authorization: `Bearer ${token}` }
-        });
-        
+        })
+
+        console.log(data)
+
         const response = NextResponse.json({
             success: true,
-            data: { cart: data?.data.cart.items }
+            data: { cart_count: data.data.cart_count }
         });
 
         return response
@@ -33,7 +32,7 @@ export async function POST(req: Request) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: axiosError.response.data?.message || "Failed to add the product to cart"
+                    message: axiosError.response.data?.message || "Failed to fetch the carts count"
                 },
                 { status: axiosError.response.status }
             );

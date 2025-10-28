@@ -1,3 +1,5 @@
+"use client"
+
 import { Suspense } from "react";
 import MyAccountPage from "./MyAccountPage";
 import MyAccountSkeleton from "@/components/ui/loading/AccountPageSkeleton";

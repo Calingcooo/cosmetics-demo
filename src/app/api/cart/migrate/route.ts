@@ -14,17 +14,17 @@ export async function POST(req: Request) {
     }
 
     try {
-        const body = await req.json()        
-
-        const { data } = await serverApi.post("/cart/add", body, {
-            headers: { Authorization: `Bearer ${token}` }
+        const body = await req.json()
+        const { data } = await serverApi.post("/cart/migrate", body, {
+            headers: { Authorization: `Bearer ${token}` },
         });
-        
+
+        console.log(data)
+
         const response = NextResponse.json({
             success: true,
-            data: { cart: data?.data.cart.items }
+            data: { cart: data.data.cart }
         });
-
         return response
     } catch (error: unknown) {
         const axiosError = error as AxiosError<ApiErrorResponse>;
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: axiosError.response.data?.message || "Failed to add the product to cart"
+                    message: axiosError.response.data?.message || "Failed to fetch all products"
                 },
                 { status: axiosError.response.status }
             );
@@ -44,5 +44,4 @@ export async function POST(req: Request) {
             { status: 500 }
         );
     }
-
 }

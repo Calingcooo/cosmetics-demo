@@ -1,7 +1,9 @@
+"use client";
+
 import React from "react";
 import type { FormData } from "@/app/types";
 
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/lib/hooks/auth/useAuth";
 
 import InputField from "../../ui/input/InputField";
 
@@ -9,7 +11,8 @@ const LoginForm: React.FC<{
   formData: FormData;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }> = ({ formData, handleChange }) => {
-  const {authError} = useAuth()
+  const { authError } = useAuth();
+  
   return (
     <div className="space-y-4">
       <InputField
@@ -32,7 +35,14 @@ const LoginForm: React.FC<{
         placeholder="••••••••"
         error={authError}
       />
-      {authError && <p role="alert" className="text-xs italic ml-1 text-[theme(--destructive)]">{authError}</p>}
+      {authError && (
+        <p
+          role="alert"
+          className="text-xs italic ml-1 text-[theme(--destructive)]"
+        >
+          {authError}
+        </p>
+      )}
     </div>
   );
 };

@@ -1,11 +1,11 @@
 import React from "react";
 
-type HeaderProps = {
+type TabHeaderProps = {
   title: string;
   subtitle: string;
 };
 
-const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
+const TabHeader: React.FC<TabHeaderProps> = ({ title, subtitle }) => {
   return (
     <div>
       <h2 className="text-xl font-semibold">{title}</h2>
@@ -14,4 +14,4 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
   );
 };
 
-export default Header;
+export default TabHeader;

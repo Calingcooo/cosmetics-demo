@@ -6,7 +6,7 @@ import PSGC from "@efdiaz/psgc";
 import { useUser } from "@/app/hooks/useUser";
 import type { User } from "@/app/types";
 
-import Header from "./Header";
+import TabHeader from "./TabHeader";
 import InputField from "@/components/ui/input/InputField";
 import SelectField from "@/components/ui/select/SelectField";
 
@@ -169,7 +169,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
 
   return (
     <div className="space-y-4 bg-[theme(--card)] p-5">
-      <Header
+      <TabHeader
         title="Shipping Details"
         subtitle="Manage your shipping address"
       />

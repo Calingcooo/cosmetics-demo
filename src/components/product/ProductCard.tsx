@@ -4,7 +4,7 @@ import { LuShoppingCart, LuEye } from "react-icons/lu";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import { useCart } from "@/app/hooks/useCart";
+import { useCart } from "@/lib/hooks/cart/useCart";
 import { Product } from "@/app/types";
 
 interface ProductCardProps {
@@ -17,7 +17,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   const image = product.images[0].url;
   const { id, name, slug, price, category, variations } = product;
-  
+
   const handleAddToCart = () => {
     // Convert variations array into Record<string, string>
     const selectedVariations: Record<string, string> = {};

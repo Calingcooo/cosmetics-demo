@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import clsx from "clsx";
 
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@/lib/hooks/auth/useAuth";
 import Social from "@/components/pages/login/Social";
 import LoginForm from "@/components/pages/login/LoginForm";
 import CreateAccountForm from "@/components/pages/login/CreateAccountForm";
@@ -19,7 +19,7 @@ const LoginPage = () => {
     modeParam as "login" | "signup"
   );
 
-  const { loading, hanndleSubmit, setAuthError } = useAuth();
+  const { loading, login, register, clearError } = useAuth();
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -28,10 +28,20 @@ const LoginPage = () => {
     confirm_password: "",
   });
 
-  // Update mode when URL param changes
   useEffect(() => {
     setMode(modeParam as "login" | "signup");
+    clearError(); // ✅ clear errors when switching mode via URL
   }, [modeParam]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (mode === "signup") {
+      register(formData);
+    } else {
+      login({ email: formData.email, password: formData.password });
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,14 +50,14 @@ const LoginPage = () => {
   const toggleMode = () => {
     const newMode = mode === "login" ? "signup" : "login";
     router.replace(`/login?mode=${newMode}`);
-    setAuthError(null)
+    clearError();
     setFormData({
       first_name: "",
       last_name: "",
       email: "",
       password: "",
       confirm_password: "",
-    })
+    });
   };
 
   return (
@@ -92,14 +102,12 @@ const LoginPage = () => {
           </div>
 
           {/* Form */}
-          <form
-            onSubmit={(e) =>
-              hanndleSubmit(formData, e, mode === "signup" ? "signup" : "")
-            }
-            className="gap-4"
-          >
+          <form onSubmit={handleSubmit} className="gap-4">
             {mode === "signup" ? (
-              <CreateAccountForm formData={formData} handleChange={handleChange} />
+              <CreateAccountForm
+                formData={formData}
+                handleChange={handleChange}
+              />
             ) : (
               <LoginForm formData={formData} handleChange={handleChange} />
             )}
