@@ -25,6 +25,15 @@ export const cartService = {
             withCredentials: true,
         }),
 
+    // Update an item from the cart
+    updateItem: (
+        endpoint: string,
+        data: { id: string; quantity: number, selected_variations?: Record<string, string> }
+    ) =>
+        api.post<ApiResponse<{ cart: Cart }>>(endpoint, data, {
+            withCredentials: true,
+        }),
+
     // Clear all items from the user's cart
     clearCart: (endpoint: string) =>
         api.post<ApiResponse<{ success: boolean }>>(endpoint, {}, {

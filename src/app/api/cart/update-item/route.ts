@@ -14,13 +14,15 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json()
-        const { data } = await serverApi.post<ApiResponse<{ cart: Cart }>>("/cart/remove-item", body, {
+        const { data } = await serverApi.post<ApiResponse<{ cart: Cart }>>("/cart/update-item", body, {
             headers: { Authorization: `Bearer ${token}` },
         });
 
+        console.log(data)
+
         const response = NextResponse.json({
             success: true,
-            data: { cart: data.data.cart }
+            // data: { cart: data.data.cart }
         });
         return response
     } catch (error: unknown) {

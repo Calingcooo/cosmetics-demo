@@ -23,7 +23,6 @@ export default function SessionInitializer() {
       
       // Only migrate if there are guest items and migration hasn't been done
       const guestItems = JSON.parse(localStorage.getItem("guest_cart") || "[]");
-      console.log(guestItems)
       if (guestItems.length > 0) {
         migrateGuestCart();
       } else {

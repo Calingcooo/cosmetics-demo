@@ -6,9 +6,10 @@ import {
     addToCart,
     removeFromCart,
     loadGuestCartState,
-    updateQuantity,
     migrateGuestCart,
-    fetchCartCount
+    fetchCartCount,
+    updateItemCart,
+    updateQuantityImmediate 
 } from "@/redux/slice/cartSlice";
 import type { CartItem } from "@/app/types";
 
@@ -37,11 +38,17 @@ export function useCart() {
             selected_variations?: Record<string, string>;
         }) => dispatch(removeFromCart(params)),
 
-        updateQuantity: (params: {
+        updateItemCart: (params: {
             id: string;
             quantity: number;
             selected_variations?: Record<string, string>;
-        }) => dispatch(updateQuantity(params)),
+        }) => dispatch(updateItemCart(params)),
+
+        updateQuantityImmediate : (params: {
+            id: string;
+            quantity: number;
+            selected_variations?: Record<string, string>;
+        }) => dispatch(updateQuantityImmediate (params)), // Immediate quantity reflection
 
         loadGuestCartState: () => dispatch(loadGuestCartState()),
         migrateGuestCart: () => dispatch(migrateGuestCart()),

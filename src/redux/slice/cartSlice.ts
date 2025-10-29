@@ -100,7 +100,6 @@ export const fetchUserCart = createAsyncThunk("cart/fetchUserCart", async () => 
 // 🧭 Fetch only the cart count (for authenticated users)
 export const fetchCartCount = createAsyncThunk("cart/fetchCartCount", async () => {
     const { data } = await cartService.count("/api/cart/count");
-    console.log(data)
     return data.data.cart_count as number;
 });
 
@@ -206,6 +205,68 @@ export const removeFromCart = createAsyncThunk<
     }
 });
 
+// 🧭 Remove item
+export const updateItemCart = createAsyncThunk<
+    CartItem[],
+    { id: string; quantity: number; selected_variations?: Record<string, string> },
+    { state: RootState }
+>("cart/updateItemCart", async ({ id, quantity, selected_variations }, { getState }) => {
+    const { auth, cart } = getState();
+    // const filtered = cart.items.filter(
+    //     (item) =>
+    //         !(
+    //             item.id === id &&
+    //             JSON.stringify(item.selected_variations) === JSON.stringify(selected_variations)
+    //         )
+    // );
+    if (auth.isAuthenticated) {
+        try {
+            await cartService.updateItem("/api/cart/update-item", {
+                id,
+                quantity,
+                selected_variations,
+            });
+
+            const updatedItems = cart.items.map((item) => {
+                if (
+                    item.id === id &&
+                    JSON.stringify(item.selected_variations) ===
+                    JSON.stringify(selected_variations)
+                ) {
+                    return { ...item, quantity };
+                }
+                return item;
+            }).filter((item) => item.quantity > 0);
+
+            //   toast({
+            //     title: "Removed from Cart",
+            //     description: "Item removed successfully.",
+            //     variant: "destructive",
+            //   });
+
+            // ✅ Fetch the updated cart
+            return updatedItems as CartItem[];
+        } catch {
+            throw new Error("Failed to remove item from cart.");
+        }
+    } else {
+        const filtered = cart.items.filter(
+            (item) =>
+                !(
+                    item.id === id &&
+                    JSON.stringify(item.selected_variations) === JSON.stringify(selected_variations)
+                )
+        );
+        saveGuestCart(filtered);
+        // toast({
+        //   title: "Removed from Cart",
+        //   description: "Item removed successfully.",
+        //   variant: "destructive",
+        // });
+        return filtered;
+    }
+});
+
 // 🧭 Clear Cart
 // export const clearCart = createAsyncThunk<void, void, { state: RootState }>(
 //   "cart/clearCart",
@@ -241,7 +302,7 @@ const cartSlice = createSlice({
         clearMigration: () => {
             clearMigrationStatus(); // Manually clear migration status
         },
-        updateQuantity: (
+        updateQuantityImmediate: (
             state,
             action: PayloadAction<{
                 id: string;
@@ -297,6 +358,12 @@ const cartSlice = createSlice({
                 state.cartCount = cartCount;
                 state.totalPrice = totalPrice;
             })
+            .addCase(updateItemCart.fulfilled, (state, action) => {
+                state.items = action.payload;
+                const { totalPrice, cartCount } = calculateTotals(action.payload);
+                state.cartCount = cartCount;
+                state.totalPrice = totalPrice;
+            })
             .addCase(migrateGuestCart.fulfilled, (state, action) => {
                 state.items = action.payload;
                 const { totalPrice, cartCount } = calculateTotals(action.payload);
@@ -317,5 +384,5 @@ const cartSlice = createSlice({
     },
 });
 
-export const { loadGuestCartState, updateQuantity } = cartSlice.actions;
+export const { loadGuestCartState, updateQuantityImmediate } = cartSlice.actions;
 export default cartSlice.reducer;

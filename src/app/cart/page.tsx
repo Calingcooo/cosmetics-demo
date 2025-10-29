@@ -6,14 +6,26 @@ import { useRouter } from "next/navigation";
 import { LuMinus, LuPlus, LuTrash2 } from "react-icons/lu";
 
 import { useCart } from "@/lib/hooks/cart/useCart";
+import { useDebounce } from "@/lib/hooks/debounce/useDebounce";
 
 import CartPageSkeleton from "@/components/ui/loading/CartPageSkeleton";
 
 const CartPage = () => {
-  const { items, updateQuantity, fetchUserCart, removeFromCart, totalPrice } =
+  const { items, updateItemCart, updateQuantityImmediate , fetchUserCart, removeFromCart, totalPrice } =
     useCart();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+
+  const debouncedUpdate = useDebounce(
+    (
+      id: string,
+      quantity: number,
+      selected_variations: Record<string, string>
+    ) => {
+      updateItemCart({ id, quantity, selected_variations });
+    },
+    400
+  );
 
   useEffect(() => {
     const loadCart = async () => {
@@ -26,6 +38,15 @@ const CartPage = () => {
   if (loading) {
     return <CartPageSkeleton />;
   }
+
+  const handleQuantityChange = (
+    id: string,
+    quantity: number,
+    selected_variations: Record<string, string>
+  ) => {
+    updateQuantityImmediate({ id, quantity, selected_variations })
+    debouncedUpdate(id, quantity, selected_variations);
+  };
 
   // ✅ Empty cart
   if (items.length === 0) {
@@ -104,11 +125,11 @@ const CartPage = () => {
                   <button
                     className="h-10 w-10 border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center rounded-md transition-colors cursor-pointer"
                     onClick={() =>
-                      updateQuantity({
-                        id: item.id,
-                        quantity: item.quantity - 1,
-                        selected_variations: item.selected_variations,
-                      })
+                      handleQuantityChange(
+                        item.id,
+                        item.quantity - 1,
+                        item.selected_variations ?? {}
+                      )
                     }
                   >
                     <LuMinus className="h-3 w-3" />
@@ -117,11 +138,11 @@ const CartPage = () => {
                   <button
                     className="h-10 w-10 border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center rounded-md transition-colors cursor-pointer"
                     onClick={() =>
-                      updateQuantity({
-                        id: item.id,
-                        quantity: item.quantity + 1,
-                        selected_variations: item.selected_variations,
-                      })
+                      handleQuantityChange(
+                        item.id,
+                        item.quantity + 1,
+                        item.selected_variations ?? {}
+                      )
                     }
                   >
                     <LuPlus className="h-3 w-3" />
