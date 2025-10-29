@@ -1,20 +1,31 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LuMinus, LuPlus, LuTrash2 } from "react-icons/lu";
 
 import { useCart } from "@/lib/hooks/cart/useCart";
 
+import CartPageSkeleton from "@/components/ui/loading/CartPageSkeleton";
+
 const CartPage = () => {
   const { items, updateQuantity, fetchUserCart, removeFromCart, totalPrice } =
     useCart();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchUserCart();
+    const loadCart = async () => {
+      await fetchUserCart();
+      setLoading(false);
+    };
+    loadCart();
   }, []);
+
+  if (loading) {
+    return <CartPageSkeleton />;
+  }
 
   // ✅ Empty cart
   if (items.length === 0) {

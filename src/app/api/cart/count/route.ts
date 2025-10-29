@@ -17,8 +17,6 @@ export async function GET(req: Request) {
             headers: { Authorization: `Bearer ${token}` }
         })
 
-        console.log(data)
-
         const response = NextResponse.json({
             success: true,
             data: { cart_count: data.data.cart_count }
