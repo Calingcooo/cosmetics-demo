@@ -113,13 +113,9 @@ export const addToCart = createAsyncThunk<
 
     if (auth.isAuthenticated) {
         try {
-            const { data } = await cartService.addCart("/api/cart/add", item);
-            //   toast({
-            //     title: "Added to Cart",
-            //     description: `${item.name} added to your cart.`,
-            //   });
-            const refreshed = await cartService.me("/api/cart/me");
-            return refreshed.data.data.cart.items as CartItem[];
+            const { data } = await cartService.addToCart("/api/cart/add", item);
+
+            return data.data.cart as CartItem[];
         } catch (error) {
             const err = error as AxiosError<{ message?: string }>;
             throw new Error(err.response?.data?.message || "Failed to add to cart.");
@@ -141,16 +137,8 @@ export const addToCart = createAsyncThunk<
                     ? { ...i, quantity: i.quantity + 1 }
                     : i
             );
-            //   toast({
-            //     title: "Updated Cart",
-            //     description: `${item.name} quantity increased.`,
-            //   });
         } else {
             newCart = [...guestItems, { ...item, quantity: 1 }];
-            //   toast({
-            //     title: "Added to Cart",
-            //     description: `${item.name} added to your cart.`,
-            //   });
         }
 
         saveGuestCart(newCart);
@@ -166,24 +154,11 @@ export const removeFromCart = createAsyncThunk<
 >("cart/removeFromCart", async ({ id, selected_variations }, { getState }) => {
     const { auth, cart } = getState();
 
-    const filtered = cart.items.filter(
-        (item) =>
-            !(
-                item.id === id &&
-                JSON.stringify(item.selected_variations) === JSON.stringify(selected_variations)
-            )
-    );
     if (auth.isAuthenticated) {
         try {
-            await cartService.removeItem("/api/cart/remove-item", { id, selected_variations });
-            const refreshed = await cartService.me("/api/cart/me");
+            const { data } = await cartService.removeItem("/api/cart/remove-item", { id, selected_variations });
 
-            //   toast({
-            //     title: "Removed from Cart",
-            //     description: "Item removed successfully.",
-            //     variant: "destructive",
-            //   });
-            return refreshed.data.data.cart.items as CartItem[];
+            return data.data.cart.items as CartItem[];
         } catch {
             throw new Error("Failed to remove item from cart.");
         }
@@ -196,11 +171,6 @@ export const removeFromCart = createAsyncThunk<
                 )
         );
         saveGuestCart(filtered);
-        // toast({
-        //   title: "Removed from Cart",
-        //   description: "Item removed successfully.",
-        //   variant: "destructive",
-        // });
         return filtered;
     }
 });

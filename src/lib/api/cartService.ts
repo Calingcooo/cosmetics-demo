@@ -11,7 +11,7 @@ export const cartService = {
     }),
 
     // Add an item to the cart
-    addCart: (endpoint: string, item: CartItem) =>
+    addToCart: (endpoint: string, item: CartItem) =>
         api.post<ApiResponse<{ cart: CartItem[] }>>(endpoint, item, {
             withCredentials: true,
         }),
