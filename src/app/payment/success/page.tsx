@@ -1,4 +1,4 @@
-// app/payment/success/page.tsx
+// app/payments/success/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,18 +10,32 @@ export default function PaymentSuccess() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState("loading");
 
-  const paymentId = searchParams.get("payment_id");
-  const paymentRequestId = searchParams.get("payment_request_id");
+  // HitPay sends these parameters after payment
+  const orderId = searchParams.get("order_id");
+  const reference = searchParams.get("reference");
+  const paymentStatus = searchParams.get("status");
+  const paymentId = searchParams.get("id");
+
+  console.log("Payment success parameters:", {
+    orderId,
+    reference,
+    paymentStatus,
+    paymentId,
+    allParams: Object.fromEntries(searchParams.entries()),
+  });
 
   useEffect(() => {
-    if (paymentId && paymentRequestId) {
+    // If we have an order ID, consider it successful for now
+    // The webhook will update the actual status in the background
+    if (orderId || reference) {
       setStatus("success");
       // Clear cart data
       sessionStorage.removeItem("hitpay_checkout_data");
+      localStorage.removeItem("cart"); // If you use localStorage
     } else {
       setStatus("error");
     }
-  }, [paymentId, paymentRequestId]);
+  }, [orderId, reference]);
 
   return (
     <div className="flex-1 bg-[theme(--background)] flex items-center justify-center p-4">
@@ -30,10 +44,10 @@ export default function PaymentSuccess() {
           <>
             <div className="w-16 h-16 border-4 border-[theme(--primary)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <h1 className="text-2xl font-bold text-[theme(--foreground)] mb-2">
-              Verifying Payment...
+              Processing Payment...
             </h1>
             <p className="text-[theme(--muted-foreground)]">
-              Please wait while we confirm your payment.
+              Please wait while we process your payment.
             </p>
           </>
         )}
@@ -52,20 +66,28 @@ export default function PaymentSuccess() {
                   strokeLinejoin="round"
                   strokeWidth="2"
                   d="M5 13l4 4L19 7"
-                ></path>
+                />
               </svg>
             </div>
             <h1 className="text-2xl font-bold text-[theme(--foreground)] mb-2">
-              Payment Successful!
+              Thank You for Your Order!
             </h1>
             <p className="text-[theme(--muted-foreground)] mb-4">
-              Thank you for your purchase. Your order has been confirmed.
+              Your payment is being processed. You will receive a confirmation
+              email shortly.
             </p>
-            {paymentId && (
+
+            {(orderId || reference) && (
               <div className="bg-[theme(--accent)] text-[theme(--accent-foreground)] rounded-lg p-3 mb-4 text-sm">
-                <p className="font-medium">Payment ID: {paymentId}</p>
+                <p className="font-medium">
+                  Order Reference: {orderId || reference}
+                </p>
+                <p className="text-xs mt-1">
+                  Check your orders page for updates
+                </p>
               </div>
             )}
+
             <div className="space-y-3">
               <Link
                 href="/orders"
@@ -97,27 +119,28 @@ export default function PaymentSuccess() {
                   strokeLinejoin="round"
                   strokeWidth="2"
                   d="M6 18L18 6M6 6l12 12"
-                ></path>
+                />
               </svg>
             </div>
             <h1 className="text-2xl font-bold text-[theme(--foreground)] mb-2">
-              Payment Failed
+              Payment Issue
             </h1>
             <p className="text-[theme(--muted-foreground)] mb-4">
-              There was an issue processing your payment. Please try again.
+              There was an issue with your payment. Please check your orders or
+              try again.
             </p>
             <div className="space-y-3">
               <Link
-                href="/cart"
+                href="/orders"
                 className="block w-full bg-[theme(--primary)] text-[theme(--primary-foreground)] py-2 px-4 rounded-md hover:bg-[theme(--primary)]/90 transition-colors font-medium"
               >
-                Return to Cart
+                Check Orders
               </Link>
               <Link
-                href="/products"
+                href="/cart"
                 className="block w-full border border-[theme(--input)] bg-[theme(--background)] text-[theme(--foreground)] py-2 px-4 rounded-md hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] transition-colors font-medium"
               >
-                Continue Shopping
+                Return to Cart
               </Link>
             </div>
           </>
