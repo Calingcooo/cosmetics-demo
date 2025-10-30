@@ -97,3 +97,47 @@ export type MiminalUser = {
     last_name: string;
     cart_count: number;
 };
+
+
+//****** PAYMENT ******//
+export interface HitPayCreatePaymentRequest {
+    amount: number;
+    email: string;
+    purpose: string;
+    items: Array<{
+        name: string;
+        quantity: number;
+        price: number;
+    }>;
+}
+
+export interface HitPayPaymentResponse {
+    id: string;
+    url: string;
+    status: string;
+    currency: string;
+    amount: number;
+    payment_request_id: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface HitPayWebhookData {
+    id: string;
+    payment_request_id: string;
+    payment_id: string;
+    status: 'completed' | 'failed' | 'pending';
+    amount: number;
+    currency: string;
+    email: string;
+    purpose: string;
+}
+
+export interface HitPayApiError {
+    code: string;
+    message: string;
+    errors?: Array<{
+        field: string;
+        message: string;
+    }>;
+}

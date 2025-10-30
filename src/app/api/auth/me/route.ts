@@ -10,6 +10,8 @@ export async function GET() {
     const cookie = await cookies()
     const token = cookie.get("token")?.value;
 
+    console.log(cookie)
+
     if (!token) {
         return NextResponse.json({ success: false, message: "Not authenticated" }, { status: 401 });
     }
@@ -20,7 +22,7 @@ export async function GET() {
         const res = await serverApi.get("/auth/me", {
             headers: { Authorization: `Bearer ${token}` },
         })
-        
+
         return NextResponse.json({ success: true, user: res?.data?.data.user });
     } catch (error) {
         const axiosError = error as AxiosError<ApiErrorResponse>;

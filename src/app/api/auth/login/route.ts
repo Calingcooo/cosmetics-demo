@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { serverApi } from "@/lib/axios/instance";
 import type { ApiErrorResponse } from "@/app/types";
 import type { AxiosError } from "axios";
+// import { withCors, corsOptions } from "@/lib/cors";
 
 export async function POST(req: Request) {
     try {
@@ -23,34 +24,34 @@ export async function POST(req: Request) {
             data: { user: res?.data?.data.user }
         });
 
-        // Attach the token as an HttpOnly cookie
+        // Set cookie with proper cross-origin settings
         response.cookies.set("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            maxAge: 60 * 60 * 24 * 7, // 7 Days
-            // maxAge: 5 * 1, // 5 seconds
-            sameSite: "strict",
-            path: "/"
+            secure: true,
+            maxAge: 60 * 60 * 24 * 7,
+            sameSite: "lax",
+            path: "/",
         });
 
-        return response;
+        return response
     } catch (error: unknown) {
         const axiosError = error as AxiosError<ApiErrorResponse>;
 
         if (axiosError.response) {
-            return NextResponse.json(
+            const errorResponse = NextResponse.json(
                 {
                     success: false,
                     message: axiosError.response.data?.message || "Login failed"
                 },
                 { status: axiosError.response.status }
             );
+            return errorResponse
         }
 
-        return NextResponse.json(
+        const errorResponse = NextResponse.json(
             { success: false, message: "Something went wrong" },
             { status: 500 }
         );
+        return errorResponse
     }
-
 }

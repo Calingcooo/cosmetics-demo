@@ -7,16 +7,24 @@ import { LuMinus, LuPlus, LuTrash2, LuCreditCard } from "react-icons/lu";
 
 import { useCart } from "@/lib/hooks/cart/useCart";
 import { useDebounce } from "@/lib/hooks/debounce/useDebounce";
+import { useAuth } from "@/lib/hooks/auth/useAuth";
 
 import CartPageSkeleton from "@/components/ui/loading/CartPageSkeleton";
 
 const CartPage = () => {
-  const { items, updateItemCart, updateQuantityImmediate, fetchUserCart, removeFromCart, totalPrice } =
-    useCart();
+  const {
+    items,
+    updateItemCart,
+    updateQuantityImmediate,
+    fetchUserCart,
+    removeFromCart,
+    totalPrice,
+  } = useCart();
   const router = useRouter();
+  const { minimalUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [checkoutError, setCheckoutError] = useState<string>("");
+  const [checkoutError, setCheckoutError] = useState("");
 
   const debouncedUpdate = useDebounce(
     (
@@ -37,120 +45,72 @@ const CartPage = () => {
     loadCart();
   }, []);
 
-  const handleCheckout = async () => {
+  const handleHitPayCheckout = async () => {
     if (items.length === 0) return;
 
     setCheckoutLoading(true);
     setCheckoutError("");
 
     try {
-      // Calculate final total including shipping
       const shippingCost = totalPrice >= 50 ? 0 : 5.99;
       const finalTotal = totalPrice + shippingCost;
 
-      console.log('🔄 Creating payment intent for total:', finalTotal);
+      console.log("🔄 Creating HitPay payment request for total:", finalTotal);
 
-      // Call our API route to create payment intent
-      const response = await fetch('/api/payment-intents', {
-        method: 'POST',
+      // Call our API route to create HitPay payment
+      const response = await fetch("/api/hitpay/create-payment", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           amount: finalTotal,
-          description: `Purchase of ${items.length} items`,
+          email: minimalUser?.email,
+          purpose: `Purchase of ${items.length} items`,
+          items: items.map((item) => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price_at_add,
+          })),
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create payment intent');
+        throw new Error(data.message || "Failed to create HitPay payment");
       }
 
-      console.log('✅ Payment intent created:', data.id);
+      if (!data.success) {
+        throw new Error(data.message || "HitPay payment creation failed");
+      }
 
-      // Store cart data temporarily for the checkout page
+      console.log("✅ HitPay payment created:", data.data);
+
+      // Store cart data temporarily for after payment
       const checkoutData = {
         items,
         total: finalTotal,
-        paymentIntentId: data.id,
-        clientKey: data.clientKey
+        hitpayId: data.data.id,
+        paymentRequestId: data.data.payment_request_id,
       };
-      
-      sessionStorage.setItem('checkout_data', JSON.stringify(checkoutData));
 
-      // Redirect to checkout page
-      router.push('/checkout');
-
-    } catch (error) {
-      console.error("Checkout error:", error);
-      setCheckoutError(error instanceof Error ? error.message : "Failed to initialize checkout");
-    } finally {
-      setCheckoutLoading(false);
-    }
-  };
-
-  const handleTestCheckout = async () => {
-    if (items.length === 0) return;
-
-    setCheckoutLoading(true);
-    setCheckoutError("");
-
-    try {
-      const shippingCost = totalPrice >= 50 ? 0 : 5.99;
-      const finalTotal = totalPrice + shippingCost;
-
-      console.log('🔄 Test checkout for total:', finalTotal);
-
-      // Call our API route to create payment intent
-      const response = await fetch('/api/payment-intents', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: finalTotal,
-          description: `Test purchase of ${items.length} items`,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create payment intent');
-      }
-
-      console.log('✅ Test payment intent created:', data.id);
-
-      // For test mode, show payment instructions
-      const proceed = window.confirm(
-        `TEST MODE: Payment intent created successfully!\n\n` +
-        `Payment Intent ID: ${data.id}\n` +
-        `Amount: $${finalTotal.toFixed(2)}\n\n` +
-        `You can:\n` +
-        `1. Use Paymongo's test cards in your payment form\n` +
-        `2. Check the Paymongo dashboard for this payment intent\n\n` +
-        `Click OK to proceed to a simple payment form.`
+      sessionStorage.setItem(
+        "hitpay_checkout_data",
+        JSON.stringify(checkoutData)
       );
 
-      if (proceed) {
-        // Store data for payment page
-        const paymentData = {
-          paymentIntentId: data.id,
-          clientKey: data.clientKey,
-          amount: finalTotal,
-          description: `Test purchase of ${items.length} items`,
-          items: items
-        };
-        
-        sessionStorage.setItem('test_payment_data', JSON.stringify(paymentData));
-        router.push('/test-payment');
+      // Redirect to HitPay payment page
+      if (data.data.url) {
+        window.location.href = data.data.url;
+      } else {
+        throw new Error("No payment URL received from HitPay");
       }
-
     } catch (error) {
-      console.error("Test checkout error:", error);
-      setCheckoutError(error instanceof Error ? error.message : "Payment failed");
+      console.error("HitPay checkout error:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to initialize payment";
+      setCheckoutError(errorMessage);
     } finally {
       setCheckoutLoading(false);
     }
@@ -165,7 +125,7 @@ const CartPage = () => {
     quantity: number,
     selected_variations: Record<string, string>
   ) => {
-    updateQuantityImmediate({ id, quantity, selected_variations })
+    updateQuantityImmediate({ id, quantity, selected_variations });
     debouncedUpdate(id, quantity, selected_variations);
   };
 
@@ -201,13 +161,92 @@ const CartPage = () => {
       <div className="grid lg:grid-cols-3 gap-8 flex-1">
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Your existing cart items code remains the same */}
           {items.map((item, index) => (
             <div
               key={`${item.id}-${index}`}
               className="flex gap-4 bg-[theme(--card)] p-4 rounded-lg border border-[theme(--border)]/40 shadow-sm"
             >
-              {/* ... existing item rendering code ... */}
+              {/* Your existing item rendering code */}
+              <div className="flex-shrink-0 w-24 h-24 relative">
+                <Image
+                  src={item.image || "/placeholder-product.jpg"}
+                  alt={item.name}
+                  fill
+                  className="object-cover rounded-md"
+                />
+              </div>
+
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg">{item.name}</h3>
+                <p className="text-[theme(--muted-foreground)] text-sm">
+                  ₱{item.price_at_add}
+                </p>
+
+                {item.selected_variations &&
+                  Object.keys(item.selected_variations).length > 0 && (
+                    <div className="text-xs text-[theme(--foreground)] mb-2 space-y-1">
+                      {Object.entries(item.selected_variations).map(
+                        ([key, value]) => (
+                          <div key={key}>
+                            <span className="font-medium">{key}:</span> {value}
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
+
+                {/* Quantity Controls */}
+                <div className="flex items-center gap-3 mt-2">
+                  <button
+                    onClick={() =>
+                      handleQuantityChange(
+                        item.id,
+                        Math.max(0, item.quantity - 1),
+                        item.selected_variations || {}
+                      )
+                    }
+                    className="w-8 h-8 rounded-full border border-[theme(--border)] inline-flex items-center justify-center hover:bg-[theme(--accent)] cursor-pointer"
+                  >
+                    <LuMinus className="h-3 w-3" />
+                  </button>
+
+                  <span className="text-sm font-medium w-8 text-center">
+                    {item.quantity}
+                  </span>
+
+                  <button
+                    onClick={() =>
+                      handleQuantityChange(
+                        item.id,
+                        item.quantity + 1,
+                        item.selected_variations || {}
+                      )
+                    }
+                    className="w-8 h-8 rounded-full border border-[theme(--border)] inline-flex items-center justify-center hover:bg-[theme(--accent)] cursor-pointer"
+                  >
+                    <LuPlus className="h-3 w-3" />
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      removeFromCart({
+                        id: item.id,
+                        selected_variations: item.selected_variations,
+                      })
+                    }
+                    className="ml-4 text-[theme(--destructive)] hover:text-[theme(--primary)] inline-flex items-center gap-1 text-sm cursor-pointer"
+                  >
+                    <LuTrash2 className="h-4 w-4" />
+                    Remove
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <p className="font-semibold">
+                  ${(item.price_at_add * item.quantity).toFixed(2)}
+                </p>
+              </div>
             </div>
           ))}
         </div>
@@ -216,10 +255,10 @@ const CartPage = () => {
         <div className="lg:col-span-1 bg-[theme(--card)] self-start shadow-sm">
           <div className="bg-card p-6 rounded-lg border border-[theme(--border)]/40 sticky top-4">
             <h2 className="text-xl font-bold mb-4">Order Summary</h2>
-            
-            {/* Test Mode Banner */}
+
+            {/* Sandbox Mode Banner */}
             <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-3 py-2 rounded mb-4 text-sm">
-              <strong>TEST MODE:</strong> Payments are simulated
+              <strong>SANDBOX MODE:</strong> Using HitPay Test Environment
             </div>
 
             {checkoutError && (
@@ -233,63 +272,55 @@ const CartPage = () => {
                 <span className="text-[theme(--muted-foreground)]">
                   Subtotal
                 </span>
-                <span>${totalPrice.toFixed(2)}</span>
+                <span>₱{totalPrice.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[theme(--muted-foreground)]">
                   Shipping
                 </span>
-                <span>{totalPrice >= 50 ? "FREE" : "$5.99"}</span>
+                <span>{totalPrice >= 50 ? "FREE" : "₱5.99"}</span>
               </div>
               <div className="border-t pt-3 flex justify-between font-bold">
                 <span>Total</span>
                 <span className="text-[theme(--primary)]">
-                  ${finalTotal.toFixed(2)}
+                  ₱{finalTotal.toFixed(2)}
                 </span>
               </div>
             </div>
 
-            {/* Checkout Buttons */}
+            {/* Checkout Button */}
             <div className="space-y-3">
               <button
-                className="h-11 rounded-md px-8 bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary)]/90 inline-flex items-center justify-center gap-2 text-sm font-medium w-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={handleCheckout}
+                className="h-11 rounded-md px-8 bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary)]/90 inline-flex items-center justify-center gap-2 text-sm font-medium w-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                onClick={handleHitPayCheckout}
                 disabled={checkoutLoading}
               >
                 {checkoutLoading ? (
-                  "Processing..."
+                  "Redirecting to Payment..."
                 ) : (
                   <>
                     <LuCreditCard className="h-4 w-4" />
-                    Proceed to Checkout
+                    Pay with HitPay
                   </>
                 )}
               </button>
 
-              {/* Test Payment Button */}
               <button
-                className="h-10 rounded-md px-8 bg-green-600 text-white hover:bg-green-700 inline-flex items-center justify-center gap-2 text-sm font-medium w-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={handleTestCheckout}
-                disabled={checkoutLoading}
-              >
-                {checkoutLoading ? "Processing..." : "Test Payment Now"}
-              </button>
-
-              <button
-                className="h-10 px-4 py-2 border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center rounded-md text-sm font-medium w-full transition-colors"
+                className="h-10 px-4 py-2 border border-[theme(--input)] bg-[theme(--background)] hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center rounded-md text-sm font-medium w-full transition-colors cursor-pointer"
                 onClick={() => router.push("/products")}
               >
                 Continue Shopping
               </button>
             </div>
 
-            {/* Test Card Info */}
+            {/* HitPay Test Info */}
             <div className="mt-4 p-3 bg-gray-100 rounded text-xs">
-              <h3 className="font-semibold mb-2">Test Cards:</h3>
+              <h3 className="font-semibold mb-2">HitPay Sandbox Testing:</h3>
               <ul className="space-y-1">
-                <li>• 4343 4343 4343 4343 - Successful Payment</li>
-                <li>• 4000 0000 0000 0002 - Card Declined</li>
-                <li>• 4000 0000 0000 0069 - Insufficient Funds</li>
+                <li>• Use test cards: 4242 4242 4242 4242</li>
+                <li>• Any future expiry date</li>
+                <li>• Any 3-digit CVC</li>
+                <li>• Redirects to HitPay sandbox</li>
               </ul>
             </div>
           </div>
