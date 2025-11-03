@@ -45,6 +45,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    console.log({ name, value });
     setFormData((prev) => ({
       ...prev,
       [name]: name === "dob" && value ? new Date(value) : value,
@@ -91,8 +92,8 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
           placeholder="example@email.com"
         />
         <InputField
-          id="phone_number"
-          name="phone_number"
+          id="phone"
+          name="phone"
           type="tel"
           inputMode="numeric"
           pattern="[0-9+ ]*"

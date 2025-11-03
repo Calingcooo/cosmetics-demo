@@ -6,46 +6,60 @@ import type { ApiErrorResponse } from "@/app/types";
 
 export async function POST(req: Request) {
     try {
-        const body = await req.json();
+        // Get the content type to determine how to parse the body
+        const contentType = req.headers.get('content-type') || '';
         const signature = req.headers.get('x-signature');
 
-        console.log('🔵 [NEXTJS] HitPay Webhook Received');
-        console.log('🔵 [NEXTJS] Full webhook data:', JSON.stringify(body, null, 2));
+        let body: any;
+
+        if (contentType.includes('application/x-www-form-urlencoded')) {
+            // Handle form data from HitPay
+            const rawBody = await req.text();
+            console.log('🔵 [NEXTJS] Raw form data:', rawBody);
+
+            // Parse URL-encoded form data
+            const params = new URLSearchParams(rawBody);
+            body = Object.fromEntries(params.entries());
+        } else if (contentType.includes('application/json')) {
+            // Handle JSON data
+            body = await req.json();
+        } else {
+            // Fallback: try to get raw text
+            const rawBody = await req.text();
+
+            // Try to parse as form data first, then as JSON
+            try {
+                const params = new URLSearchParams(rawBody);
+                body = Object.fromEntries(params.entries());
+            } catch {
+                try {
+                    body = JSON.parse(rawBody);
+                } catch {
+                    body = { raw: rawBody };
+                }
+            }
+        }
+
         console.log('🔵 [NEXTJS] Headers:', {
             signature: signature,
-            'content-type': req.headers.get('content-type'),
+            'content-type': contentType,
             'user-agent': req.headers.get('user-agent')
         });
 
-        // Log the exact data we're sending to Express
-        console.log('🔵 [NEXTJS] Proxying to Express backend with data:', {
-            payment_id: body.id,
-            status: body.status,
-            reference_number: body.reference_number,
-            payment_request_id: body.payment_request_id
-        });
-
-        const expressBackendUrl = process.env.EXPRESS_BACKEND_URL || 'http://localhost:8000';
-        console.log('🔵 [NEXTJS] Sending to Express backend:', `${expressBackendUrl}/api/payments/hitpay/webhook`);
-
+        // Send to Express backend - make sure it's sending as form data if that's what HitPay sends
         const response = await serverApi.post("/payments/hitpay/webhook", body, {
             headers: {
                 ...(signature && { 'x-signature': signature }),
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json' // Keep as JSON since we're parsing it properly now
             }
         });
-
-        console.log('🟢 [NEXTJS] Webhook successfully proxied to Express');
-        console.log('🟢 [NEXTJS] Express response:', response.data);
 
         return NextResponse.json({
             success: true,
             data: response.data
         });
-
     } catch (error: unknown) {
         const axiosError = error as AxiosError<ApiErrorResponse>;
-
         console.error('🔴 [NEXTJS] Webhook proxy ERROR:');
         console.error('🔴 [NEXTJS] Error message:', axiosError.message);
         console.error('🔴 [NEXTJS] Error response:', axiosError.response?.data);

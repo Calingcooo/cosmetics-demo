@@ -2,7 +2,15 @@
 import { useState } from "react";
 import { useCart } from "@/lib/hooks/cart/useCart";
 import { useAuth } from "@/lib/hooks/auth/useAuth";
+import { useUser } from "@/app/hooks/useUser";
 import { paymentService } from "@/lib/api/payment.service";
+import {
+    isAddressComplete,
+    createShippingAddress,
+    calculateShippingCost,
+    calculateTax,
+    getMissingAddressFields
+} from "@/lib/helpers/address.helper";
 import type { CartItem } from "@/app/types";
 
 interface CheckoutState {
@@ -18,6 +26,7 @@ export const useCartCheckout = () => {
 
     const { items, totalPrice } = useCart();
     const { minimalUser } = useAuth();
+    const { user } = useUser();
 
     const processHitPayCheckout = async () => {
         if (items.length === 0) {
@@ -30,11 +39,25 @@ export const useCartCheckout = () => {
             return;
         }
 
+        // Check if user has complete address
+        if (!user || !isAddressComplete(user)) {
+            const missingFields = getMissingAddressFields(user);
+            setCheckoutState(prev => ({
+                ...prev,
+                error: `Please complete your shipping address. Missing: ${missingFields.join(', ')}`
+            }));
+            return;
+        }
+
         setCheckoutState({ loading: true, error: "" });
 
         try {
-            const shippingCost = totalPrice >= 50 ? 0 : 5.99;
+            const shippingCost = calculateShippingCost(totalPrice);
             const finalTotal = totalPrice + shippingCost;
+            const taxAmount = calculateTax(totalPrice);
+
+            // Create shipping address from user data
+            const shipping_address = createShippingAddress(user);
 
             console.log("🔄 Creating order with payment for total:", finalTotal);
 
@@ -51,8 +74,10 @@ export const useCartCheckout = () => {
                     quantity: item.quantity,
                     selected_variations: item.selected_variations,
                 })),
+                shipping_address,
+                billing_address: shipping_address, // Use same as shipping for now
                 shipping_cost: shippingCost,
-                tax_amount: finalTotal * 0.12, // Example tax calculation
+                tax_amount: taxAmount,
             };
 
             const response = await paymentService.createOrderWithPayment(
@@ -91,5 +116,7 @@ export const useCartCheckout = () => {
     return {
         ...checkoutState,
         processHitPayCheckout,
+        hasCompleteAddress: user ? isAddressComplete(user) : false,
+        missingAddressFields: user ? getMissingAddressFields(user) : [],
     };
 };

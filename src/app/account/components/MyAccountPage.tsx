@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { useUser } from "../hooks/useUser";
+import { useUser } from "../../hooks/useUser";
 
 import PersonalInformationForm from "./PersonalInformationForm";
 import ShippingDetailsForm from "./ShippingDetailsForm";
