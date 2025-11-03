@@ -4,24 +4,20 @@ import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { useUser } from "../../hooks/useUser";
+import { useUser } from "@/lib/hooks/user/useUser";
 
 import PersonalInformationForm from "./PersonalInformationForm";
 import ShippingDetailsForm from "./ShippingDetailsForm";
 import PaymentMethod from "./PaymentMethod";
 
 const MyAccountPage = () => {
-  const { user, getMe } = useUser();
+  const { user } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   // Read tab from URL or fallback to "personal"
   const initialTab = searchParams.get("tab") || "personal";
   const [activeTab, setActiveTab] = useState(initialTab);
-
-  useEffect(() => {
-    getMe();
-  }, []);
 
   // Whenever activeTab changes, update the URL
   useEffect(() => {

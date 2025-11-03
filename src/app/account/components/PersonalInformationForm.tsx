@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 
 import { User } from "@/app/types";
 
-import { useUser } from "@/app/hooks/useUser";
+import { useUser } from "@/lib/hooks/user/useUser";
 
 import TabHeader from "./TabHeader";
 import InputField from "@/components/ui/input/InputField";

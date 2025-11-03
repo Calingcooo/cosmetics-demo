@@ -7,7 +7,6 @@ import SessionInitializer from "@/lib/helpers/SessionInitializer";
 
 import ProductProvider from "@/context/ProductContext";
 import ToastProvider from "@/context/ToastContext";
-import UserProvider from "@/context/UserContext";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import CookieConsent from "@/components/CookieConsent";
@@ -21,13 +20,11 @@ export default function ClientProviders({
     <Provider store={store}>
       <ProductProvider>
         <ToastProvider>
-          <UserProvider>
-              <SessionInitializer />
-              <Header />
-              <main className="flex-1 flex flex-col">{children}</main>
-              <Footer />
-              <CookieConsent />
-          </UserProvider>
+          <SessionInitializer />
+          <Header />
+          <main className="flex-1 flex flex-col">{children}</main>
+          <Footer />
+          <CookieConsent />
         </ToastProvider>
       </ProductProvider>
     </Provider>

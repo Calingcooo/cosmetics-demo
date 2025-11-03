@@ -2,13 +2,11 @@
 import { useState } from "react";
 import { useCart } from "@/lib/hooks/cart/useCart";
 import { useAuth } from "@/lib/hooks/auth/useAuth";
-import { useUser } from "@/app/hooks/useUser";
+import { useUser } from "@/lib/hooks/user/useUser";
 import { paymentService } from "@/lib/api/payment.service";
 import {
     isAddressComplete,
     createShippingAddress,
-    calculateShippingCost,
-    calculateTax,
     getMissingAddressFields
 } from "@/lib/helpers/address.helper";
 import type { CartItem } from "@/app/types";
@@ -52,9 +50,10 @@ export const useCartCheckout = () => {
         setCheckoutState({ loading: true, error: "" });
 
         try {
-            const shippingCost = calculateShippingCost(totalPrice);
-            const finalTotal = totalPrice + shippingCost;
-            const taxAmount = calculateTax(totalPrice);
+            // const shippingCost = calculateShippingCost(totalPrice);
+            // const finalTotal = totalPrice + shippingCost;
+            // const taxAmount = calculateTax(totalPrice);
+            const finalTotal = totalPrice;
 
             // Create shipping address from user data
             const shipping_address = createShippingAddress(user);
@@ -76,8 +75,8 @@ export const useCartCheckout = () => {
                 })),
                 shipping_address,
                 billing_address: shipping_address, // Use same as shipping for now
-                shipping_cost: shippingCost,
-                tax_amount: taxAmount,
+                shipping_cost: 0,
+                tax_amount: 0,
             };
 
             const response = await paymentService.createOrderWithPayment(

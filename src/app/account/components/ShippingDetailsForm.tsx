@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import PSGC from "@efdiaz/psgc";
 
-import { useUser } from "@/app/hooks/useUser";
+import { useUser } from "@/lib/hooks/user/useUser";
 import type { User } from "@/app/types";
 
 import TabHeader from "./TabHeader";

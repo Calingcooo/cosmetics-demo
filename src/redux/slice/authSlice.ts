@@ -32,7 +32,7 @@ const extractErrorMessage = (err: unknown): string => {
 
 // Restore session
 export const restoreSession = createAsyncThunk(
-  "auth/restoreSession", 
+  "auth/restoreSession",
   async (_, { rejectWithValue }) => {
     try {
       const res = await fetch("/api/auth/me", { credentials: "include" });
@@ -50,7 +50,7 @@ export const restoreSession = createAsyncThunk(
 export const login = createAsyncThunk(
   "auth/login",
   async (
-    { email, password }: { email: string; password: string }, 
+    { email, password }: { email: string; password: string },
     { rejectWithValue }
   ) => {
     try {
@@ -79,7 +79,7 @@ export const register = createAsyncThunk(
 
 // Logout
 export const logout = createAsyncThunk(
-  "auth/logout", 
+  "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
       await authService.logout("/api/auth/logout");

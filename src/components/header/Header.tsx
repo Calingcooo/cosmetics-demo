@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LuSearch, LuShoppingBag, LuUser, LuMenu } from "react-icons/lu";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { useCart } from "@/lib/hooks/cart/useCart";
@@ -14,6 +15,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { initialized, minimalUser, isAuthenticated, logout } = useAuth();
   const { cartCount } = useCart();
+  const router = useRouter()
 
   const navItems = [
     { name: "home", href: "/" },
