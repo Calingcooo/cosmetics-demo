@@ -5,11 +5,23 @@
   text-align: center;
 }
 
-/* Hide arrows for all number inputs */
+/* Hide number input arrows globally with full browser support */
+input[type="number"] {
+  /* Standard property */
+  appearance: textfield;
+
+  /* Firefox */
+  -moz-appearance: textfield;
+
+  /* Safari and Chrome */
+  -webkit-appearance: textfield;
+}
+
+/* Specific webkit pseudo-elements for Safari/Chrome */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* Animation  */

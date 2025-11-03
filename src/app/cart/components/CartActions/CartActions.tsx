@@ -1,7 +1,8 @@
 // cart/components/CartActions/CartActions.tsx
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
+import Link from "next/link";
 import { CartItem as CartItemType } from "@/app/types";
 import { useUser } from "@/lib/hooks/user/useUser";
 import { useRouter } from "next/navigation";
@@ -27,10 +28,6 @@ const CartActions: React.FC<CartActionsProps> = ({
   const selectedSubtotal = items
     .filter((_, index) => selectedItems.includes(index))
     .reduce((sum, item) => sum + item.price_at_add * item.quantity, 0);
-
-  // const shippingCost = calculateShippingCost(selectedSubtotal);
-  // const taxAmount = calculateTax(selectedSubtotal);
-  // const selectedTotal = selectedSubtotal + shippingCost;
 
   const selectedTotal = selectedSubtotal;
 
@@ -78,32 +75,51 @@ const CartActions: React.FC<CartActionsProps> = ({
           )}
         </div>
 
-        {/* Checkout Button */}
-        <button
-          onClick={handleProceedToCheckout}
-          disabled={!canCheckout}
-          className={`w-full py-3 px-4 rounded-[theme(--radius)] font-medium transition-[theme(--transition-smooth)] mb-3 ${
-            canCheckout
-              ? "bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary-hover)] cursor-pointer"
-              : "bg-[theme(--muted)] text-[theme(--muted-foreground)] cursor-not-allowed"
-          }`}
-        >
-          {canCheckout
-            ? `Checkout ${selectedItems.length} Items`
-            : selectedItems.length === 0
-            ? "Select Items to Checkout"
-            : "Complete Profile to Checkout"}
-        </button>
+        {/* Checkout Button Area */}
+        <div className="space-y-3">
+          {isAuthenticated ? (
+            <button
+              onClick={handleProceedToCheckout}
+              disabled={!canCheckout}
+              className={`w-full py-3 px-4 rounded-[theme(--radius)] font-medium transition-[theme(--transition-smooth)] ${
+                canCheckout
+                  ? "bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary-hover)] cursor-pointer"
+                  : "bg-[theme(--muted)] text-[theme(--muted-foreground)] cursor-not-allowed"
+              }`}
+            >
+              {canCheckout
+                ? `Checkout ${selectedItems.length} Items`
+                : selectedItems.length === 0
+                ? "Select Items to Checkout"
+                : "Complete Profile to Checkout"}
+            </button>
+          ) : (
+            <div className="bg-[theme(--primary)]/5 border border-[theme(--primary)]/20 rounded-[theme(--radius)] p-4">
+              <p className="text-[theme(--primary)] text-sm font-medium mb-2 text-center">
+                Sign In to Checkout
+              </p>
+              <p className="text-[theme(--muted-foreground)] text-xs mb-3 text-center">
+                Access your saved cart and faster checkout
+              </p>
+              <Link
+                href="/login"
+                className="block w-full text-center py-2 bg-[theme(--primary)] text-[theme(--primary-foreground)] rounded-[theme(--radius)] font-medium hover:bg-[theme(--primary-hover)] transition-colors"
+              >
+                Sign In
+              </Link>
+            </div>
+          )}
 
-        {/* Remove Selected Button */}
-        {selectedItems.length > 0 && (
-          <button
-            onClick={handleRemoveSelected}
-            className="w-full py-2 px-4 border border-[theme(--destructive)] text-[theme(--destructive)] rounded-[theme(--radius)] font-medium hover:bg-[theme(--destructive)] hover:text-[theme(--destructive-foreground)] transition-colors"
-          >
-            Remove Selected
-          </button>
-        )}
+          {/* Remove Selected Button */}
+          {selectedItems.length > 0 && (
+            <button
+              onClick={handleRemoveSelected}
+              className="w-full py-2 px-4 border border-[theme(--destructive)] text-[theme(--destructive)] rounded-[theme(--radius)] font-medium hover:bg-[theme(--destructive)] hover:text-[theme(--destructive-foreground)] transition-colors"
+            >
+              Remove Selected
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Help & Info Cards */}
@@ -115,26 +131,12 @@ const CartActions: React.FC<CartActionsProps> = ({
           <p className="text-[theme(--muted-foreground)] text-xs mb-3">
             Add your shipping address to checkout
           </p>
-          <a
+          <Link
             href="/account?tab=shipping"
             className="text-[theme(--primary)] hover:text-[theme(--primary-hover)] text-xs font-medium"
           >
             Update Profile →
-          </a>
-        </div>
-      )}
-
-      {!isAuthenticated && (
-        <div className="bg-[theme(--muted)] border border-[theme(--border)] rounded-[theme(--radius)] p-4">
-          <p className="text-[theme(--muted-foreground)] text-sm mb-2">
-            Sign in for faster checkout
-          </p>
-          <a
-            href="/auth/signin"
-            className="text-[theme(--primary)] hover:text-[theme(--primary-hover)] text-xs font-medium"
-          >
-            Sign In →
-          </a>
+          </Link>
         </div>
       )}
 
