@@ -28,16 +28,16 @@ export default function CartPage() {
   }
 
   return (
-    <div className="flex-1 container mx-auto px-4 py-8 flex flex-col">
+    <div className="flex-1 container mx-auto px-2 lg:px-4 py-8 flex flex-col">
       <h1 className="text-3xl md:text-4xl font-bold mb-8">Shopping Cart</h1>
 
-      <div className="grid lg:grid-cols-3 gap-8 flex-1">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
         {/* Cart Items */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="col-span-1 lg:col-span-2 space-y-4">
           {items.map((item, index) => (
             <CartItem key={`${item.id}-${index}`} item={item} index={index} />
           ))}
-        </div>
+        </div> 
 
         {/* Order Summary */}
         <CartSummary />

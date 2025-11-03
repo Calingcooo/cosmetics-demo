@@ -31,15 +31,15 @@ export const CartSummary = () => {
         <div className="space-y-3 mb-6">
           <div className="flex justify-between text-sm">
             <span className="text-[theme(--muted-foreground)]">Subtotal</span>
-            <span>${totalPrice.toFixed(2)}</span>
+            <span>₱{totalPrice.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-[theme(--muted-foreground)]">Shipping</span>
-            <span>{totalPrice >= 50 ? "FREE" : "$5.99"}</span>
+            <span>{totalPrice >= 50 ? "FREE" : "₱5.99"}</span>
           </div>
           <div className="border-t pt-3 flex justify-between font-bold">
             <span>Total</span>
-            <span className="text-[theme(--primary)]">${finalTotal.toFixed(2)}</span>
+            <span className="text-[theme(--primary)]">₱{finalTotal.toFixed(2)}</span>
           </div>
         </div>
 

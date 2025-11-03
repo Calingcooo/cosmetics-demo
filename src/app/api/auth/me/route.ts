@@ -10,8 +10,6 @@ export async function GET() {
     const cookie = await cookies()
     const token = cookie.get("token")?.value;
 
-    console.log(cookie)
-
     if (!token) {
         return NextResponse.json({ success: false, message: "Not authenticated" }, { status: 401 });
     }
