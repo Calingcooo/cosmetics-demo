@@ -1,14 +1,15 @@
 import { api } from "../axios/instance";
 import type { ApiResponse } from "@/app/types";
+import type { CartItem } from "@/app/types";
 
 export interface OrderPaymentRequest {
     amount: number;
     email: string;
     purpose: string;
-    items: any[];
+    items: CartItem[];
     user_id: string;
-    shipping_address?: any;
-    billing_address?: any;
+    shipping_address?: string;
+    billing_address?: string;
     shipping_cost?: number;
     tax_amount?: number;
 }
