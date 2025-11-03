@@ -21,7 +21,7 @@ export const authService = {
     ) => api.post<ApiResponse<{ user: MiminalUser; token: string }>>(endpoint, data),
 
     // Get authenticated user
-    me: (endpoint: string) => api.get<ApiResponse<{ user: User }>>(endpoint),
+    me: (endpoint: string) => api.get<ApiResponse<{ user: User }>>(endpoint, { withCredentials: true }),
 
     // Logout
     logout: (endpoint: string) => api.post(endpoint)

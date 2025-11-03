@@ -98,6 +98,34 @@ export type MiminalUser = {
     cart_count: number;
 };
 
+export interface Order {
+    id: string;
+    order_number: string;
+    status: "pending" | "processing" | "paid" | "shipped" | "delivered" | "cancelled" | "refunded";
+    payment_status: "pending" | "completed" | "failed" | "refunded";
+    total_amount: number;
+    paid_amount: number;
+    currency: string;
+    created_at: string;
+    paid_at?: string;
+    shipped_at?: string;
+    delivered_at?: string;
+    items: OrderItem[];
+    shipping_address: any;
+    billing_address: any;
+}
+
+export interface OrderItem {
+    id: string;
+    product_id: string;
+    product_name: string;
+    product_image: string;
+    price: number;
+    quantity: number;
+    selected_variations: Record<string, string>;
+    subtotal: number;
+}
+
 
 //****** PAYMENT ******//
 export interface HitPayCreatePaymentRequest {
