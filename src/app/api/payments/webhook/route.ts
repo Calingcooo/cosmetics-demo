@@ -4,13 +4,17 @@ import { serverApi } from "@/lib/axios/instance";
 import type { AxiosError } from "axios";
 import type { ApiErrorResponse } from "@/app/types";
 
+interface HitpayPaymentWebhook {
+    [key: string]: unknown;
+}
+
 export async function POST(req: Request) {
     try {
         // Get the content type to determine how to parse the body
         const contentType = req.headers.get('content-type') || '';
         const signature = req.headers.get('x-signature');
 
-        let body: any;
+        let body: HitpayPaymentWebhook;
 
         if (contentType.includes('application/x-www-form-urlencoded')) {
             // Handle form data from HitPay

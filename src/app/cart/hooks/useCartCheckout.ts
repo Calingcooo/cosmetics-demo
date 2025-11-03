@@ -73,8 +73,8 @@ export const useCartCheckout = () => {
                     quantity: item.quantity,
                     selected_variations: item.selected_variations,
                 })),
-                shipping_address,
-                billing_address: shipping_address, // Use same as shipping for now
+                shipping_address: JSON.stringify(shipping_address),
+                billing_address: JSON.stringify(shipping_address), // Use same as shipping for now
                 shipping_cost: 0,
                 tax_amount: 0,
             };

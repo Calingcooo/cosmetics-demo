@@ -1,15 +1,36 @@
 import { api } from "../axios/instance";
 import type { ApiResponse } from "@/app/types";
-import type { CartItem } from "@/app/types";
+
+export interface Address {
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+    house_number: string;
+    street_name: string;
+    barangay: string;
+    city: string;
+    province: string;
+    region: string;
+    zip_code: string;
+    landmark: string;
+}
 
 export interface OrderPaymentRequest {
     amount: number;
     email: string;
     purpose: string;
-    items: CartItem[];
     user_id: string;
-    shipping_address?: string;
-    billing_address?: string;
+    items: {
+        product_id: string;
+        product_name: string;
+        product_image: string;
+        price: number;
+        quantity: number;
+        selected_variations?: Record<string, string>;
+    }[];
+    shipping_address?: Address;
+    billing_address?: Address;
     shipping_cost?: number;
     tax_amount?: number;
 }

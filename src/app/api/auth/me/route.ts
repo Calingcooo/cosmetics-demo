@@ -1,10 +1,18 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import jwt, { TokenExpiredError } from "jsonwebtoken"
+import jwt, { JwtPayload, TokenExpiredError } from "jsonwebtoken"
 
 import { serverApi } from "@/lib/axios/instance";
 import type { ApiErrorResponse } from "@/app/types";
 import type { AxiosError } from "axios";
+
+interface CustomJWTPayload extends JwtPayload {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    cart_count: number;
+}
 
 export async function GET() {
     const cookie = await cookies()
@@ -15,7 +23,7 @@ export async function GET() {
     }
 
     try {
-        jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret") as any;
+        jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret") as CustomJWTPayload;
 
         const res = await serverApi.get("/auth/me", {
             headers: { Authorization: `Bearer ${token}` },
