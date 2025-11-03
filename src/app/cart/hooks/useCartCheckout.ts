@@ -73,8 +73,8 @@ export const useCartCheckout = () => {
                     quantity: item.quantity,
                     selected_variations: item.selected_variations,
                 })),
-                shipping_address: JSON.stringify(shipping_address),
-                billing_address: JSON.stringify(shipping_address), // Use same as shipping for now
+                shipping_address,
+                billing_address: shipping_address, // Use same as shipping for now
                 shipping_cost: 0,
                 tax_amount: 0,
             };
@@ -103,10 +103,19 @@ export const useCartCheckout = () => {
                 throw new Error("No payment URL received from server");
             }
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Order and payment creation error:", error);
-            const errorMessage = error.response?.data?.message || error.message || "Failed to create order and payment";
-            setCheckoutState(prev => ({ ...prev, error: errorMessage }));
+
+            let errorMessage = "Failed to create order and payment";
+
+            if (error && typeof error === "object" && "response" in error) {
+                const axiosError = error as { response?: { data?: { message?: string } } };
+                errorMessage = axiosError.response?.data?.message ?? errorMessage;
+            } else if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+
+            setCheckoutState((prev) => ({ ...prev, error: errorMessage }));
         } finally {
             setCheckoutState(prev => ({ ...prev, loading: false }));
         }
