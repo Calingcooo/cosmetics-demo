@@ -17,9 +17,10 @@ const PriceBreakdown: React.FC = () => {
       <div className="flex justify-between">
         <span className="text-[theme(--muted-foreground)]">Shipping:</span>
         <span className="text-[theme(--foreground)]">
-          {orderSummary.shipping === 0
+          Free
+          {/* {orderSummary.shipping === 0
             ? "Free"
-            : `₱${orderSummary.shipping.toFixed(2)}`}
+            : `₱${orderSummary.shipping.toFixed(2)}`} */}
         </span>
       </div>
 
