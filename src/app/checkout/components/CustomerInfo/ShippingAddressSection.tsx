@@ -3,17 +3,35 @@ import React from "react";
 import { User } from "@/app/types";
 import Header from "../Header";
 import ProfileRedirect from "../CheckoutActions/ProfileRedirect";
-import { 
-  getFormattedAddress, 
-  isAddressComplete, 
-  getMissingShippingFields 
-} from "../../utils/checkout.helper";
+import {
+  getFormattedAddress,
+  isAddressComplete,
+} from "@/lib/helpers/address.helper";
 
 interface ShippingAddressSectionProps {
   user: User | null;
 }
 
-const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({ user }) => {
+const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
+  user,
+}) => {
+  const getMissingShippingFields = (user: User): string[] => {
+    const shippingFields = [
+      "house_number",
+      "street_name",
+      "barangay_label",
+      "city_label",
+      "province_label",
+      "region_label",
+      "zip_code",
+    ];
+    return shippingFields.filter(
+      (field) =>
+        !user[field as keyof User] ||
+        String(user[field as keyof User]).trim() === ""
+    );
+  };
+
   const hasCompleteAddress = user ? isAddressComplete(user) : false;
   const missingShippingFields = user ? getMissingShippingFields(user) : [];
   const formattedAddress = getFormattedAddress(user);
@@ -21,10 +39,12 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({ user })
   return (
     <section className="bg-[theme(--card)] p-6 rounded-[theme(--radius)] shadow-[theme(--shadow-card)] border border-[theme(--border)]">
       <Header title="Shipping Address" size="sm" />
-      
+
       {hasCompleteAddress ? (
         <div className="mt-4">
-          <p className="text-[theme(--foreground)] font-medium">{formattedAddress}</p>
+          <p className="text-[theme(--foreground)] font-medium">
+            {formattedAddress}
+          </p>
           {user?.landmark && (
             <p className="text-[theme(--muted-foreground)] mt-2">
               <span className="font-medium">Landmark:</span> {user.landmark}
@@ -38,11 +58,11 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({ user })
               Incomplete Shipping Address
             </p>
             <p className="text-[theme(--muted-foreground)] text-sm mb-3">
-              Missing: {missingShippingFields.join(', ')}
+              Missing: {missingShippingFields.join(", ")}
             </p>
-            <ProfileRedirect 
-              tab="shipping" 
-              missingFields={missingShippingFields} 
+            <ProfileRedirect
+              tab="shipping"
+              missingFields={missingShippingFields}
             />
           </div>
         </div>

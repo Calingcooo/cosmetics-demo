@@ -9,12 +9,18 @@ import {
     migrateGuestCart,
     fetchCartCount,
     updateItemCart,
-    updateQuantityImmediate 
+    updateQuantityImmediate,
+    selectCartItem,
+    deselectCartItem,
+    selectAllCartItems,
+    deselectAllCartItems,
+    toggleCartItemSelection,
+    clearSelectedItems
 } from "@/redux/slice/cartSlice";
 import type { CartItem } from "@/app/types";
 
 export function useCart() {
-    const { items, cartCount, totalPrice, loading, error } = useAppSelector(
+    const { items, selectedItems, cartCount, totalPrice, loading, error } = useAppSelector(
         (state) => state.cart
     );
 
@@ -23,12 +29,25 @@ export function useCart() {
     return {
         // State
         items,
+        selectedItems,
         cartCount,
         totalPrice,
         loading,
         error,
 
         // Actions
+        selectCartItem: (item: CartItem) => dispatch(selectCartItem(item)),
+
+        deselectCartItem: (item: CartItem) => dispatch(deselectCartItem(item)),
+
+        selectAllCartItems: () => dispatch(selectAllCartItems()),
+
+        deselectAllCartItems: () => dispatch(deselectAllCartItems()),
+
+        toggleCartItemSelection: (item: CartItem) => dispatch(toggleCartItemSelection(item)),
+
+        clearSelectedItems: () => dispatch(clearSelectedItems()),
+        
         fetchUserCart: () => dispatch(fetchUserCart()),
 
         addToCart: (item: CartItem) => dispatch(addToCart(item)),

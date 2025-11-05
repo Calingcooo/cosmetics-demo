@@ -1,16 +1,6 @@
 // checkout/components/OrderSummary/OrderItems.tsx
 import React from "react";
-
-interface OrderItem {
-  id: string;
-  product_id: string;
-  product_name: string;
-  product_image: string;
-  price: number;
-  quantity: number;
-  selected_variations: Record<string, string>;
-  subtotal: number;
-}
+import type { OrderItem } from "@/app/types";
 
 interface OrderItemsProps {
   items: OrderItem[];
@@ -73,10 +63,10 @@ const OrderItems: React.FC<OrderItemsProps> = ({ items }) => {
             {/* Price */}
             <div className="text-right flex-shrink-0">
               <p className="font-medium text-[theme(--foreground)]">
-                ₱{item.subtotal.toFixed(2)}
+                ₱{item.subtotal}
               </p>
               <p className="text-[theme(--muted-foreground)] text-sm">
-                ₱{item.price.toFixed(2)} each
+                ₱{item.price} each
               </p>
             </div>
           </div>

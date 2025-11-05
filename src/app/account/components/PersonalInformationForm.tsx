@@ -8,6 +8,7 @@ import { useUser } from "@/lib/hooks/user/useUser";
 
 import TabHeader from "./TabHeader";
 import InputField from "@/components/ui/input/InputField";
+import { formatPhoneNumber } from "@/lib/helpers/formatPhoneNumber";
 
 type PersonalUser = Pick<
   User,
@@ -29,6 +30,11 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
     phone: user.phone ?? "",
     dob: user.dob ?? undefined,
   });
+  const [displayPhone, setDisplayPhone] = useState(
+    formatPhoneNumber(formData.phone ?? "")
+  );
+
+  console.log(displayPhone);
 
   useEffect(() => {
     if (user) {
@@ -39,8 +45,26 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
         phone: user.phone ?? "",
         dob: user.dob ?? undefined,
       });
+      setDisplayPhone(formatPhoneNumber(user.phone ?? ""));
     }
   }, [user]);
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    // Only allow numbers, +, and spaces
+    const filteredValue = value.replace(/[^0-9+\s]/g, "");
+
+    // Update display value
+    setDisplayPhone(filteredValue);
+
+    // Update form data with clean phone (numbers only)
+    const cleanPhone = filteredValue.replace(/\D/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      phone: cleanPhone,
+    }));
+  };
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,9 +121,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
           type="tel"
           inputMode="numeric"
           pattern="[0-9+ ]*"
-          value={formData.phone ?? ""}
-          onChange={handleChange}
-          placeholder="+63 917 123 4567"
+          value={displayPhone}
+          onChange={handlePhoneChange}
+          placeholder="+63 917 123 4567 or 09 1234 5678"
         />
         <InputField
           id="date_of_birth"

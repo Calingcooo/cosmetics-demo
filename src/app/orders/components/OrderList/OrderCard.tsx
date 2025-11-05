@@ -1,49 +1,47 @@
-// orders/components/OrdersList/OrderCard.tsx
+// orders/components/OrderList/OrderCard.tsx
 import React from "react";
-import { Order } from "@/app/types";
-import OrderStatusBadge from "./OrderStatusBadge";
+import type { Order } from "@/app/types";
+import OrderStatusBadge from "../OrderStatusBadge/OrderStatusBadge";
 
 interface OrderCardProps {
   order: Order;
-  isSelected: boolean;
-  onSelect: () => void;
+  onClick: () => void;
 }
 
-const OrderCard: React.FC<OrderCardProps> = ({ order, isSelected, onSelect }) => {
-  const orderDate = new Date(order.created_at).toLocaleDateString();
-  const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
+const OrderCard: React.FC<OrderCardProps> = ({ order, onClick }) => {
+  const getLatestStatusDate = () => {
+    if (order.delivered_at) return { date: order.delivered_at, action: 'Delivered' };
+    if (order.shipped_at) return { date: order.shipped_at, action: 'Shipped' };
+    if (order.paid_at) return { date: order.paid_at, action: 'Paid' };
+    return { date: order.created_at, action: 'Ordered' };
+  };
+
+  const latestStatus = getLatestStatusDate();
 
   return (
-    <div
-      onClick={onSelect}
-      className={`p-4 border rounded-[theme(--radius)] cursor-pointer transition-[theme(--transition-smooth)] ${
-        isSelected
-          ? "border-[theme(--primary)] bg-[theme(--primary)]/5 shadow-[theme(--shadow-soft)]"
-          : "border-[theme(--border)] bg-[theme(--card)] hover:shadow-[theme(--shadow-soft)] hover:border-[theme(--primary)]/30"
-      }`}
+    <div 
+      className="bg-[theme(--card)] p-6 rounded-[theme(--radius)] shadow-[theme(--shadow-card)] border border-[theme(--border)] hover:shadow-md transition-shadow cursor-pointer"
+      onClick={onClick}
     >
-      <div className="flex items-start justify-between mb-3">
+      {/* Header */}
+      <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="font-semibold text-[theme(--foreground)]">
-            Order #{order.order_number}
-          </h3>
+          <h3 className="font-semibold text-[theme(--foreground)]">Order #{order.order_number}</h3>
           <p className="text-[theme(--muted-foreground)] text-sm">
-            {orderDate} • {itemCount} {itemCount === 1 ? 'item' : 'items'}
+            {latestStatus.action} • {new Date(latestStatus.date).toLocaleDateString()}
           </p>
         </div>
         <OrderStatusBadge status={order.status} />
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+      {/* Items Preview */}
+      <div className="mb-4">
+        <div className="flex items-center space-x-2 mb-2">
           {order.items.slice(0, 3).map((item, index) => (
-            <div
-              key={index}
-              className="w-8 h-8 bg-[theme(--muted)] rounded-[theme(--radius)] flex items-center justify-center"
-            >
+            <div key={index} className="w-12 h-12 bg-[theme(--muted)] rounded-[theme(--radius)] flex items-center justify-center">
               {item.product_image ? (
-                <img
-                  src={item.product_image}
+                <img 
+                  src={item.product_image} 
                   alt={item.product_name}
                   className="w-full h-full object-cover rounded-[theme(--radius)]"
                 />
@@ -53,20 +51,24 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isSelected, onSelect }) =>
             </div>
           ))}
           {order.items.length > 3 && (
-            <span className="text-[theme(--muted-foreground)] text-xs">
-              +{order.items.length - 3} more
-            </span>
+            <div className="w-12 h-12 bg-[theme(--muted)] rounded-[theme(--radius)] flex items-center justify-center">
+              <span className="text-[theme(--muted-foreground)] text-xs">+{order.items.length - 3}</span>
+            </div>
           )}
         </div>
+        <p className="text-[theme(--muted-foreground)] text-sm">
+          {order.items.length} item{order.items.length !== 1 ? 's' : ''} • ₱{order.total_amount}
+        </p>
+      </div>
 
-        <div className="text-right">
-          <p className="font-semibold text-[theme(--foreground)]">
-            ₱{order.total_amount}
-          </p>
-          <p className="text-[theme(--muted-foreground)] text-xs capitalize">
-            {order.payment_status}
-          </p>
-        </div>
+      {/* Quick Status */}
+      <div className="flex justify-between items-center text-sm">
+        <span className="text-[theme(--muted-foreground)]">
+          Payment: <span className="capitalize">{order.payment_status}</span>
+        </span>
+        <button className="text-[theme(--primary)] hover:text-[theme(--primary)]/80 font-medium">
+          View Details →
+        </button>
       </div>
     </div>
   );

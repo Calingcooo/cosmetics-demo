@@ -8,6 +8,7 @@ import NewsLetter from "./home/NewsLetter";
 import BenefitsSection from "./home/BenefitsSection";
 
 export default function Home() {
+
   return (
     <div className="flex-1 flex-col">
       <HeroSection />

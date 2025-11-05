@@ -100,23 +100,34 @@ export type MiminalUser = {
 
 export interface Order {
     id: string;
-    order_number: string;
+    user_id: string;
+    order_number?: string;
     status: "pending" | "processing" | "paid" | "shipped" | "delivered" | "cancelled" | "refunded";
     payment_status: "pending" | "completed" | "failed" | "refunded";
     total_amount: number;
     paid_amount: number;
     currency: string;
+    tax_amount?: number;
+    shipping_cost?: number;
+    notes?: string | null;
     created_at: string;
-    paid_at?: string;
-    shipped_at?: string;
-    delivered_at?: string;
-    items: OrderItem[];
+    updated_at?: string;
+    paid_at?: string | null;
+    shipped_at?: string | null;
+    delivered_at?: string | null;
+    cancelled_at?: string | null;
     shipping_address: any;
     billing_address: any;
+    payment_request_id?: string;
+    payment_gateway_id?: string;
+    payment_gateway_response?: string;
+    payment_gateway_error?: string | null;
+    items: OrderItem[];
 }
 
 export interface OrderItem {
     id: string;
+    order_id: string;
     product_id: string;
     product_name: string;
     product_image: string;
@@ -124,8 +135,10 @@ export interface OrderItem {
     quantity: number;
     selected_variations: Record<string, string>;
     subtotal: number;
+    created_at: string;
+    updated_at: string;
+    order?: Order;
 }
-
 
 //****** PAYMENT ******//
 export interface HitPayCreatePaymentRequest {

@@ -7,14 +7,12 @@ import QuantityControls from "./QuantityControls";
 
 interface CartItemProps {
   item: CartItemType;
-  index: number;
   selected: boolean;
   onSelect: (checked: boolean) => void;
 }
 
 const CartItem: React.FC<CartItemProps> = ({
   item,
-  index,
   selected,
   onSelect,
 }) => {

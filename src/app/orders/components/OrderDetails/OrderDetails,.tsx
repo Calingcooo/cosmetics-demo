@@ -1,7 +1,8 @@
 // orders/components/OrderDetails/OrderDetails.tsx
 import React from "react";
-import { Order } from "@/app/types";
-import OrderItems from "./OrderItems";
+import type { Order } from "@/app/types";
+import OrderItems from "../OrderDetails/OrderItems";
+import OrderTimeline from "../OrderTimeline/OrderTimeline";
 
 interface OrderDetailsProps {
   order: Order;
@@ -9,81 +10,101 @@ interface OrderDetailsProps {
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
-  const orderDate = new Date(order.created_at).toLocaleDateString();
-  const paidDate = order.paid_at ? new Date(order.paid_at).toLocaleDateString() : null;
-  const deliveredDate = order.delivered_at ? new Date(order.delivered_at).toLocaleDateString() : null;
-
-  console.log(order)
   return (
-    <div className="sticky top-8 space-y-6">
-      {/* Order Summary */}
-      <div className="bg-[theme(--card)] p-6 rounded-[theme(--radius)] shadow-[theme(--shadow-card)] border border-[theme(--border)]">
-        <h3 className="text-lg font-semibold text-[theme(--foreground)] mb-4">
-          Order Details
-        </h3>
-
-        {/* Order Info */}
-        <div className="space-y-3 mb-4">
-          <div className="flex justify-between">
-            <span className="text-[theme(--muted-foreground)]">Order #</span>
-            <span className="font-medium text-[theme(--foreground)]">{order.order_number}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-[theme(--muted-foreground)]">Date</span>
-            <span className="font-medium text-[theme(--foreground)]">{orderDate}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-[theme(--muted-foreground)]">Status</span>
-            <span className="font-medium text-[theme(--foreground)] capitalize">{order.status}</span>
-          </div>
-          {paidDate && (
-            <div className="flex justify-between">
-              <span className="text-[theme(--muted-foreground)]">Paid</span>
-              <span className="font-medium text-[theme(--foreground)]">{paidDate}</span>
-            </div>
-          )}
-          {deliveredDate && (
-            <div className="flex justify-between">
-              <span className="text-[theme(--muted-foreground)]">Delivered</span>
-              <span className="font-medium text-[theme(--foreground)]">{deliveredDate}</span>
-            </div>
-          )}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-2xl font-bold text-[theme(--foreground)]">
+            Order #{order.order_number}
+          </h2>
+          <p className="text-[theme(--muted-foreground)] mt-1">
+            Placed on {new Date(order.created_at).toLocaleDateString()}
+          </p>
         </div>
-
-        {/* Price Breakdown */}
-        <div className="border-t border-[theme(--border)] pt-4 space-y-2">
-          <div className="flex justify-between">
-            <span className="text-[theme(--muted-foreground)]">Subtotal</span>
-            <span className="text-[theme(--foreground)]">₱{order.total_amount}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-[theme(--muted-foreground)]">Shipping</span>
-            <span className="text-[theme(--foreground)]">Free</span>
-          </div>
-          <div className="border-t border-[theme(--border)] pt-2">
-            <div className="flex justify-between font-semibold">
-              <span className="text-[theme(--foreground)]">Total</span>
-              <span className="text-[theme(--primary)]">₱{order.paid_amount}</span>
-            </div>
-          </div>
-        </div>
+        <button
+          onClick={onClose}
+          className="p-2 hover:bg-[theme(--muted)] rounded-[theme(--radius)] transition-colors"
+        >
+          ✕
+        </button>
       </div>
 
-      {/* Order Items */}
-      <OrderItems items={order.items} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          <OrderItems items={order.items} />
+          
+          {/* Price Breakdown */}
+          <div className="bg-[theme(--card)] p-6 rounded-[theme(--radius)] shadow-[theme(--shadow-card)] border border-[theme(--border)]">
+            <h3 className="text-lg font-semibold text-[theme(--foreground)] mb-4">
+              Price Breakdown
+            </h3>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-[theme(--muted-foreground)]">Subtotal</span>
+                <span className="text-[theme(--foreground)]">
+                  ₱{(Number(order.total_amount) - Number(order.shipping_cost || 0) - Number(order.tax_amount || 0)).toFixed(2)}
+                </span>
+              </div>
+              {order.shipping_cost && Number(order.shipping_cost) > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-[theme(--muted-foreground)]">Shipping</span>
+                  <span className="text-[theme(--foreground)]">₱{order.shipping_cost}</span>
+                </div>
+              )}
+              {order.tax_amount && Number(order.tax_amount) > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-[theme(--muted-foreground)]">Tax</span>
+                  <span className="text-[theme(--foreground)]">₱{order.tax_amount}</span>
+                </div>
+              )}
+              <div className="border-t border-[theme(--border)] pt-2">
+                <div className="flex justify-between font-semibold">
+                  <span className="text-[theme(--foreground)]">Total</span>
+                  <span className="text-[theme(--primary)]">₱{order.total_amount}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      {/* Shipping Address */}
-      <div className="bg-[theme(--card)] p-6 rounded-[theme(--radius)] shadow-[theme(--shadow-card)] border border-[theme(--border)]">
-        <h4 className="font-semibold text-[theme(--foreground)] mb-3">Shipping Address</h4>
-        <div className="text-[theme(--muted-foreground)] text-sm">
-          <p>{order.shipping_address.first_name} {order.shipping_address.last_name}</p>
-          <p>{order.shipping_address.address}</p>
-          <p>
-            {order.shipping_address.city}, {order.shipping_address.province} {order.shipping_address.zip_code}
-          </p>
-          {order.shipping_address.phone && (
-            <p className="mt-2">📞 {order.shipping_address.phone}</p>
-          )}
+        {/* Sidebar */}
+        <div className="space-y-6">
+          <OrderTimeline order={order} />
+          
+          {/* Payment Status */}
+          <div className="bg-[theme(--card)] p-6 rounded-[theme(--radius)] shadow-[theme(--shadow-card)] border border-[theme(--border)]">
+            <h3 className="text-lg font-semibold text-[theme(--foreground)] mb-4">
+              Payment Information
+            </h3>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-[theme(--muted-foreground)]">Status</span>
+                <span className={`font-medium capitalize ${
+                  order.payment_status === 'completed' ? 'text-green-600' : 
+                  order.payment_status === 'pending' ? 'text-yellow-600' : 
+                  'text-red-600'
+                }`}>
+                  {order.payment_status}
+                </span>
+              </div>
+              {order.paid_at && (
+                <div className="flex justify-between">
+                  <span className="text-[theme(--muted-foreground)]">Paid On</span>
+                  <span className="text-[theme(--foreground)]">
+                    {new Date(order.paid_at).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-[theme(--muted-foreground)]">Total Paid</span>
+                <span className="text-[theme(--foreground)] font-semibold">
+                  ₱{order.paid_amount || order.total_amount}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

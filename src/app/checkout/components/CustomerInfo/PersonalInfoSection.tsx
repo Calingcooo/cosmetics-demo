@@ -2,30 +2,39 @@
 import React from "react";
 import { User } from "@/app/types";
 import Header from "../Header";
-import { getMissingPersonalFields } from "../../utils/checkout.helper";
 
 interface PersonalInfoSectionProps {
   user: User | null;
 }
 
 const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ user }) => {
+  const getMissingPersonalFields = (user: User): string[] => {
+    const personalFields = ["first_name", "last_name", "email", "phone"];
+    return personalFields.filter(
+      (field) =>
+        !user[field as keyof User] ||
+        String(user[field as keyof User]).trim() === ""
+    );
+  };
+
   const missingPersonalFields = user ? getMissingPersonalFields(user) : [];
 
   return (
     <section className="bg-[theme(--card)] p-6 rounded-[theme(--radius)] shadow-[theme(--shadow-card)] border border-[theme(--border)]">
       <Header title="Customer Information" size="sm" />
-      
+
       <div className="mt-4 space-y-3">
         <div className="flex justify-between">
           <span className="text-[theme(--muted-foreground)]">Name:</span>
           <span className="font-medium text-[theme(--foreground)]">
-            {user?.first_name && user?.last_name 
-              ? `${user.first_name} ${user.last_name}`
-              : <span className="text-[theme(--destructive)]">Incomplete</span>
-            }
+            {user?.first_name && user?.last_name ? (
+              `${user.first_name} ${user.last_name}`
+            ) : (
+              <span className="text-[theme(--destructive)]">Incomplete</span>
+            )}
           </span>
         </div>
-        
+
         <div className="flex justify-between">
           <span className="text-[theme(--muted-foreground)]">Email:</span>
           <span className="font-medium text-[theme(--foreground)]">
@@ -34,7 +43,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ user }) => {
             )}
           </span>
         </div>
-        
+
         <div className="flex justify-between">
           <span className="text-[theme(--muted-foreground)]">Phone:</span>
           <span className="font-medium">
@@ -43,14 +52,14 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ user }) => {
             )}
           </span>
         </div>
-        
+
         {missingPersonalFields.length > 0 && (
           <div className="bg-[theme(--destructive)]/10 border border-[theme(--destructive)]/20 rounded-[theme(--radius)] p-3 mt-3">
             <p className="text-[theme(--destructive)] text-sm font-medium">
               Missing personal information
             </p>
             <p className="text-[theme(--muted-foreground)] text-xs mt-1">
-              Please complete: {missingPersonalFields.join(', ')}
+              Please complete: {missingPersonalFields.join(", ")}
             </p>
           </div>
         )}

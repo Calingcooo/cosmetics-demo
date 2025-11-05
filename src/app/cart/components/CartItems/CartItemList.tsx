@@ -1,55 +1,48 @@
 // cart/components/CartItems/CartItemsList.tsx
 import React from "react";
-import { CartItem as CartItemType } from "@/app/types";
+import { useCart } from "@/lib/hooks/cart/useCart";
 import CartItem from "./CartItem";
 import SelectionHeader from "./SelectionHeader";
 
-interface CartItemsListProps {
-  items: CartItemType[];
-  selectedItems: number[];
-  onSelectedItemsChange: (selected: number[]) => void;
-}
+const CartItemsList: React.FC = () => {
+  const { 
+    items, 
+    selectedItems, 
+    selectAllCartItems, 
+    deselectAllCartItems,
+    toggleCartItemSelection 
+  } = useCart();
 
-const CartItemsList: React.FC<CartItemsListProps> = ({ 
-  items, 
-  selectedItems, 
-  onSelectedItemsChange 
-}) => {
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      onSelectedItemsChange(items.map((_, index) => index));
+      selectAllCartItems();
     } else {
-      onSelectedItemsChange([]);
+      deselectAllCartItems();
     }
   };
 
-  const handleSelectItem = (index: number, checked: boolean) => {
-    if (checked) {
-      onSelectedItemsChange([...selectedItems, index]);
-    } else {
-      onSelectedItemsChange(selectedItems.filter(i => i !== index));
-    }
-  };
+  const allSelected = items.length > 0 && selectedItems.length === items.length;
 
   return (
     <section className="space-y-6">
-      {/* Selection Header */}
       <SelectionHeader 
         items={items}
         selectedItems={selectedItems}
         onSelectAll={handleSelectAll}
+        allSelected={allSelected}
       />
       
-      {/* Cart Items */}
       <div className="bg-[theme(--card)] p-6 rounded-[theme(--radius)] shadow-[theme(--shadow-card)] border border-[theme(--border)]">
         <div className="space-y-4">
           {items.map((item, index) => (
             <CartItem 
-              key={`${item.id}-${index}`} 
+              key={`${item.id}-${JSON.stringify(item.selected_variations)}-${index}`} 
               item={item} 
-              index={index}
-              selected={selectedItems.includes(index)}
-              onSelect={(checked) => handleSelectItem(index, checked)}
+              selected={selectedItems.some(selectedItem => 
+                selectedItem.id === item.id && 
+                JSON.stringify(selectedItem.selected_variations) === JSON.stringify(item.selected_variations)
+              )}
+              onSelect={(checked) => toggleCartItemSelection(item)}
             />
           ))}
         </div>

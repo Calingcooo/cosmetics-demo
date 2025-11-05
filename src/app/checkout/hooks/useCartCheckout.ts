@@ -1,6 +1,5 @@
 // hooks/useCartCheckout.ts
 import { useState } from "react";
-import { useCart } from "@/lib/hooks/cart/useCart";
 import { useAuth } from "@/lib/hooks/auth/useAuth";
 import { useUser } from "@/lib/hooks/user/useUser";
 import { paymentService } from "@/lib/api/payment.service";
@@ -16,19 +15,23 @@ interface CheckoutState {
     error: string;
 }
 
+interface ProcessCheckoutParams {
+    items: CartItem[];
+    totalAmount: number;
+}
+
 export const useCartCheckout = () => {
     const [checkoutState, setCheckoutState] = useState<CheckoutState>({
         loading: false,
         error: "",
     });
 
-    const { items, totalPrice } = useCart();
     const { minimalUser } = useAuth();
     const { user } = useUser();
 
-    const processHitPayCheckout = async () => {
+    const processHitPayCheckout = async ({ items, totalAmount }: ProcessCheckoutParams) => {
         if (items.length === 0) {
-            setCheckoutState(prev => ({ ...prev, error: "Cart is empty" }));
+            setCheckoutState(prev => ({ ...prev, error: "No items selected for checkout" }));
             return;
         }
 
@@ -50,18 +53,13 @@ export const useCartCheckout = () => {
         setCheckoutState({ loading: true, error: "" });
 
         try {
-            // const shippingCost = calculateShippingCost(totalPrice);
-            // const finalTotal = totalPrice + shippingCost;
-            // const taxAmount = calculateTax(totalPrice);
-            const finalTotal = totalPrice;
-
             // Create shipping address from user data
             const shipping_address = createShippingAddress(user);
 
-            console.log("🔄 Creating order with payment for total:", finalTotal);
+            console.log("🔄 Creating order with payment for total:", totalAmount);
 
             const orderPaymentPayload = {
-                amount: finalTotal,
+                amount: totalAmount,
                 email: minimalUser.email,
                 purpose: `Purchase of ${items.length} items`,
                 user_id: minimalUser.id,
@@ -89,7 +87,7 @@ export const useCartCheckout = () => {
             // Store checkout data
             const checkoutData = {
                 items,
-                total: finalTotal,
+                total: totalAmount,
                 order_id: response.data.data.order_id,
                 payment_id: response.data.data.payment_id,
             };

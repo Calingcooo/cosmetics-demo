@@ -8,6 +8,7 @@ import { AppDispatch, RootState } from "@/redux/store";
 
 export interface CartState {
     items: CartItem[];
+    selectedItems: CartItem[];
     cartCount: number;
     totalPrice: number;
     loading: boolean;
@@ -17,6 +18,7 @@ export interface CartState {
 
 const initialState: CartState = {
     items: [],
+    selectedItems: [],
     cartCount: 0,
     totalPrice: 0,
     loading: false,
@@ -261,6 +263,55 @@ const cartSlice = createSlice({
     name: "cart",
     initialState,
     reducers: {
+        selectCartItem: (state, action: PayloadAction<CartItem>) => {
+            const item = action.payload;
+            const isAlreadySelected = state.selectedItems.some(selectedItem =>
+                selectedItem.id === item.id &&
+                JSON.stringify(selectedItem.selected_variations) === JSON.stringify(item.selected_variations)
+            );
+
+            if (!isAlreadySelected) {
+                state.selectedItems.push(item);
+            }
+        },
+
+        deselectCartItem: (state, action: PayloadAction<CartItem>) => {
+            const item = action.payload;
+            state.selectedItems = state.selectedItems.filter(selectedItem =>
+                !(selectedItem.id === item.id &&
+                    JSON.stringify(selectedItem.selected_variations) === JSON.stringify(item.selected_variations))
+            );
+        },
+
+        selectAllCartItems: (state) => {
+            state.selectedItems = [...state.items];
+        },
+
+        deselectAllCartItems: (state) => {
+            state.selectedItems = [];
+        },
+
+        toggleCartItemSelection: (state, action: PayloadAction<CartItem>) => {
+            const item = action.payload;
+            const isSelected = state.selectedItems.some(selectedItem =>
+                selectedItem.id === item.id &&
+                JSON.stringify(selectedItem.selected_variations) === JSON.stringify(item.selected_variations)
+            );
+
+            if (isSelected) {
+                state.selectedItems = state.selectedItems.filter(selectedItem =>
+                    !(selectedItem.id === item.id &&
+                        JSON.stringify(selectedItem.selected_variations) === JSON.stringify(item.selected_variations))
+                );
+            } else {
+                state.selectedItems.push(item);
+            }
+        },
+
+        // Clear selection when items change significantly
+        clearSelectedItems: (state) => {
+            state.selectedItems = [];
+        },
         loadGuestCartState: (state) => {
             const guestItems = loadGuestCart();
             const { totalPrice, cartCount } = calculateTotals(guestItems);
@@ -354,5 +405,5 @@ const cartSlice = createSlice({
     },
 });
 
-export const { loadGuestCartState, updateQuantityImmediate } = cartSlice.actions;
+export const { loadGuestCartState, updateQuantityImmediate, selectCartItem, deselectCartItem, selectAllCartItems, deselectAllCartItems, toggleCartItemSelection, clearSelectedItems, } = cartSlice.actions;
 export default cartSlice.reducer;
