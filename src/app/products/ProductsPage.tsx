@@ -47,7 +47,7 @@ const ProductsPage = () => {
 
   // Fetch products when category changes
   useEffect(() => {
-    handleFetchProducts(1, selectedCategory);
+    handleFetchProducts(initialPage, selectedCategory);
   }, [selectedCategory]);
 
   // Update URL whenever state changes
