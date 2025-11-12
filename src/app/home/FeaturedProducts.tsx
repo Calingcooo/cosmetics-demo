@@ -12,7 +12,7 @@ const FeaturedProducts = () => {
 
   useEffect(() => {
     handleFetchFeaturedProducts();
-  }, [handleFetchFeaturedProducts]);
+  }, []);
   return (
     <section className="container mx-auto px-4 py-16">
       <div className="text-center mb-12 space-y-2">

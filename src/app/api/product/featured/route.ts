@@ -5,16 +5,17 @@ import type { AxiosError } from "axios";
 
 export async function GET() {
     try {
-        const res = await serverApi.get("/product/featured")
-
+        const res = await serverApi.get("/product/featured");
+        
         const response = NextResponse.json({
             success: true,
-            data: { products: res?.data?.data.products }
+            data: res.data.data
         });
-
+        
         return response;
     } catch (error: unknown) {
         const axiosError = error as AxiosError<ApiErrorResponse>;
+        console.error("❌ Featured products error:", axiosError.response?.data);
 
         if (axiosError.response) {
             return NextResponse.json(
@@ -31,5 +32,4 @@ export async function GET() {
             { status: 500 }
         );
     }
-
 }

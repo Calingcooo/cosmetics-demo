@@ -18,6 +18,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const image = product.images[0].url;
   const { id, name, slug, price, category, variations } = product;
 
+  console.log("image: ", image)
+
   const handleAddToCart = () => {
     // Convert variations array into Record<string, string>
     const selectedVariations: Record<string, string> = {};
@@ -46,7 +48,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         {/* Image */}
         <div className="relative aspect-square overflow-hidden bg-[theme(--muted)]/30 cursor-pointer">
           <Image
-            src={`${image}`}
+            src={image}
             alt={name}
             loading="lazy"
             fill

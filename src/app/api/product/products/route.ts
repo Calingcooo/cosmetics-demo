@@ -11,8 +11,6 @@ export async function GET(req: Request) {
 
         const res = await serverApi.get(`/product/all?page=${page}&limit=8&category=${category}`)
 
-        console.log(res)
-
         const response = NextResponse.json({
             success: true,
             data: { products: res?.data?.data.products, totalPages: res?.data?.data.totalPages }

@@ -59,6 +59,8 @@ const ProductsPage = () => {
     router.replace(`?${params.toString()}`, { scroll: false });
   }, [selectedCategory, page]);
 
+  console.log(products)
+
   return (
     <div className="flex-1 container mx-auto px-4 py-8 flex flex-col">
       {/* Header */}
