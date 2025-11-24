@@ -53,7 +53,6 @@ export const fetchFeaturedproducts = createAsyncThunk(
         try {
             const { data } = await contentService.getFeatured("/api/content/featured")
 
-            console.log("featured products: ", data)
             return data.data.products
         } catch (error) {
             console.error(error)

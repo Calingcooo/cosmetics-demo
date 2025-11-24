@@ -25,7 +25,7 @@ const ProductsPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 🧭 Read initial state from URL
+  // Read initial state from URL
   const initialCategory = searchParams.get("category") || "all";
   const initialPage = Number(searchParams.get("page")) || 1;
 
@@ -129,9 +129,9 @@ const ProductsPage = () => {
           currentPage={initialPage}
           totalPages={pagination.totalPages}
           onPageChange={(newPage) => {
-            console.log(newPage)
+            console.log(newPage);
             setPage(newPage);
-            fetchProducts({ page: newPage, category: selectedCategory});
+            fetchProducts({ page: newPage, category: selectedCategory });
           }}
         />
       )}
