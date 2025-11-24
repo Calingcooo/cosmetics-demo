@@ -37,10 +37,14 @@ const MyAccountPage = () => {
   const shipping = {
     house_number: user?.house_number ?? "",
     street_name: user?.street_name ?? "",
-    region_label: user?.region_label ?? "",
-    province_label: user?.province_label ?? "",
-    city_label: user?.city_label ?? "",
-    barangay_label: user?.barangay_label ?? "",
+    region: user?.region_code ?? "",
+    region_code: user?.region_code ?? "",
+    province: user?.province_code ?? "",
+    province_code: user?.province_code ?? "",
+    city: user?.city_code ?? "",
+    city_code: user?.city_code ?? "",
+    barangay: user?.barangay_code ?? "",
+    barangay_code: user?.barangay_code ?? "",
     zip_code: user?.zip_code ?? "",
     landmark: user?.landmark ?? "",
   };

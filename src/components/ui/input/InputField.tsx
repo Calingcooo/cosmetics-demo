@@ -1,7 +1,7 @@
 import clsx from "clsx";
 
 interface InputFieldProps {
-  id: string;
+  label: string;
   name: string;
   type?: string;
   placeholder?: string;
@@ -15,7 +15,7 @@ interface InputFieldProps {
 }
 
 const InputField: React.FC<InputFieldProps> = ({
-  id,
+  label,
   name,
   type = "text",
   placeholder,
@@ -27,23 +27,16 @@ const InputField: React.FC<InputFieldProps> = ({
   inputMode,
   maxLength,
 }) => {
-  const formatLabel = (id: string) => {
-    return id
-      .split("_") // split by underscore
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // capitalize
-      .join(" "); // join back with spaces
-  };
-
   return (
     <div className="space-y-1">
       <label
-        htmlFor={id}
+        htmlFor={name}
         className="text-sm capitalize font-medium leading-none"
       >
-        {formatLabel(id)}
+        {label}
       </label>
       <input
-        id={id}
+        id={name}
         name={name}
         type={type}
         value={value}
