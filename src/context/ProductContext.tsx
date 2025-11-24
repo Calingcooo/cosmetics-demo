@@ -60,8 +60,6 @@ const ProductProvider = ({ children }: { children: React.ReactNode }) => {
       setProducts([]);
 
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
         const { data } = await productService.getProducts(
           "/api/product/products",
           pageNumber,

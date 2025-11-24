@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "e-commerce-demo.s3.us-east-005.backblazeb2.com",
-        pathname: "/products/**",
+        pathname: "/**",
       },
     ],
   },

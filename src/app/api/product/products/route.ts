@@ -9,7 +9,7 @@ export async function GET(req: Request) {
         const page = searchParams.get("page") || "1";
         const category = searchParams.get("category") || "";
 
-        const res = await serverApi.get(`/product/all?page=${page}&limit=8&category=${category}`)
+        const res = await serverApi.get(`/products/all?page=${page}&limit=8&category=${category}`)
 
         const response = NextResponse.json({
             success: true,

@@ -5,7 +5,7 @@ import type { AxiosError } from "axios";
 
 export async function GET() {
     try {
-        const res = await serverApi.get("/product/featured");
+        const res = await serverApi.get("/products/featured");
         
         const response = NextResponse.json({
             success: true,

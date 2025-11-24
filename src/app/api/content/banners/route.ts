@@ -1,18 +1,20 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { serverApi } from "@/lib/axios/instance";
-import type { ApiErrorResponse } from "@/app/types";
 import type { AxiosError } from "axios";
+import type { ApiErrorResponse } from "@/app/types";
 
-export async function GET(req: Request) {
+export async function GET() {
     try {
-        const res = await serverApi.get("/categories/all")
+        const { data } = await serverApi.get("/content/banners");
+
+        console.log("GET BANNERS RESPONSE: ", data)
 
         const response = NextResponse.json({
             success: true,
-            data: { categories: res?.data?.data.categories },
+            data: data.data
         });
-
-        return response
+        return response;
     } catch (error: unknown) {
         const axiosError = error as AxiosError<ApiErrorResponse>;
 
@@ -20,7 +22,7 @@ export async function GET(req: Request) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: axiosError.response.data?.message || "Failed to fetch all products"
+                    message: axiosError.response.data?.message || "Failed to fetch banners"
                 },
                 { status: axiosError.response.status }
             );
@@ -31,5 +33,4 @@ export async function GET(req: Request) {
             { status: 500 }
         );
     }
-
 }

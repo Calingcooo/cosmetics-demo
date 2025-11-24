@@ -18,8 +18,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const image = product.images[0].url;
   const { id, name, slug, price, category, variations } = product;
 
-  console.log("image: ", image)
-
   const handleAddToCart = () => {
     // Convert variations array into Record<string, string>
     const selectedVariations: Record<string, string> = {};

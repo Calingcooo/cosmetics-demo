@@ -1,5 +1,3 @@
-"use client";
-
 import { useAppSelector, useAppDispatch } from "../reduxHooks";
 import {
     fetchUserCart,
