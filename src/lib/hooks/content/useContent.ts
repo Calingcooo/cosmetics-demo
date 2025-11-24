@@ -1,21 +1,32 @@
 import { useAppSelector, useAppDispatch } from "../reduxHooks";
-import { fetchBanners } from "@/redux/thunks/content.thunks";
+import { fetchBanners, fetchProducts, fetchCategories } from "@/redux/thunks/content.thunks";
+import { setPage } from "@/redux/slice/content.slice";
 
 export function useContent() {
-    const { banners, error, loading } = useAppSelector(
+    const { products, banners, categories, error, loading, pagination } = useAppSelector(
         (state) => state.content
     );
     const dispatch = useAppDispatch();
 
     return {
         // State
+        products,
+        categories,
         banners,
+        fetchBannerLoading: loading.fetchingBanners,
+        fetchProductsLoading: loading.fetchingProducts,
+        fetchCategoriesLoading: loading.fetchingCategories,
         fetchBannerError: error.fetchingBanners,
-        fetBannerLoading: loading.fetchingBanners,
+        fetchProductsError: error.fetchingProducts,
+        fetchCategoriesError: error.fetchingCategories,
+        pagination,
 
         // Async
-        fetchBanners: () => dispatch(fetchBanners())
+        fetchBanners: () => dispatch(fetchBanners()),
+        fetchProducts: ({ page, category }: { page: number, category: string }) => dispatch(fetchProducts({ page, category })),
+        fetchCategories: () => dispatch(fetchCategories()),
 
         // Sync
+        setPage: (page: number) => setPage(page)
     }
 }

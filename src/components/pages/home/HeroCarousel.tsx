@@ -16,7 +16,7 @@ interface BannerSlide {
 }
 
 const HeroCarousel = () => {
-  const { banners, fetchBanners, fetBannerLoading, fetchBannerError } =
+  const { banners, fetchBanners, fetchBannerLoading, fetchBannerError } =
     useContent();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -52,7 +52,7 @@ const HeroCarousel = () => {
   const handleMouseLeave = () => setIsAutoPlaying(true);
 
   // Show loading state
-  if (fetBannerLoading) {
+  if (fetchBannerLoading) {
     return <BannerSkeleton />;
   }
 

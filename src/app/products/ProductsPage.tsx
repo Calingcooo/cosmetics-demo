@@ -6,7 +6,7 @@ import clsx from "clsx";
 
 import type { Category } from "@/app/types";
 
-import { useProduct } from "@/app/hooks/useProduct";
+import { useContent } from "@/lib/hooks/content/useContent";
 
 import ProductCard from "@/components/product/ProductCard";
 import ProductCardSkeleton from "@/components/ui/loading/ProducCardSkeleton";
@@ -15,17 +15,16 @@ import Pagination from "@/components/ui/pagination/Pagination";
 
 const ProductsPage = () => {
   const {
-    categories,
     products,
-    handleFetchCategories,
-    handleFetchProducts,
-    totalPages,
-    page,
+    categories,
+    fetchProducts,
+    fetchCategories,
+    pagination,
     setPage,
-    isLoading,
-  } = useProduct();
+    fetchCategoriesLoading,
+    fetchProductsLoading,
+  } = useContent();
 
-  const [isCategoryLoading, setIsCategoryLoading] = useState(true);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -37,29 +36,22 @@ const ProductsPage = () => {
 
   // Fetch categories
   useEffect(() => {
-    const loadCategories = async () => {
-      setIsCategoryLoading(true);
-      await handleFetchCategories();
-      setIsCategoryLoading(false);
-    };
-    loadCategories();
+    fetchCategories();
   }, []);
 
   // Fetch products when category changes
   useEffect(() => {
-    handleFetchProducts(initialPage, selectedCategory);
+    fetchProducts({ page: initialPage, category: selectedCategory });
   }, [selectedCategory]);
 
   // Update URL whenever state changes
   useEffect(() => {
     const params = new URLSearchParams();
     if (selectedCategory !== "all") params.set("category", selectedCategory);
-    if (page > 1) params.set("page", String(page));
+    if (pagination.page > 1) params.set("page", String(pagination.page));
 
     router.replace(`?${params.toString()}`, { scroll: false });
-  }, [selectedCategory, page]);
-
-  console.log(products)
+  }, [selectedCategory, pagination.page]);
 
   return (
     <div className="flex-1 container mx-auto px-4 py-8 flex flex-col">
@@ -73,7 +65,7 @@ const ProductsPage = () => {
 
       {/* Categories */}
       <div className="mb-8 flex flex-wrap gap-2 justify-center min-h-[48px]">
-        {isCategoryLoading ? (
+        {fetchCategoriesLoading ? (
           // Show category skeletons
           Array.from({ length: 5 }).map((_, i) => <CategorySkeleton key={i} />)
         ) : (
@@ -115,7 +107,7 @@ const ProductsPage = () => {
 
       {/* Product Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
-        {isLoading && products.length === 0
+        {fetchProductsLoading && products.length === 0
           ? Array.from({ length: 8 }).map((_, i) => (
               <ProductCardSkeleton key={i} />
             ))
@@ -124,7 +116,7 @@ const ProductsPage = () => {
             ))}
       </div>
 
-      {page === totalPages && !isLoading && (
+      {pagination.page === pagination.totalPages && !fetchProductsLoading && (
         <div className="flex justify-center mt-12">
           <div className="flex items-center gap-3 text-[theme(--muted-foreground)] text-sm">
             <span className="h-px w-8 bg-[theme(--primary)]"></span>
@@ -135,13 +127,13 @@ const ProductsPage = () => {
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {pagination.totalPages > 1 && (
         <Pagination
-          currentPage={page}
-          totalPages={totalPages}
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
           onPageChange={(newPage) => {
             setPage(newPage);
-            handleFetchProducts(newPage, selectedCategory, false);
+            fetchProducts({ page: newPage, category: selectedCategory});
           }}
         />
       )}
