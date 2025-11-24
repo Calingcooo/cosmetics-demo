@@ -3,15 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import clsx from "clsx";
-
-import type { Category } from "@/app/types";
-
 import { useContent } from "@/lib/hooks/content/useContent";
-
 import ProductCard from "@/components/product/ProductCard";
 import ProductCardSkeleton from "@/components/ui/loading/ProducCardSkeleton";
 import CategorySkeleton from "@/components/ui/loading/CategorySkeleton";
 import Pagination from "@/components/ui/pagination/Pagination";
+import type { Category } from "@/app/types";
 
 const ProductsPage = () => {
   const {
@@ -129,9 +126,10 @@ const ProductsPage = () => {
       {/* Pagination */}
       {pagination.totalPages > 1 && (
         <Pagination
-          currentPage={pagination.page}
+          currentPage={initialPage}
           totalPages={pagination.totalPages}
           onPageChange={(newPage) => {
+            console.log(newPage)
             setPage(newPage);
             fetchProducts({ page: newPage, category: selectedCategory});
           }}

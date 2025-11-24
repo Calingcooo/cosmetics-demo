@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { fetchBanners, fetchProducts, fetchCategories } from "../thunks/content.thunks"
+import { fetchBanners, fetchProducts, fetchCategories, fetchFeaturedproducts } from "../thunks/content.thunks"
 import type { BannerType } from "@/types/content"
 import type { Product, Category } from "@/app/types"
 
@@ -8,15 +8,18 @@ interface contentState {
     banners: BannerType[];
     products: Product[];
     categories: Category[];
+    featuredProducts: Product[];
     loading: {
         fetchingBanners: boolean;
         fetchingProducts: boolean
         fetchingCategories: boolean;
+        fetchingFeatured: boolean;
     }
     error: {
         fetchingBanners: string | null;
         fetchingProducts: string | null
         fetchingCategories: string | null
+        fetchingFeatured: string | null
     }
     pagination: {
         page: number;
@@ -30,15 +33,18 @@ const initialState: contentState = {
     banners: [],
     products: [],
     categories: [],
+    featuredProducts: [],
     loading: {
         fetchingBanners: false,
         fetchingProducts: false,
-        fetchingCategories: false
+        fetchingCategories: false,
+        fetchingFeatured: false
     },
     error: {
         fetchingBanners: null,
         fetchingProducts: null,
-        fetchingCategories: null
+        fetchingCategories: null,
+        fetchingFeatured: null
     },
     pagination: {
         page: 1,
@@ -85,7 +91,7 @@ const contentSlice = createSlice({
                 state.products = action.payload.products
 
                 state.pagination = {
-                    page: action.payload.page,
+                    page: action.payload.currentPage,
                     limit: state.pagination.limit,
                     total: action.payload.total,
                     totalPages: action.payload.totalPages
@@ -111,7 +117,20 @@ const contentSlice = createSlice({
                 state.error.fetchingCategories = action.payload as string
             })
 
-
+        // Fetch featured products
+        builder
+            .addCase(fetchFeaturedproducts.pending, (state) => {
+                state.loading.fetchingFeatured = true
+                state.error.fetchingFeatured = null
+            })
+            .addCase(fetchFeaturedproducts.fulfilled, (state, action) => {
+                state.loading.fetchingFeatured = false
+                state.featuredProducts = action.payload
+            })
+            .addCase(fetchFeaturedproducts.rejected, (state, action) => {
+                state.loading.fetchingFeatured = false
+                state.error.fetchingFeatured = action.payload as string;
+            })
     }
 })
 

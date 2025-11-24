@@ -10,4 +10,7 @@ export const contentService = {
 
     // Get categories
     getCategories: (endpoint: string) => api.get(endpoint),
+
+    // Fetch featured products
+    getFeatured: (endpoint: string) => api.get(endpoint)
 }

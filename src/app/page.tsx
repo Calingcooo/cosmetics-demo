@@ -1,6 +1,7 @@
 "use client";
 
-import { useProduct } from "./hooks/useProduct";
+import { useEffect } from "react";
+import { useContent } from "@/lib/hooks/content/useContent";
 import HeroSection from "./home/HeroSection";
 import FeaturedProducts from "./home/FeaturedProducts";
 import CategoryHighlights from "./home/CategoryHighlights";
@@ -9,11 +10,17 @@ import NewsLetter from "./home/NewsLetter";
 import BenefitsSection from "./home/BenefitsSection";
 
 export default function Home() {
-  const { featureProducts } = useProduct();
+  const { featuredProducts, fetchFeaturedproducts, fetchBanners } = useContent();
+
+  useEffect(() => {
+    fetchFeaturedproducts();
+    fetchBanners()
+  }, []);
+
   return (
     <div className="flex-1 flex-col">
       <HeroSection />
-      {featureProducts.length > 0 && <FeaturedProducts />}
+      {featuredProducts.length > 0 && <FeaturedProducts />}
       <CategoryHighlights />
       <Testimonials />
       <NewsLetter />

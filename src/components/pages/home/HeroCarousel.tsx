@@ -21,10 +21,6 @@ const HeroCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  useEffect(() => {
-    fetchBanners();
-  }, []);
-
   // Auto-play functionality
   useEffect(() => {
     if (banners.length > 1 && isAutoPlaying) {

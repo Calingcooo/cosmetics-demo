@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { serverApi } from "@/lib/axios/instance";
 import type { AxiosError } from "axios";
 import type { ApiErrorResponse } from "@/app/types";
@@ -7,8 +6,6 @@ import type { ApiErrorResponse } from "@/app/types";
 export async function GET() {
     try {
         const { data } = await serverApi.get("/content/banners");
-
-        console.log("GET BANNERS RESPONSE: ", data)
 
         const response = NextResponse.json({
             success: true,

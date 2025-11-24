@@ -21,7 +21,7 @@ export const fetchProducts = createAsyncThunk(
     "contents/fetchProducts",
     async ({ page, category }: { page: number, category: string; }, { rejectWithValue }) => {
         try {
-            const { data } = await contentService.getProducts("/api/product/products", page, category)
+            const { data } = await contentService.getProducts("/api/content/products", page, category)
 
             return data.data
         } catch (error) {
@@ -36,9 +36,25 @@ export const fetchCategories = createAsyncThunk(
     "contents/fetchCategories",
     async (_, { rejectWithValue }) => {
         try {
-            const { data } = await contentService.getCategories("/api/product/categories")
-            
+            const { data } = await contentService.getCategories("/api/content/categories")
+
             return data.data.categories
+        } catch (error) {
+            console.error(error)
+            return rejectWithValue(error)
+        }
+    }
+)
+
+// Fetch featured products
+export const fetchFeaturedproducts = createAsyncThunk(
+    "contents/fetchFeaturedproducts",
+    async (_, { rejectWithValue }) => {
+        try {
+            const { data } = await contentService.getFeatured("/api/content/featured")
+
+            console.log("featured products: ", data)
+            return data.data.products
         } catch (error) {
             console.error(error)
             return rejectWithValue(error)

@@ -1,27 +1,31 @@
 import { NextResponse } from "next/server";
 import { serverApi } from "@/lib/axios/instance";
-import type { ApiErrorResponse } from "@/app/types";
 import type { AxiosError } from "axios";
+import type { ApiErrorResponse } from "@/app/types";
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
-        const res = await serverApi.get("/products/featured");
-        
+        const { searchParams } = new URL(req.url);
+        const page = searchParams.get("page") || "1";
+        const limit = 8
+        const category = searchParams.get("category") || "";
+
+        const res = await serverApi.get(`/products/all?page=${page}&limit=${limit}&category=${category}`)
+
         const response = NextResponse.json({
             success: true,
-            data: res.data.data
+            data: { products: res?.data?.data.products, currentPage: res?.data?.data.currentPage, total: res?.data?.data.total, totalPages: res?.data?.data.totalPages }
         });
-        
-        return response;
+
+        return response
     } catch (error: unknown) {
         const axiosError = error as AxiosError<ApiErrorResponse>;
-        console.error("❌ Featured products error:", axiosError.response?.data);
 
         if (axiosError.response) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: axiosError.response.data?.message || "Failed to fetch featured products"
+                    message: axiosError.response.data?.message || "Failed to fetch all products"
                 },
                 { status: axiosError.response.status }
             );
@@ -32,4 +36,5 @@ export async function GET() {
             { status: 500 }
         );
     }
+
 }
