@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import type { FormData } from "@/app/types";
 import InputField from "../../ui/input/InputField";

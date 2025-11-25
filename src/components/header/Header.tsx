@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import { LuSearch, LuShoppingBag, LuUser, LuMenu } from "react-icons/lu";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import { useCart } from "@/app/hooks/useCart";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useCart } from "@/lib/hooks/cart/useCart";
+import { useAuth } from "@/lib/hooks/auth/useAuth";
 
 import MobileNav from "./MobileNav";
 import UserMenu from "./UserMenu";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const { initialized, minimalUser, isAuthenticated, logout } = useAuth();
+  const { cartCount } = useCart();
+  const router = useRouter()
 
   const navItems = [
     { name: "home", href: "/" },
@@ -22,7 +24,7 @@ const Header = () => {
   ];
 
   const handleToggle = () => setIsOpen((prev) => !prev);
-
+  
   return (
     <>
       {/* HEADER */}
@@ -70,9 +72,9 @@ const Header = () => {
               <Link href="/cart">
                 <button className="relative inline-flex items-center justify-center h-10 w-10 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] rounded-md cursor-pointer">
                   <LuShoppingBag className="h-5 w-5" />
-                  {minimalUser && minimalUser.cart_count > 0 && (
+                  {cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-[theme(--primary)] text-[theme(--primary-foreground)] text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {minimalUser?.cart_count}
+                      {cartCount}
                     </span>
                   )}
                 </button>

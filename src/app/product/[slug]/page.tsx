@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { usePathname, useRouter } from "next/navigation";
 import { LuCheck, LuShoppingCart, LuArrowLeft } from "react-icons/lu";
 
-import { useCart } from "@/app/hooks/useCart";
+import { useCart } from "@/lib/hooks/cart/useCart";
 import { useProduct } from "@/app/hooks/useProduct";
 
 import ProductPreview from "@/components/product/ProductPreview";
@@ -13,7 +13,6 @@ import ProductDetailSkeleton from "@/components/ui/loading/ProductDetailSkeleton
 
 const ProductDetail = () => {
   const pathname = usePathname();
-  const router = useRouter();
   const slug = pathname?.split("/").pop();
   const { product, handleFetchSingleProduct } = useProduct();
   
@@ -30,15 +29,15 @@ const ProductDetail = () => {
 
   if (!product) return <ProductDetailSkeleton/>
 
-  console.log(product)
-
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
       name: product.name,
-      price: product.price,
-      image: product.images[0],
-      selectedVariations,
+      price_at_add: product.price,
+      image: product.images[0].url,
+      category: product.category.name,
+      quantity: quantity,
+      selected_variations: selectedVariations,
     });
   };
 
@@ -47,7 +46,7 @@ const ProductDetail = () => {
       <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
         <h1 className="text-3xl font-bold mb-4">Product Not Found</h1>
         <button
-          onClick={() => router.push("/products")}
+          onClick={() => window.history.back()}
           className="inline-flex items-center justify-center gap-2 h-10 px-4 py-2 rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors bg-[theme(--primary)] text-[theme(--primary-foreground)] hover:bg-[theme(--primary)]/90 cursor-pointer"
         >
           <LuArrowLeft className="mr-2 h-4 w-4" /> Back to Products
@@ -56,15 +55,12 @@ const ProductDetail = () => {
     );
   }
 
-  console.log(product);
-  
-
   return (
     <div className="flex flex-1 flex-col container mx-auto px-4 py-8">
       {/* Back Button */}
       <div>
         <button
-          onClick={() => router.push("/products")}
+          onClick={() => window.history.back()}
           className="mb-6 h-10 px-4 py-2 hover:bg-[theme(--accent)] hover:text-[theme(--accent-foreground)] inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-[theme(--background)] transition-colors cursor-pointer"
         >
           <LuArrowLeft className="mr-2 h-4 w-4" /> Back to Products

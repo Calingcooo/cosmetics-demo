@@ -3,15 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./app.css";
 
-import AuthProvider from "@/context/AuthContext";
-import ProductProvider from "@/context/ProductContext";
-import ToastProvider from "@/context/ToastContext";
-import CartProvider from "@/context/CartContext";
-import UserProvider from "@/context/UserContext";
-
-import Header from "@/components/header/Header";
-import Footer from "@/components/footer/Footer";
-import CookieConsent from "@/components/CookieConsent";
+import ClientProviders from "./ClientProviders";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,20 +30,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <ProductProvider>
-          <ToastProvider>
-            <AuthProvider>
-              <UserProvider>
-                <CartProvider>
-                  <Header />
-                  <main className="flex-1 flex flex-col">{children}</main>
-                  <Footer />
-                  <CookieConsent />
-                </CartProvider>
-              </UserProvider>
-            </AuthProvider>
-          </ToastProvider>
-        </ProductProvider>
+        <ClientProviders>
+          <main className="flex-1 flex flex-col">{children}</main>
+        </ClientProviders>
       </body>
     </html>
   );

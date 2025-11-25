@@ -35,25 +35,28 @@ const getImages = (start: number, count: number): (string | StaticImageData)[] =
 
 export const slides = [
   {
-    id: 1,
-    image: "/assets/products/hero-banner.jpg",
+    id: "1",
+    img: "/assets/products/hero-banner.jpg",
     title: "Luxury Skincare",
     subtitle: "Discover our new collection",
     cta: "Shop Now",
+    link: ""
   },
   {
-    id: 2,
-    image: "/assets/products/hero-banner.jpg",
+    id: "2",
+    img: "/assets/products/hero-banner.jpg",
     title: "Natural Beauty",
     subtitle: "Pure ingredients, stunning results",
     cta: "Explore",
+    link: ""
   },
   {
-    id: 3,
-    image: "/assets/products/hero-banner.jpg",
+    id: "3",
+    img: "/assets/products/hero-banner.jpg",
     title: "Glow Up",
     subtitle: "Premium cosmetics for every occasion",
     cta: "View Collection",
+    link: ""
   },
 ];
 

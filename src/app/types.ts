@@ -31,14 +31,24 @@ export type ProductImage = {
     url: string;
 }
 
+export type Cart = {
+    id: string;
+    guest_id: string | null;
+    created_at: string;
+    updated_at: string;
+    items: CartItem[];
+}
+
 export interface CartItem {
-    id: number;
+    id: string;
     name: string;
-    price: number;
-    image: ProductImage;
+    price_at_add: number;
+    image: string;
     category?: string;
     quantity: number;
-    selectedVariations?: Record<string, string>;
+    selected_variations?: Record<string, string>;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export type Category = {
@@ -48,7 +58,7 @@ export type Category = {
 }
 
 export type Product = {
-    id: number;
+    id: string;
     name: string;
     slug: string;
     price: number;
@@ -86,4 +96,89 @@ export type MiminalUser = {
     first_name: string;
     last_name: string;
     cart_count: number;
-  };
+};
+
+export interface Order {
+    id: string;
+    user_id: string;
+    order_number?: string;
+    status: "pending" | "processing" | "paid" | "shipped" | "delivered" | "cancelled" | "refunded";
+    payment_status: "pending" | "completed" | "failed" | "refunded";
+    total_amount: number;
+    paid_amount: number;
+    currency: string;
+    tax_amount?: number;
+    shipping_cost?: number;
+    notes?: string | null;
+    created_at: string;
+    updated_at?: string;
+    paid_at?: string | null;
+    shipped_at?: string | null;
+    delivered_at?: string | null;
+    cancelled_at?: string | null;
+    shipping_address: any;
+    billing_address: any;
+    payment_request_id?: string;
+    payment_gateway_id?: string;
+    payment_gateway_response?: string;
+    payment_gateway_error?: string | null;
+    items: OrderItem[];
+}
+
+export interface OrderItem {
+    id: string;
+    order_id: string;
+    product_id: string;
+    product_name: string;
+    product_image: string;
+    price: number;
+    quantity: number;
+    selected_variations: Record<string, string>;
+    subtotal: number;
+    created_at: string;
+    updated_at: string;
+    order?: Order;
+}
+
+//****** PAYMENT ******//
+export interface HitPayCreatePaymentRequest {
+    amount: number;
+    email: string;
+    purpose: string;
+    items: Array<{
+        name: string;
+        quantity: number;
+        price: number;
+    }>;
+}
+
+export interface HitPayPaymentResponse {
+    id: string;
+    url: string;
+    status: string;
+    currency: string;
+    amount: number;
+    payment_request_id: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface HitPayWebhookData {
+    id: string;
+    payment_request_id: string;
+    payment_id: string;
+    status: 'completed' | 'failed' | 'pending';
+    amount: number;
+    currency: string;
+    email: string;
+    purpose: string;
+}
+
+export interface HitPayApiError {
+    code: string;
+    message: string;
+    errors?: Array<{
+        field: string;
+        message: string;
+    }>;
+}

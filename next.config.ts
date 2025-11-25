@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
         hostname: "localhost",
         port: "3001",
       },
+      {
+        protocol: "https",
+        hostname: "e-commerce-demo.s3.us-east-005.backblazeb2.com",
+        pathname: "/**",
+      },
     ],
   },
   /* config options here */

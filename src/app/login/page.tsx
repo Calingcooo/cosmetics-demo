@@ -1,9 +1,8 @@
-// app/login/page.tsx
 "use client";
 
 import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@/lib/hooks/auth/useAuth";
 import LoginPage from "./LoginPage";
 import LoginFormSkeleton from "@/components/ui/loading/LoginFormSkeleton";
 

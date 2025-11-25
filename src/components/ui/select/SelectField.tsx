@@ -1,7 +1,7 @@
 import clsx from "clsx";
 
 interface SelectFieldProps {
-  id: string;
+  label: string;
   name: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -12,7 +12,7 @@ interface SelectFieldProps {
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
-  id,
+  label,
   name,
   value,
   onChange,
@@ -21,23 +21,16 @@ const SelectField: React.FC<SelectFieldProps> = ({
   error,
   disabled,
 }) => {
-  const formatLabel = (id: string) => {
-    return id
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
-
   return (
     <div className="space-y-1">
       <label
-        htmlFor={id}
+        htmlFor={name}
         className="text-sm capitalize font-medium leading-none"
       >
-        {formatLabel(id)}
+        {label}
       </label>
       <select
-        id={id}
+        id={name}
         name={name}
         value={value}
         onChange={onChange}
