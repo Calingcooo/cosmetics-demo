@@ -1,10 +1,13 @@
-import AuthGuard from "../guard/auth-guard";
-import MyAccountPage from "./MyAccountPage";
+"use client"
+
+import { Suspense } from "react";
+import MyAccountPage from "./components/MyAccountPage";
+import MyAccountSkeleton from "@/components/ui/loading/AccountPageSkeleton";
 
 export default function AccountLayout() {
   return (
-    <AuthGuard>
-      <MyAccountPage />
-    </AuthGuard>
+      <Suspense fallback={<MyAccountSkeleton />}>
+        <MyAccountPage />
+      </Suspense>
   );
 }

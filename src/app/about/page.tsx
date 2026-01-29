@@ -1,3 +1,5 @@
+"use client;"
+
 import Image from "next/image";
 import aboutBanner from "../../../public/assets/products/about-banner.jpg";
 
@@ -8,6 +10,7 @@ const AboutPage = () => {
       <section className="relative h-[300px] md:h-[400px] overflow-hidden">
         <Image
           src={aboutBanner}
+          loading="lazy"
           alt="About E-Commerce Demo"
           className="w-full h-full object-cover"
         />

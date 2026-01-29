@@ -1,0 +1,65 @@
+import clsx from "clsx";
+
+interface SelectFieldProps {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  placeholder?: string; // Optional placeholder like "Select Region"
+  options: { label: string; value: string }[];
+  error?: string | null;
+  disabled?: boolean;
+}
+
+const SelectField: React.FC<SelectFieldProps> = ({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  options,
+  error,
+  disabled,
+}) => {
+  return (
+    <div className="space-y-1">
+      <label
+        htmlFor={name}
+        className="text-sm capitalize font-medium leading-none"
+      >
+        {label}
+      </label>
+      <select
+        id={name}
+        name={name}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        className={clsx(
+          "bg-[theme(--muted)]/50 flex h-10 w-full rounded-md border px-3 py-2 text-base ring-offset-[theme(--background)] capitalize placeholder:text-[theme(--muted-foreground)]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:text-sm",
+          {
+            "border-[theme(--destructive)] focus-visible:ring-[theme(--destructive)]":
+              error,
+            "border-input focus-visible:ring-[theme(--ring)]": !error,
+
+            "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200":
+              disabled,
+          }
+        )}
+      >
+        {placeholder && (
+          <option value="" disabled>
+            {placeholder}
+          </option>
+        )}
+        {options.map((opt, i) => (
+          <option key={i} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
+
+export default SelectField;

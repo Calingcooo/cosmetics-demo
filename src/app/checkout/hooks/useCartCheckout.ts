@@ -1,0 +1,128 @@
+// hooks/useCartCheckout.ts
+import { useState } from "react";
+import { useAuth } from "@/lib/hooks/auth/useAuth";
+import { useUser } from "@/lib/hooks/user/useUser";
+import { paymentService } from "@/lib/api/payment.service";
+import {
+    isAddressComplete,
+    createShippingAddress,
+    getMissingAddressFields
+} from "@/lib/helpers/address.helper";
+import type { CartItem } from "@/app/types";
+
+interface CheckoutState {
+    loading: boolean;
+    error: string;
+}
+
+interface ProcessCheckoutParams {
+    items: CartItem[];
+    totalAmount: number;
+}
+
+export const useCartCheckout = () => {
+    const [checkoutState, setCheckoutState] = useState<CheckoutState>({
+        loading: false,
+        error: "",
+    });
+
+    const { minimalUser } = useAuth();
+    const { user } = useUser();
+
+    const processHitPayCheckout = async ({ items, totalAmount }: ProcessCheckoutParams) => {
+        if (items.length === 0) {
+            setCheckoutState(prev => ({ ...prev, error: "No items selected for checkout" }));
+            return;
+        }
+
+        if (!minimalUser?.id) {
+            setCheckoutState(prev => ({ ...prev, error: "User not authenticated" }));
+            return;
+        }
+
+        // Check if user has complete address
+        if (!user || !isAddressComplete(user)) {
+            const missingFields = getMissingAddressFields(user);
+            setCheckoutState(prev => ({
+                ...prev,
+                error: `Please complete your shipping address. Missing: ${missingFields.join(', ')}`
+            }));
+            return;
+        }
+
+        setCheckoutState({ loading: true, error: "" });
+
+        try {
+            // Create shipping address from user data
+            const shipping_address = createShippingAddress(user);
+
+            console.log("🔄 Creating order with payment for total:", totalAmount);
+
+            const orderPaymentPayload = {
+                amount: totalAmount,
+                email: minimalUser.email,
+                purpose: `Purchase of ${items.length} items`,
+                user_id: minimalUser.id,
+                items: items.map((item: CartItem) => ({
+                    product_id: item.id,
+                    product_name: item.name,
+                    product_image: item.image,
+                    price: item.price_at_add,
+                    quantity: item.quantity,
+                    selected_variations: item.selected_variations,
+                })),
+                shipping_address,
+                billing_address: shipping_address, // Use same as shipping for now
+                shipping_cost: 0,
+                tax_amount: 0,
+            };
+
+            const response = await paymentService.createOrderWithPayment(
+                "/api/payments/create-order-payment",
+                orderPaymentPayload
+            );
+
+            console.log("✅ Order and payment created:", response.data.data);
+
+            // Store checkout data
+            const checkoutData = {
+                items,
+                total: totalAmount,
+                order_id: response.data.data.order_id,
+                payment_id: response.data.data.payment_id,
+            };
+
+            sessionStorage.setItem("hitpay_checkout_data", JSON.stringify(checkoutData));
+
+            // Redirect to payment
+            if (response.data.data.payment_url) {
+                window.location.href = response.data.data.payment_url;
+            } else {
+                throw new Error("No payment URL received from server");
+            }
+
+        } catch (error: unknown) {
+            console.error("Order and payment creation error:", error);
+
+            let errorMessage = "Failed to create order and payment";
+
+            if (error && typeof error === "object" && "response" in error) {
+                const axiosError = error as { response?: { data?: { message?: string } } };
+                errorMessage = axiosError.response?.data?.message ?? errorMessage;
+            } else if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+
+            setCheckoutState((prev) => ({ ...prev, error: errorMessage }));
+        } finally {
+            setCheckoutState(prev => ({ ...prev, loading: false }));
+        }
+    };
+
+    return {
+        ...checkoutState,
+        processHitPayCheckout,
+        hasCompleteAddress: user ? isAddressComplete(user) : false,
+        missingAddressFields: user ? getMissingAddressFields(user) : [],
+    };
+};
